@@ -1,11 +1,41 @@
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MMU Past Papers+</title>
-        <link href="{{ url_for('static', filename='style/style.css')}}" rel="stylesheet" />
-    </head>
-     
-    <p>Hello</p>
-</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMUPastPapers</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="style.css" />
+</head>
 
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Header Bar -->
+<header class="topbar">
+  <div class="container">
+    <!-- Logo -->
+    <div class="logo">
+      <img src="mmupplogo.png" alt="Logo" class="logo" />
+    </div>
+
+    <!-- Menu -->
+    <nav class="menu">
+      <a href="login.html">Login</a>|
+      <a href="register.html">Register</a>
+    </nav>
+  </div>
+</header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="center-box">
+      <h1 class="main-title">Welcome to MMUPastPapers</h1>
+      <p class="main-subtitle">
+        You may search for your courses past year papers here.
+      </p>
+      <a href="login.html" class="btn">Login</a>
+    </div>
+  </main>
+
+</body>
+</html>
