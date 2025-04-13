@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -121,6 +121,14 @@ class DISCUSSION_FORUM(db.Model):
 
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
+@app.route('/login',methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Add authentication logic here
+        return redirect('/')
+    return render_template("login.html")
 
 @app.route('/')
 def main():
