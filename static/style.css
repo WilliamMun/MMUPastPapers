@@ -1,0 +1,87 @@
+/* Container and layout overrides */
+.container {
+    max-width: 1350px;
+    max-height: 100px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Topbar */
+  .topbar {
+    background-color: #E1E8E6;
+    height: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Logo */
+  .logo {
+    display: flex;
+    height: auto;
+    width: 300px;
+    align-items: left;
+    gap: 0.5rem;
+  }
+  
+  .logo-text {
+    font-size: 0.9rem;
+    color: black; /* Adjust color for contrast */
+    opacity: 0.8; /* Optional: Slightly transparent */
+  }
+  
+  /* Menu */
+  .menu {
+    display: flex;
+    gap: 2rem;
+    font-size: auto;
+    font-weight: 500;
+  }
+  .menu a {
+    color: #374151;
+    transition: color 0.2s ease-in-out;
+  }
+  .menu a:hover {
+    color: #2563eb; /* Tailwind's blue-600 */
+  }
+  
+  /* Main content */
+  .main-content {
+    background-image: url('mmuaerialview.png');
+    background-size: cover;           
+    background-position: center;               
+    background-repeat: no-repeat;
+    background-color: #f0f0f0;              
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .main-title {
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
+  .main-subtitle {
+    font-size: 12px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+  }
+  
+  .btn {
+    background-color: peachpuff;
+    color: black;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    box-shadow: ;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+  }
+  .btn:hover {
+    background-color: lightblue;
+  }
