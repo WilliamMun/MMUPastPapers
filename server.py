@@ -121,6 +121,7 @@ class DISCUSSION_FORUM(db.Model):
 
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
+
 @app.route('/login',methods=['GET','POST'])
 def login():
     if request.method == 'POST':
