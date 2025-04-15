@@ -135,5 +135,13 @@ def login():
 def main():
     return render_template("main.html")
 
+@app.route('/register')
+def register():
+  return render_template('register.html')
+
+@app.route('/resetPassword')
+def resetPassword():
+  return render_template('resetPassword.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
