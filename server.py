@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mmupastpapers.db"
@@ -130,6 +131,15 @@ def login():
         # Add authentication logic here
         return redirect('/')
     return render_template("login.html")
+
+@app.route('/register' ,methods=['GET','POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = generate_password_hash(request.form['password'], method='sha256')
+        # Add registration logic here
+        return redirect('/login')
+    return render_template("register.html")
 
 @app.route('/')
 def main():
