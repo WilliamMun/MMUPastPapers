@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MMUPastPapers</title>
+  <title>Main | MMUPastPapers</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -26,16 +27,36 @@
   </div>
 </header>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="center-box">
-      <h1 class="main-title">Welcome to MMUPastPapers</h1>
-      <p class="main-subtitle">
-        You may search for your courses past year papers here.
-      </p>
-      <a href="login.html" class="btn">Login</a>
+<!-- Main Content -->
+<main class="main-content">
+  <div class="content-section">
+    <div class="info-box">
+      <img src="ppcover.png" alt="Objective">
+      <h3>Objective</h3>
+      <p>Designed to improve MMU students' experience in accessing the past year paper</p>
     </div>
-  </main>
+    <div class="info-box">
+      <img src="ppcover.png" alt="Student & Lecturer">
+      <h3>Student & Lecturer</h3>
+      <p>Students can access past year papers uploaded by lecturers via this application</p>
+    </div>
+    <div class="info-box">
+      <img src="ppcover.png" alt="About Us">
+      <h3>About Us</h3>
+      <p>Build and design by Foundation students. Trimester 2510, C SP1113, TT3L / 3-03</p>
+    </div>
+  </div>
+</main>
+
+  <!-- Footer Bar -->
+<footer class="footer">
+  <div class="footer">
+    <!-- Logo -->
+    <div class="logo-footer">
+      <img src="mmupplogo2.png" alt="Logo" class="logo-footer" />
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>
