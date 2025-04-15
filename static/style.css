@@ -42,7 +42,7 @@
 
 /* Main content */
   .main-content {
-    background-image: url('mmuaerialview.png');
+    background-image: "{{ url_for('images', filename='images/mmuaerialview.png') }}";
     background-size: cover;           
     background-position: center;               
     background-repeat: no-repeat;
