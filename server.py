@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -139,9 +139,33 @@ def main():
 def register():
   return render_template('register.html')
 
-@app.route('/resetPassword')
+@app.route('/resetPassword', methods=['GET', 'POST'])
 def resetPassword():
-  return render_template('resetPassword.html')
+  questions = SECURITY_QUES.query.all()
+
+  if request.method == 'POST':
+    userID = request.form['userID']
+    new_password = request.form['newPassword']
+    confirm_password = request.form['confirmPassword']
+    question_id = request.form['securityQuestion']
+    answer = request.form['securityAnswer']
+  
+    if new_password != confirm_password:
+      flash("Passwords do not match!")
+      return redirect(url_for('reset_password'))
+  
+    record = SECURITY_QUES_ANS.query.filter_by(USER_ID=userID, SECURITY_QUES_ID=question_id, ANSWER=answer).first()
+
+    if record:
+      user = USER_INFO.query.filter_by(USER_ID=userID.first())
+      user.PASSWORD = new_password  
+      db.session.commit()
+      flash("Password reset successfully!")
+      return redirect(url_for('login'))
+  
+  else:
+    questions = SECURITY_QUES.query.all()
+    return render_template('resetPassword.html', questions=questions)
 
 if __name__ == "__main__":
     app.run(debug=True)
