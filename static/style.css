@@ -1,37 +1,31 @@
 /* Container and layout overrides */
 .container {
-    max-width: 1350px;
-    max-height: 100px;
-    margin: 0 auto;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  /* Topbar */
-  .topbar {
-    background-color: #E1E8E6;
-    height: auto;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  }
-  
-  /* Logo */
-  .logo {
-    display: flex;
-    height: auto;
-    width: 300px;
-    align-items: left;
-    gap: 0.5rem;
-  }
-  
-  .logo-text {
-    font-size: 0.9rem;
-    color: black; /* Adjust color for contrast */
-    opacity: 0.8; /* Optional: Slightly transparent */
-  }
-  
-  /* Menu */
+  max-width: 1350px;
+  max-height: 100px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Topbar */
+.topbar {
+  background-color: whitesmoke;
+  height: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  height: auto;
+  width: 300px;
+  align-items: left;
+  gap: 0.5rem;
+}
+
+/* Menu */
   .menu {
     display: flex;
     gap: 2rem;
@@ -45,8 +39,8 @@
   .menu a:hover {
     color: #2563eb; /* Tailwind's blue-600 */
   }
-  
-  /* Main content */
+
+/* Main content */
   .main-content {
     background-image: url('mmuaerialview.png');
     background-size: cover;           
@@ -60,7 +54,7 @@
     text-align: center;
     padding: 1rem;
   }
-  
+
   .main-title {
     font-size: 2.5rem;
     font-weight: 400;
@@ -72,16 +66,85 @@
     color: #6b7280;
     margin-bottom: 1.5rem;
   }
-  
+
   .btn {
     background-color: peachpuff;
     color: black;
     padding: 0.75rem 1.5rem;
     border-radius: 9999px;
-    /*box-shadow: ; */
+    box-shadow: ;
     transition: background-color 0.2s ease;
     text-decoration: none;
   }
   .btn:hover {
     background-color: lightblue;
+  }
+
+/**Content Design Settings for Main Page**/
+  .content-section {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding: 60px 20px;
+    background-color: none;
+  }
+
+  .info-box {
+    background: whitesmoke;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    flex: 1 1 300px;
+    max-width: 320px;
+    text-align: center;
+  }
+  
+  .info-box img { /**Image Size**/
+    width: 100%;
+    height: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 15px;
+  }
+
+  .info-box h3 { /**Text Box**/
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin-bottom: 10px;
+  }
+
+  .info-box p {
+    font-size: 14px;
+    color: #444;
+  }
+/**The End of Content Settings for Main Page**/
+
+
+/* Footer Bar */
+
+  .footerbar {
+  background-color: whitesmoke;
+  }
+
+  /* Footer Logo */
+  .logo-footer {
+    display: flex;
+    height: 100px;
+    width: 225px;
+    align-items: left;
+    gap: 0.5rem;
+  }
+
+  .footer {
+    max-width: 1500px;
+    max-height: 100px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
