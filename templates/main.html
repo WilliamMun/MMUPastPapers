@@ -3,21 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Main | MMUPastPapers</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+  <title>Main | MMUPastPapers</title>
 </head>
-
-<body class="bg-gray-50 text-gray-800">
 
 <!-- Header Bar -->
 <header class="topbar">
   <div class="container">
     <!-- Logo -->
-    <div class="logo">
-      <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
-    </div>
+      <div class="logo">
+        <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
+      </div>
 
     <!-- Menu -->
     <nav class="menu">
@@ -32,28 +29,25 @@
   <div class="content-section">
     <div class="info-box">
       <img src="{{ url_for('static', filename='images/ppcover.png') }}" alt="Objective">
-      <h3>Objective</h3>
-      <p>Designed to improve MMU students' experience in accessing the past year paper</p>
+        <h3>Objective</h3>
+        <p>Designed to improve MMU students' experience in accessing the past year paper</p>
     </div>
     <div class="info-box">
       <img src="{{ url_for('static', filename='images/ppcover.png') }}" alt="Student & Lecturer">
-      <h3>Student & Lecturer</h3>
-      <p>Students can access past year papers uploaded by lecturers via this application</p>
+        <h3>Student & Lecturer</h3>
+        <p>Students can access past year papers uploaded by lecturers via this application</p>
     </div>
     <div class="info-box">
       <img src="{{ url_for('static', filename='images/ppcover.png') }}" alt="About Us">
-      <h3>About Us</h3>
-      <p>Build and design by Foundation students. Trimester 2510, C SP1113, TT3L / 3-03</p>
+        <h3>About Us</h3>
+        <p>Build and design by Foundation students. Trimester 2510, C SP1113, TT3L / 3-03</p>
     </div>
   </div>
 </main>
 
-  <!-- Footer Bar -->
+<!-- Footer Bar -->
 <footer class="footer">
   <div class="footer">
-    <div class="footer-content">
-      <p>&copy; 2023 MMUPastPapers. All rights reserved.</p>
-      <p>Designed by Foundation Students, Trimester 2510, C SP1113, TT3L / 3-03</p>
     <!-- Logo -->
     <div class="logo-footer">
       <img src="{{ url_for('static', filename='images/mmupplogo2.png') }}" alt="Logo" class="logo-footer" />
@@ -61,5 +55,4 @@
   </div>
 </footer>
 
-</body>
 </html>
