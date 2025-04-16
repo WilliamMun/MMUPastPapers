@@ -44,7 +44,7 @@
 
 /** Main content - Background **/
   .main-content {
-    background-image: url('mmuaerialview.png');
+    background-image: url("{{ url_for('static', filename='images/mmuaerialview.png') }}");
     background-size: cover;           
     background-position: center;               
     background-repeat: no-repeat;
