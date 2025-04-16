@@ -26,6 +26,24 @@
     <body>
         <div class="Container">
             <h2>Register</h2>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            {% with error = get_flashed_messages(with_categories=true) %}
+                {% if error %}
+                    <ul class="flashes">
+                        {% for category, message in error %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
             <form action="/register" method="POST">
                 <div class="input-fields">
                     <label for="username">Username</label>
