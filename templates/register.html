@@ -6,23 +6,58 @@
         <title>Register - MMUPastPapers</title>
         <link href="/static/style.css" rel="stylesheet">
     </head>
+
+    <!-- Header Bar -->
+    <header class="topbar">
+        <div class="container">
+            <!-- Logo -->
+            <div class="logo">
+                <img src="mmupplogo.png" alt="Logo" class="logo" />
+            </div>
+
+            <!-- Menu -->
+            <nav class="menu">
+                <a href="login.html">Login</a>|
+                <a href="register.html">Register</a>
+            </nav>
+        </div>
+    </header>
+
     <body>
-        <div>
+        <div class="Container">
             <h2>Register</h2>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            {% with error = get_flashed_messages(with_categories=true) %}
+                {% if error %}
+                    <ul class="flashes">
+                        {% for category, message in error %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
             <form action="/register" method="POST">
-                <div>
+                <div class="input-fields">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" required />
                 </div>
-                <div>
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required />
+                <div class="input-fields">
+                    <label for="userid">User_ID</label>
+                    <input type="text" id="userid" name="userid" required />
                 </div>
-                <div>
+                <div class="input-fields">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required />
                 </div>
-                <div>
+                <div class="input-fields">
                     <label for="confirm_password">Confirm Password</label>
                     <input type="password" id="confirm_password" name="confirm_password" required />
                 </div>
@@ -32,4 +67,5 @@
                 Already have an account? <a href="login.html">Login here</a>
             </p>
         </div>
+    </body>
 </html>

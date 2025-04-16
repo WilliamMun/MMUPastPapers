@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <title>Login - MMUPastPapers</title>
-  <link href="/static/style.css" rel="stylesheet" />
 </head>
 <body>
 
@@ -27,6 +26,24 @@
   
   <div class="loginBox">
     <h2>Login</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% with error = get_flashed_messages(with_categories=true) %}
+      {% if error %}
+        <ul class="flashes">
+          {% for category, message in error %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     <form action="/login" method="POST" id="resetForm">
       <div class="usernameBox">
         <label for="username">Username</label>
