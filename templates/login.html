@@ -3,63 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <title>Login - MMUPastPapers</title>
+  <title>Login | MMUPastPapers</title>
 </head>
-<body>
 
-  <!-- Header Bar -->
-  <header class="topbar">
+<body>
+    
+<!-- Header Bar -->
+<header class="topbar">
     <div class="container">
       <!-- Logo -->
       <div class="logo">
-        <img src="mmupplogo.png" alt="Logo" class="logo" />
+        <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
       </div>
-
+  
       <!-- Menu -->
       <nav class="menu">
-        <a href="login.html">Login</a>|
-        <a href="register.html">Register</a>
+        <a href="{{ url_for('login') }}">Login</a>|
+        <a href="{{ url_for('register') }}">Register</a>
       </nav>
     </div>
-  </header>
-  
-  <div class="loginBox">
-    <h2>Login</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    {% with error = get_flashed_messages(with_categories=true) %}
-      {% if error %}
-        <ul class="flashes">
-          {% for category, message in error %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    <form action="/login" method="POST" id="resetForm">
-      <div class="usernameBox">
+</header>
+
+<!--Main Content Settings-->  
+<main class="main-content"> 
+    <div class="loginBox">
+      <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="loginBox-img"><br>
+        <h1>Login</h1>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+            {% with error = get_flashed_messages(with_categories=true) %}
+            {% if error %}
+                <ul class="flashes">
+                {% for category, message in error %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+        <form action="/login" method="POST">
+    <div class="usernameBox">
         <label for="username">Username</label>
-        <input type="text" id="username" name="username">
-      </div>
-      <div class="passwordBox">
+        <input type="text" id="username" name="username" placeholder="Enter username">
+        </div>
+    <div class="passwordBox">
         <label for="password">Password</label>
-        <input type="password" id="password" name="password">
-      </div>
-      <a href="{{ url_for('resetPassword') }}">Forgot Password?</a>
-      <button type="submit">Login</button>
-    </form>
-    <p>
-      Don't have an account? <a href="register.html">Register here</a>
-    </p>
+        <input type="password" id="password" name="password" placeholder="Enter password">
+    </div>
+        <a href="{{ url_for('resetPassword') }}">Forgot Password?</a>
+        <button type="submit">Login</button>
+      <p>
+        Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+      </p>
   </div>
+</main>
 
 </body>
 </html>
