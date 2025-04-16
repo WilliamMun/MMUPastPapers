@@ -28,9 +28,10 @@
 
 <!--Main Content Settings-->  
 <main class="main-content"> 
-    <div class="loginBox">
-      <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="loginBox-img"><br>
+  <div class="loginBox">
+    <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="loginBox-img"><br>
         <h1>Login</h1>
+           <!--
             {% with messages = get_flashed_messages() %}
             {% if messages %}
                 <ul class="flashes">
@@ -49,20 +50,22 @@
                 </ul>
             {% endif %}
             {% endwith %}
-        <form action="/login" method="POST">
-    <div class="usernameBox">
+          !-->
+    <form action="/login" method="POST">
+      <div class="usernameBox">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Enter username">
-        </div>
-    <div class="passwordBox">
+      </div>
+        <div class="passwordBox">
         <label for="password">Password</label>
         <input type="password" id="password" name="password" placeholder="Enter password">
-    </div>
+      </div>
         <a href="{{ url_for('resetPassword') }}">Forgot Password?</a>
         <button type="submit">Login</button>
-      <p>
+        <p>
         Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
-      </p>
+        </p>
+    </form>
   </div>
 </main>
 
