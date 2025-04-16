@@ -9,28 +9,28 @@
   align-items: center;
 }
 
-/* Topbar */
-.topbar {
-  background-color: whitesmoke;
-  height: auto;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
+/** Topbar Settings **/
+  .topbar {
+    background-color: whitesmoke;
+    height: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
 
-/* Logo */
-.logo {
-  display: flex;
-  height: auto;
-  width: 300px;
-  align-items: left;
-  gap: 0.5rem;
-}
+  /* Logo */
+  .logo {
+    display: flex;
+    height: auto;
+    width: 300px;
+    align-items: left;
+    gap: 0.5rem;
+  }
 
-/* Menu */
+  /* Menu */
   .menu {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     font-size: auto;
-    font-weight: 500;
+    font-display: 400px;
   }
   .menu a {
     color: #374151;
@@ -40,7 +40,9 @@
     color: #2563eb; /* Tailwind's blue-600 */
   }
 
-/* Main content */
+/** The End of TopBar Settings **/
+
+/** Main content - Background **/
   .main-content {
     background-image: url("/static/images/mmuaerialview.png");
     background-size: cover;           
@@ -54,32 +56,7 @@
     text-align: center;
     padding: 1rem;
   }
-
-  .main-title {
-    font-size: 2.5rem;
-    font-weight: 400;
-    margin-bottom: 1rem;
-  }
-  .main-subtitle {
-    font-size: 12px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    color: #6b7280;
-    margin-bottom: 1.5rem;
-  }
-
-  .btn {
-    background-color: peachpuff;
-    color: black;
-    padding: 0.75rem 1.5rem;
-    border-radius: 9999px;
-    /*box-shadow: ; */
-    transition: background-color 0.2s ease;
-    text-decoration: none;
-  }
-  .btn:hover {
-    background-color: lightblue;
-  }
-
+  
 /**Content Design Settings for Main Page**/
   .content-section {
     display: flex;
@@ -111,9 +88,9 @@
   }
 
   .info-box h3 { /**Text Box**/
-    font-size: 20px;
+    font-family: "Montsterrat";
+    font-size: 23px;
     font-weight: bold;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     margin-bottom: 10px;
   }
 
@@ -121,22 +98,19 @@
     font-size: 14px;
     color: #444;
   }
+
 /**The End of Content Settings for Main Page**/
 
 
 /* Footer Bar */
-
   .footerbar {
   background-color: whitesmoke;
   }
 
   /* Footer Logo */
   .logo-footer {
-    display: flex;
     height: 100px;
     width: 225px;
-    align-items: left;
-    gap: 0.5rem;
   }
 
   .footer {
@@ -148,3 +122,98 @@
     justify-content: space-between;
     align-items: center;
   }
+/**The End of Footer Bar Settings for Main Page**/
+
+/** Login Page (login.html) **/
+  .loginBox {
+    background: white;
+    padding: 40px;
+    width: 450px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .loginBox-img {
+    width: 230px;
+    height: 110px;
+    margin-top: -25px;
+    margin-left: 77px;
+    margin-right: 100px;
+    margin-bottom: -10px;
+  }
+
+  .loginBox h1 {
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    color: black;
+  }
+
+  .loginBox h2 {
+    margin-bottom: 30px;
+    color: #003366;
+  }
+
+  /* Input placeholder */
+  .usernameBox,
+  .passwordBox {;
+    font-family: "Georgia";
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .usernameBox label,
+  .passwordBox label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* Button */
+  button {
+    width: 70%;
+    padding: 12px;
+    background-color: #E5E1DA;
+    color: black;
+    font-family: serif;
+    font-display: bold;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #BCCCDC;
+    color: black;
+  }
+
+  /* Links */
+  .loginBox a {
+    color: #578FCA;
+  }
+
+  .loginBox a:hover {
+    color:#003366;
+  }
+
+  .loginBox p, input{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    color: #444;
+  }
+/**The End of Login Page Settings**/
