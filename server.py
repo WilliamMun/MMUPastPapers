@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect
+from sqlite3 import IntegrityError
+from flask import Flask, render_template, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -126,8 +127,23 @@ class DISCUSSION_FORUM(db.Model):
 @app.route('/login',methods=['GET','POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+
+        if not username or not password:
+            flash('Username and password are required', 'error')
+            return redirect('/login')
+        user = USER_INFO.query.filter_by(USERNAME=username).first()
+        if not user:
+            flash('Invalid username or password', 'error')
+            return redirect('/login')
+        if not check_password_hash(user.PASSWORD, password):
+            flash('Invalid username or password', 'error')
+            return redirect('/login')
+        session['user_id'] = user.USER_ID
+        session['username'] = user.USERNAME
+        session['roles'] = user.ROLES
+        flash('Login successful!', 'success')
         # Add authentication logic here
         return redirect('/')
     return render_template("login.html")
@@ -135,19 +151,42 @@ def login():
 @app.route('/register' ,methods=['GET','POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = generate_password_hash(request.form['password'], method='sha256')
+        username = request.form['username'].strip()
+        email = request.form.get('email').strip().lower()
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        if password != confirm_password:
+           flash('passwords do not match', 'error')
+           return redirect('/register')
+        if not all ([username, email, password, confirm_password]):
+           flash('All fields are required', 'error')
+           return redirect('/register')
+        if USER_INFO.query.filter_by(USERNAME=username).first():
+           flash('username already existed', 'error')
+           return redirect('/register')
+        if USER_INFO.query.filter_by(EMAIL=email).first():
+           flash('email already existed', 'error')
+           return redirect('/register')
+        try:
+           new_user = USER_INFO(USER_ID=email, USERNAME=username, PASSWORD=generate_password_hash(password, method='sha256'), ROLES=1)
+           db.session.add(new_user)
+           db.session.commit()
+           flash('User registered successfully!', 'success')
+           return redirect('/login')
+        except IntegrityError:
+           db.session.rollback()
+           flash('Username or email already exists', 'error')
+           return redirect('/register')
+        except Exception as e:
+           db.session.rollback()
+           flash('Error occurred while registering user. Please try again later', 'error')
+           return redirect('/register')
         # Add registration logic here
-        return redirect('/login')
     return render_template("register.html")
 
 @app.route('/')
 def main():
     return render_template("main.html")
-
-@app.route('/register')
-def register():
-  return render_template('register.html')
 
 @app.route('/resetPassword')
 def resetPassword():
