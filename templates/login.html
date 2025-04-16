@@ -26,24 +26,6 @@
   
   <div class="loginBox">
     <h2>Login</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flashes">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    {% with error = get_flashed_messages(with_categories=true) %}
-      {% if error %}
-        <ul class="flashes">
-          {% for category, message in error %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
     <form action="/login" method="POST" id="resetForm">
       <div class="usernameBox">
         <label for="username">Username</label>
@@ -60,6 +42,29 @@
       Don't have an account? <a href="register.html">Register here</a>
     </p>
   </div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script>
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops! An error occured.',
+              text: "{{ message }}"
+            });
+        
+          {% elif category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Yay! Success.',
+              text: "{{ message }}"
+            });
+          {% endif %}
+      {% endfor %}
+      </script>
+    {% endif %}
+{% endwith %}
 
 </body>
 </html>
