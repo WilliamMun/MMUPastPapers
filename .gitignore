@@ -174,3 +174,4 @@ cython_debug/
 
 #Database stuff:
 .devdbrc
+mmupastpapers.db
