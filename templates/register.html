@@ -7,21 +7,21 @@
         <link href="/static/style.css" rel="stylesheet">
     </head>
 
-    <!-- Header Bar -->
-    <header class="topbar">
-        <div class="container">
-            <!-- Logo -->
-            <div class="logo">
-                <img src="mmupplogo.png" alt="Logo" class="logo" />
-            </div>
-
-            <!-- Menu -->
-            <nav class="menu">
-                <a href="login.html">Login</a>|
-                <a href="register.html">Register</a>
-            </nav>
+<!-- Header Bar -->
+<header class="topbar">
+    <div class="container">
+      <!-- Logo -->
+        <div class="logo">
+          <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
         </div>
-    </header>
+  
+      <!-- Menu -->
+      <nav class="menu">
+        <a href="{{ url_for('login') }}">Login</a>|
+        <a href="{{ url_for('register') }}">Register</a>
+      </nav>
+    </div>
+</header>
 
     <body>
         <div class="Container">
@@ -60,6 +60,12 @@
                 <div class="input-fields">
                     <label for="confirm_password">Confirm Password</label>
                     <input type="password" id="confirm_password" name="confirm_password" required />
+                </div>
+                <div>
+                    <label for="user_type">User Type</label><br>
+                    <input type="radio" name="user_type" value="admin">Roles<br>
+                    <radio name="user_type" value="student" checked> Student
+                    <radio name="user_type" value="lecturer"> Lecturer
                 </div>
                 <button type="submit">Register</button>
             </form>
