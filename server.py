@@ -133,7 +133,7 @@ def login():
         if not username or not password:
             flash('Username and password are required', 'error')
             return redirect('/login')
-        user = USER_INFO.query.filter_by(USERNAME=username).first()
+        user = USER_INFO.query.filter_by(USER_ID=username).first()
         if not user:
             flash('Invalid username or password', 'error')
             return redirect('/login')
@@ -144,7 +144,6 @@ def login():
         session['username'] = user.USERNAME
         session['roles'] = user.ROLES
         flash('Login successful!', 'success')
-        # Add authentication logic here
         return redirect('/')
     return render_template("login.html")
 
@@ -152,36 +151,35 @@ def login():
 def register():
     if request.method == 'POST':
         username = request.form['username'].strip()
-        email = request.form.get('email').strip().lower()
+        userid = request.form.get('userid').strip().lower()
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         if password != confirm_password:
            flash('passwords do not match', 'error')
            return redirect('/register')
-        if not all ([username, email, password, confirm_password]):
+        if not all ([username, userid, password, confirm_password]):
            flash('All fields are required', 'error')
            return redirect('/register')
         if USER_INFO.query.filter_by(USERNAME=username).first():
            flash('username already existed', 'error')
            return redirect('/register')
-        if USER_INFO.query.filter_by(EMAIL=email).first():
-           flash('email already existed', 'error')
+        if USER_INFO.query.filter_by(USER_ID=userid).first():
+           flash('user-id already existed', 'error')
            return redirect('/register')
         try:
-           new_user = USER_INFO(USER_ID=email, USERNAME=username, PASSWORD=generate_password_hash(password, method='sha256'), ROLES=1)
+           new_user = USER_INFO(USER_ID=userid, USERNAME=username, PASSWORD=generate_password_hash(password, method='sha256'), ROLES=1)
            db.session.add(new_user)
            db.session.commit()
            flash('User registered successfully!', 'success')
            return redirect('/login')
         except IntegrityError:
            db.session.rollback()
-           flash('Username or email already exists', 'error')
+           flash('Username or user-id already exists', 'error')
            return redirect('/register')
         except Exception as e:
            db.session.rollback()
            flash('Error occurred while registering user. Please try again later', 'error')
            return redirect('/register')
-        # Add registration logic here
     return render_template("register.html")
 
 @app.route('/')
