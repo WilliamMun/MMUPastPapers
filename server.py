@@ -3,6 +3,7 @@ from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 app = Flask(__name__)
 app.secret_key = "MmUPastPap3rs2510@CSP1123"
@@ -187,41 +188,72 @@ def register():
 def main():
     return render_template("main.html")
 
+def isStrongPassword(password):
+  pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{10,}$'
+  return bool(re.match(pattern, password))
+
 @app.route('/resetPassword', methods=['GET', 'POST'])
 def resetPassword():
   questions = SECURITY_QUES.query.all()
 
   if request.method == 'POST':
+
+    #Retrive user input
     userID = request.form['userID']
     new_password = request.form['newPassword']
     confirm_password = request.form['confirmPassword']
     question_id = request.form['securityQuestion']
     answer = request.form['securityAnswer']
 
+    #User input verification
     if not userID or not new_password or not confirm_password or not question_id or not answer:
       flash("Please fill in all information!", "error")
       print("Please fill in all information!") #For debugging purposes
       return redirect(url_for('resetPassword'))
     
+    if not isStrongPassword(new_password):
+      flash("Password must be at least 10 characters, contains at least 1 uppercase, 1 lowercase, 1 symbol and 1 digit.", "error")
+      print("Password does not match requirements.") #For debugging purposes
+      return redirect(url_for('resetPassword'))
+
     if new_password != confirm_password:
       flash("Passwords do not match!", "error")
       print("Passwords do not match!") #For debugging purposes
       return redirect(url_for('resetPassword'))
-  
-    record = SECURITY_QUES_ANS.query.filter_by(USER_ID=userID, SECURITY_QUES_ID=question_id, ANSWER=answer).first()
-    print(record) #For debugging purposes
 
-    if record:
+    #Save new data into database
+    try:
       user = USER_INFO.query.filter_by(USER_ID=userID).first()
-      user.PASSWORD = new_password
-      db.session.commit()
-      flash("Password reset successfully!", "success")
-      print(f"Password reset sucessfully for user {userID}, {question_id}, the new password is {new_password}.") #For debugging purposes
-      return redirect(url_for('login'))
-  
-  else:
-    questions = SECURITY_QUES.query.all()
-  
+      print(user)
+
+      if user:
+        record = SECURITY_QUES_ANS.query.filter_by(USER_ID=userID, SECURITY_QUES_ID=question_id, ANSWER=answer).first()
+        print(record) #For debugging purposes
+
+        if record:
+          user = USER_INFO.query.filter_by(USER_ID=userID).first()
+          user.PASSWORD = generate_password_hash(new_password)
+          db.session.commit()
+          flash("Password reset successfully!", "success")
+          print(f"Password reset sucessfully for user {userID}, {question_id}, the new password is {new_password}.") #For debugging purposes
+          return render_template("resetPassword.html")
+        
+        elif record == None:
+          flash("Incorrect answer for security question. Try again.", "error")
+          print(f"Incorrect answer for security question.") #For debugging purposes 
+          return redirect(url_for('resetPassword'))
+      
+      else:
+         flash("Username does not exist.", "error")
+         print(f"Username {userID} does not exists") #For debugging purposes 
+         return redirect(url_for('resetPassword'))
+    
+    except Exception as e:
+      db.session.rollback()
+      flash("Error occurred while registering user. Please try again later", "error")
+      print("Internal server error.")
+      return redirect(url_for('resetPassword'))
+    
   return render_template('resetPassword.html', questions=questions)
 
 if __name__ == "__main__":
