@@ -1,4 +1,4 @@
-/* Container and layout overrides */
+/* Topbar Position */
 .container {
   max-width: 1350px;
   max-height: 100px;
@@ -9,14 +9,14 @@
   align-items: center;
 }
 
-/** Topbar Settings **/
+/** Topbar Settings (before login only) **/
   .topbar {
     background-color: whitesmoke;
     height: auto;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   }
 
-  /* Logo */
+  /* Logo Settings */
   .logo {
     display: flex;
     height: auto;
@@ -25,7 +25,7 @@
     gap: 0.5rem;
   }
 
-  /* Menu */
+  /* Menu Settings*/
   .menu {
     display: flex;
     gap: 1.5rem;
@@ -36,13 +36,13 @@
     color: #374151;
     transition: color 0.2s ease-in-out;
   }
-  .menu a:hover {
-    color: #2563eb; /* Tailwind's blue-600 */
+  .menu a:hover { /**Change color when mouse point towards**/
+    color: #2563eb; 
   }
 
 /** The End of TopBar Settings **/
 
-/** Main content - Background **/
+/****** Main content - Background ******/
   .main-content {
     background-image: url("/static/images/mmuaerialview.png");
     background-size: cover;           
@@ -158,7 +158,7 @@
 
   /* Input placeholder */
   .usernameBox,
-  .passwordBox {;
+  .passwordBox, {;
     font-family: "Georgia";
     margin-bottom: 20px;
     text-align: left;
@@ -211,9 +211,92 @@
     color:#003366;
   }
 
-  .loginBox p, input{
+  .loginBox p {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 14px;
     color: #444;
+    margin-top: 10px;
   }
 /**The End of Login Page Settings**/
+
+
+/** Register Page (register.html) **/
+  .registerBox { /**Size of Register Box**/
+    background: white;
+    padding: 40px;
+    width: 500px;
+    height: 590px;
+    max-width: 95%;
+    margin: 40px auto;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .registerBox-img { /**Logo**/
+    width: 230px;
+    height: 110px;
+    display: block;
+    margin: -25px auto -10px auto;
+  }
+
+  .registerBox h1 { /**Font size for h1**/
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    color: black;
+  }
+
+  .registerBox h2 { /**Font size for h2**/
+    margin-bottom: 30px;
+    color: #003366;
+  }
+
+  /** Input placeholder **/
+  .usernameBox,
+  .passwordBox,
+  .useridBox {
+    font-family: "Georgia";
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .usernameBox label,
+  .passwordBox label,
+  .useridBox label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+  }
+
+  /* Grid container for two columns */
+  .register-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 2px;
+  }
+
+  /* Radio buttons center below the grid */
+  .radio-group {
+    text-align: center;
+  }
+
+  /* Links */
+  .registerBox a {
+    color: #578FCA;
+  }
+
+  .registerBox a:hover {
+    color:#003366;
+  }
+
+  .registerBox p, b {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    color: #444;
+    margin-top: 10px;
+  }
+/**The End of Register Page Settings**/
