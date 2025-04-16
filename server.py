@@ -5,6 +5,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+app.secret_key = "MmUPastPap3rs2510@CSP1123"
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mmupastpapers.db"
 db = SQLAlchemy(app)
 
@@ -196,23 +197,32 @@ def resetPassword():
     confirm_password = request.form['confirmPassword']
     question_id = request.form['securityQuestion']
     answer = request.form['securityAnswer']
-  
+
+    if not userID or not new_password or not confirm_password or not question_id or not answer:
+      flash("Please fill in all information!", "error")
+      print("Please fill in all information!") #For debugging purposes
+      return redirect(url_for('resetPassword'))
+    
     if new_password != confirm_password:
-      flash("Passwords do not match!")
-      return redirect(url_for('reset_password'))
+      flash("Passwords do not match!", "error")
+      print("Passwords do not match!") #For debugging purposes
+      return redirect(url_for('resetPassword'))
   
     record = SECURITY_QUES_ANS.query.filter_by(USER_ID=userID, SECURITY_QUES_ID=question_id, ANSWER=answer).first()
+    print(record) #For debugging purposes
 
     if record:
-      user = USER_INFO.query.filter_by(USER_ID=userID.first())
-      user.PASSWORD = new_password  
+      user = USER_INFO.query.filter_by(USER_ID=userID).first()
+      user.PASSWORD = new_password
       db.session.commit()
-      flash("Password reset successfully!")
+      flash("Password reset successfully!", "success")
+      print(f"Password reset sucessfully for user {userID}, {question_id}, the new password is {new_password}.") #For debugging purposes
       return redirect(url_for('login'))
   
   else:
     questions = SECURITY_QUES.query.all()
-    return render_template('resetPassword.html', questions=questions)
+  
+  return render_template('resetPassword.html', questions=questions)
 
 if __name__ == "__main__":
     app.run(debug=True)
