@@ -7,21 +7,21 @@
         <link href="/static/style.css" rel="stylesheet">
     </head>
 
-    <!-- Header Bar -->
-    <header class="topbar">
-        <div class="container">
-            <!-- Logo -->
-            <div class="logo">
-                <img src="mmupplogo.png" alt="Logo" class="logo" />
-            </div>
-
-            <!-- Menu -->
-            <nav class="menu">
-                <a href="login.html">Login</a>|
-                <a href="register.html">Register</a>
-            </nav>
+<!-- Header Bar -->
+<header class="topbar">
+    <div class="container">
+      <!-- Logo -->
+        <div class="logo">
+          <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
         </div>
-    </header>
+  
+      <!-- Menu -->
+      <nav class="menu">
+        <a href="{{ url_for('login') }}">Login</a>|
+        <a href="{{ url_for('register') }}">Register</a>
+      </nav>
+    </div>
+</header>
 
     <body>
         <div class="Container">
