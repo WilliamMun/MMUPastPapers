@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <title>Register | MMUPastPapers</title>
     </head>
 
@@ -26,29 +27,33 @@
 
 <!--Main Content Settings-->
 <main class="main-content">
+  <body>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script>
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops! An error occurred.',
+              text: "{{ message }}"
+            });
+          {% elif category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Yay! Success.',
+              text: "{{ message }}"
+            });
+          {% endif %}
+        {% endfor %}
+      </script>
+    {% endif %}
+  {% endwith %}
+  
     <div class="registerBox">
         <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="registerBox-img"><br>
             <h1>Register</h1>
-            <!--
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <ul class="flashes">
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-            {% with error = get_flashed_messages(with_categories=true) %}
-                {% if error %}
-                    <ul class="flashes">
-                        {% for category, message in error %}
-                            <li class="{{ category }}">{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-            <!-->
             <form action="/register" method="POST">
                 <div class="register-form-grid">
                   <div class="usernameBox">
@@ -57,21 +62,21 @@
                   </div>
                   <div class="useridBox">
                     <label for="userid">User ID</label>
-                    <input type="text" id="userid" name="userid" placeholder="Enter User ID" required />
+                    <input type="text" id="userid" name="userid" placeholder="Enter User ID" />
                   </div>
                   <div class="passwordBox">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter password" required />
+                    <input type="password" id="password" name="password" placeholder="Enter password" />
                   </div>
                   <div class="passwordBox">
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required />
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" />
                   </div>
                 </div>
                 <div class="radio-group">
                   <b><i><label for="user_type">User Type</label></i></b><br>
-                  <input type="radio" name="user_type" value="student" required> Student<br>
-                  <input type="radio" name="user_type" value="lecturer" required> Lecturer<br>
+                  <input type="radio" name="user_type" value="student"> Student<br>
+                  <input type="radio" name="user_type" value="lecturer"> Lecturer<br>
                 </div>
                 <button type="submit">Register</button>
               </form>
