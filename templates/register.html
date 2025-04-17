@@ -3,8 +3,9 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Register - MMUPastPapers</title>
-        <link href="/static/style.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <title>Register | MMUPastPapers</title>
     </head>
 
 <!-- Header Bar -->
@@ -23,9 +24,12 @@
     </div>
 </header>
 
-    <body>
-        <div class="Container">
-            <h2>Register</h2>
+<!--Main Content Settings-->
+<main class="main-content">
+    <div class="registerBox">
+        <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="registerBox-img"><br>
+            <h1>Register</h1>
+            <!--
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     <ul class="flashes">
@@ -44,33 +48,35 @@
                     </ul>
                 {% endif %}
             {% endwith %}
+            <!-->
             <form action="/register" method="POST">
-                <div class="input-fields">
+                <div class="register-form-grid">
+                  <div class="usernameBox">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required />
-                </div>
-                <div class="input-fields">
-                    <label for="userid">User_ID</label>
-                    <input type="text" id="userid" name="userid" required />
-                </div>
-                <div class="input-fields">
+                    <input type="text" id="username" name="username" placeholder="Enter username" />
+                  </div>
+                  <div class="useridBox">
+                    <label for="userid">User ID</label>
+                    <input type="text" id="userid" name="userid" placeholder="Enter User ID" required />
+                  </div>
+                  <div class="passwordBox">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required />
-                </div>
-                <div class="input-fields">
+                    <input type="password" id="password" name="password" placeholder="Enter password" required />
+                  </div>
+                  <div class="passwordBox">
                     <label for="confirm_password">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required />
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required />
+                  </div>
                 </div>
-                <div>
-                    <label for="user_type">User Type</label><br>
-                    <input type="radio" name="user_type" value="admin">Roles<br>
-                    <radio name="user_type" value="student" checked> Student
-                    <radio name="user_type" value="lecturer"> Lecturer
+                <div class="radio-group">
+                  <b><i><label for="user_type">User Type</label></i></b><br>
+                  <input type="radio" name="user_type" value="student" required> Student<br>
+                  <input type="radio" name="user_type" value="lecturer" required> Lecturer<br>
                 </div>
                 <button type="submit">Register</button>
-            </form>
+              </form>
             <p>
-                Already have an account? <a href="login.html">Login here</a>
+                Already have an account? <a href="{{ url_for('login') }}">Login here</a>
             </p>
         </div>
     </body>

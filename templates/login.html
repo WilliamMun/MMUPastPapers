@@ -29,7 +29,6 @@
 <!--Main Content Settings-->  
 <main class="main-content"> 
   <div class="loginBox">
-    <h2>Login</h2>
     <form action="/login" method="POST" id="resetForm">
     <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="loginBox-img"><br>
         <h1>Login</h1>
@@ -57,7 +56,7 @@
           {% if category == 'error' %}
             Swal.fire({
               icon: 'error',
-              title: 'Oops! An error occured.',
+              title: 'Oops! An error occurred.',
               text: "{{ message }}"
             });
         
