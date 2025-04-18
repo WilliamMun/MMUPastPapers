@@ -128,25 +128,47 @@ class DISCUSSION_FORUM(db.Model):
 
 @app.route('/login',methods=['GET','POST'])
 def login():
+    status = True #Flag to determine whether user input is valid or invalid 
+
     if request.method == 'POST':
+        #Retrive user input 
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
+        print(username, password) #For debugging purposes 
 
+        #Input verification 
         if not username or not password:
             flash('Username and password are required', 'error')
+            status = False
+            print("Username or password is empty.") #For debugging purposes
             return redirect('/login')
+
+        
+        #Retrive data from database 
         user = USER_INFO.query.filter_by(USER_ID=username).first()
+        print(user) #For debugging purposes
         if not user:
-            flash('Invalid username or password', 'error')
+            flash('Invalid username.', 'error')
+            status = False
+            print(f"Invalid username {username}") #For debugging purposes
+            print(user == username) #For debugging purposes
             return redirect('/login')
         if not check_password_hash(user.PASSWORD, password):
-            flash('Invalid username or password', 'error')
+            flash('Invalid password', 'error')
+            status = False
+            print(f"Invalid password {password}") #For debugging purposes
+            print(password == user.PASSWORD) #For debugging purposes
+            print(check_password_hash(user.PASSWORD, password)) #For debugging purposes
             return redirect('/login')
-        session['user_id'] = user.USER_ID
-        session['username'] = user.USERNAME
-        session['roles'] = user.ROLES
-        flash('Login successful!', 'success')
-        return redirect('/')
+        
+        if status == True:
+          session['user_id'] = user.USER_ID
+          session['username'] = user.USERNAME
+          session['roles'] = user.ROLES
+          flash('Login successful!', 'success')
+          print(f"Login successful for user {username}.") #For debugging purposes
+          return render_template('login.html')
+        
     return render_template("login.html")
 
 @app.route('/register' ,methods=['GET','POST'])
