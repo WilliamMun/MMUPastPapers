@@ -256,6 +256,7 @@ def main():
 @app.route('/resetPassword', methods=['GET', 'POST'])
 def resetPassword():
   questions = SECURITY_QUES.query.all()
+  print(datetime.now())
 
   if request.method == 'POST':
 
@@ -279,14 +280,15 @@ def resetPassword():
 
     if new_password != confirm_password:
       flash("Passwords do not match!", "error")
-      print("Passwords do not match!") #For debugging purposes
+      print(f"Passwords do not match! Password: {new_password}, {confirm_password}") #For debugging purposes
       return redirect(url_for('resetPassword'))
 
     #Save new data into database
-    try:
-      user = USER_INFO.query.filter_by(USER_ID=userID).first()
-      print(user)
+    #try:
+    user = USER_INFO.query.filter_by(USER_ID=userID).first()
+    print(user)
 
+    try:
       if user:
         record = SECURITY_QUES_ANS.query.filter_by(USER_ID=userID, SECURITY_QUES_ID=question_id, ANSWER=answer).first()
         print(record) #For debugging purposes
@@ -294,6 +296,8 @@ def resetPassword():
         if record:
           user = USER_INFO.query.filter_by(USER_ID=userID).first()
           user.PASSWORD = generate_password_hash(new_password)
+          user.LAST_MODIFIED_ON = datetime.now()
+          user.LAST_MODIFIED_BY = userID 
           db.session.commit()
           flash("Password reset successfully!", "success")
           print(f"Password reset sucessfully for user {userID}, {question_id}, the new password is {new_password}.") #For debugging purposes
