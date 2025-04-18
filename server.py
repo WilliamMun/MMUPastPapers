@@ -126,6 +126,10 @@ class DISCUSSION_FORUM(db.Model):
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
 
+def isStrongPassword(password):
+  pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{10,}$'
+  return bool(re.match(pattern, password))
+
 @app.route('/login',methods=['GET','POST'])
 def login():
     status = True #Flag to determine whether user input is valid or invalid 
@@ -173,46 +177,81 @@ def login():
 
 @app.route('/register' ,methods=['GET','POST'])
 def register():
+    
     if request.method == 'POST':
+        #Retrive user input 
         username = request.form['username'].strip()
         userid = request.form.get('userid').strip().lower()
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
+        roles = request.form.get('user_type')
+
+        #Process the "roles" input 
+        if roles == "student":
+           rolesNum = 1
+        elif roles == "lecturer":
+           rolesNum = 2
+        else:
+           rolesNum = None
+
+        print(f"New registration info: {username},{userid},{password},{roles},{rolesNum}.") #For debugging purposes 
+
+        #Input verification 
         if password != confirm_password:
-           flash('passwords do not match', 'error')
+           flash('Passwords do not match.', 'error')
+           print(f"Passwords do not match. New password:{password} vs Confirm password:{confirm_password}.") #For debugging purposes 
            return redirect('/register')
-        if not all ([username, userid, password, confirm_password]):
-           flash('All fields are required', 'error')
+        
+        if not all ([username, userid, password, confirm_password, roles]):
+           flash('All fields are required.', 'error')
+           print("All/some fields are empty.") #For debugging purposes
            return redirect('/register')
-        if USER_INFO.query.filter_by(USERNAME=username).first():
-           flash('username already existed', 'error')
+        
+        if not isStrongPassword(password):
+           flash("Password must be at least 10 characters, contains at least 1 uppercase, 1 lowercase, 1 symbol and 1 digit.", "error")
+           print("Password does not meet the requirements.") #For debugging purposes
            return redirect('/register')
-        if USER_INFO.query.filter_by(USER_ID=userid).first():
-           flash('user-id already existed', 'error')
+        
+        #Retrive data from database 
+        user_db = USER_INFO.query.filter_by(USERNAME=username).first()
+        user_id_db = USER_INFO.query.filter_by(USER_ID=userid).first()
+        print(f"Username: {user_db}, User ID: {user_id_db}") #For debugging purposes
+
+        #Avoid duplication of data 
+        if user_db:
+           flash('Username already existed.', 'error')
            return redirect('/register')
+        if user_id_db:
+           flash('Email already existed.', 'error')
+           return redirect('/register')
+        if rolesNum == None:
+           flash('Invalid option for User Type.', 'error')
+           print(f"Invalid roles: {rolesNum}") #For debugging purposes
+           print(f"Roles selected: {roles}") #For debugging purposes
+           return redirect('/register')
+
         try:
-           new_user = USER_INFO(USER_ID=userid, USERNAME=username, PASSWORD=generate_password_hash(password, method='sha256'), ROLES=1)
+           new_user = USER_INFO(USER_ID=userid, USERNAME=username, PASSWORD=generate_password_hash(password), ROLES=rolesNum)
            db.session.add(new_user)
            db.session.commit()
            flash('User registered successfully!', 'success')
-           return redirect('/login')
+           print(f"User {userid} succesfully registered")
+           return render_template("register.html")
         except IntegrityError:
            db.session.rollback()
-           flash('Username or user-id already exists', 'error')
+           flash('Username or email already exists.', 'error')
+           print("Username or email already exists.")
            return redirect('/register')
         except Exception as e:
            db.session.rollback()
            flash('Error occurred while registering user. Please try again later', 'error')
+           print("Internal server error.")
            return redirect('/register')
     return render_template("register.html")
 
 @app.route('/')
 def main():
     return render_template("main.html")
-
-def isStrongPassword(password):
-  pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{10,}$'
-  return bool(re.match(pattern, password))
 
 @app.route('/resetPassword', methods=['GET', 'POST'])
 def resetPassword():

@@ -44,7 +44,11 @@
               icon: 'success',
               title: 'Yay! Success.',
               text: "{{ message }}"
-            });
+            }).then(() => {
+             setTimeout(function() {
+                window.location.href = "{{ url_for('login') }}";
+                }, 1000);
+          });
           {% endif %}
         {% endfor %}
       </script>
