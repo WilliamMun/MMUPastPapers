@@ -60,14 +60,14 @@
             <h1>Register</h1>
             <form action="/register" method="POST">
                 <div class="register-form-grid">
-                  <div class="usernameBox">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Enter username" />
+                  <div class="emailBox">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" name="email" pattern="^[\w\.-]+@([\w]+\.)*mmu\.edu\.my$" placeholder="xxxxx@mmu.edu.my" />
                   </div>
-                  <div class="useridBox">
-                    <label for="userid">User ID</label>
-                    <input type="text" id="userid" name="userid" placeholder="Enter User ID" />
-                  </div>
+                  <div class="nameBox">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter name" />
+                  </div> 
                   <div class="passwordBox">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Enter password" />

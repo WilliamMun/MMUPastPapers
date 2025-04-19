@@ -157,14 +157,14 @@
   }
 
   /* Input placeholder */
-  .usernameBox,
+  .emailBox,
   .passwordBox {
     font-family: "Georgia";
     margin-bottom: 20px;
     text-align: left;
   }
 
-  .usernameBox label,
+  .emailBox label,
   .passwordBox label {
     display: block;
     font-weight: bold;
@@ -254,17 +254,17 @@
   }
 
   /** Input placeholder **/
-  .usernameBox,
+  .emailBox,
   .passwordBox,
-  .useridBox {
+  .nameBox {
     font-family: "Georgia";
     margin-bottom: 20px;
     text-align: left;
   }
 
-  .usernameBox label,
+  .emailBox label,
   .passwordBox label,
-  .useridBox label {
+  .nameBox label {
     display: block;
     font-weight: bold;
     color: #333;
