@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>View Papers | MMUPastPapers</title>
+</head>
+
+<body>
+    
+<!-- Header Bar -->
+<header class="topbar">
+    <div class="container">
+      <!-- Logo -->
+      <div class="logo">
+        <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
+      </div>
+  
+      <!-- Menu -->
+      <nav class="menu">
+        <a href="{{ url_for('login') }}">Login</a>|
+        <a href="{{ url_for('register') }}">Register</a>
+      </nav>
+    </div>
+</header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="table-container">
+      <table>
+        <caption>View Past Papers</caption>
+        <thead>
+          <tr>
+            <th>Paper ID</th>
+            <th>Term ID</th>
+            <th>File Name</th>
+            <th>Description</th>
+            <th colspan="2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if pastpapers_info %}
+            {% for paper in pastpapers_info %}
+              <tr>
+                <td class="bil">{{ paper.PAPER_ID }}</td>
+                <td>{{ paper.TERM_ID }}</td>
+                <td>{{ paper.FILENAME }}</td>
+                <td>{{ paper.PAPER_DESC }}</td>
+                <td>
+                  <a href="{{ url_for('view_paper', paper_id=paper.PAPER_ID) }}" target="_blank"><img src="{{ url_for('static', filename='images/view.png')}}" alt="view" /></a>
+                </td>
+                <td>
+                  <a href="{{ url_for('download_paper', paper_id=paper.PAPER_ID) }}"><img src="{{ url_for('static', filename='images/download.png')}}" alt="download" /></a>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5">No past year papers found.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+        
+      </table>
+    </div>
+  </main>
+
+  <!-- Footer Bar -->
+  <footer class="footerbar">
+    <div class="container">
+      <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="logo-footer" />
+      <nav class="menu">
+        <a href="#">About Us</a>|
+        <a href="#">Contact</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
