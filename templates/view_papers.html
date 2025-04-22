@@ -38,7 +38,7 @@
             <th>Term ID</th>
             <th>File Name</th>
             <th>Description</th>
-            <th>Actions</th>
+            <th colspan="2">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -49,9 +49,11 @@
                 <td>{{ paper.TERM_ID }}</td>
                 <td>{{ paper.FILENAME }}</td>
                 <td>{{ paper.PAPER_DESC }}</td>
-                <td colspan="2">
-                  <a href="{{ url_for('view_paper', paper_id=paper.PAPER_ID) }}" target="_blank">View</a> |
-                  <a href="{{ url_for('download_paper', paper_id=paper.PAPER_ID) }}">Download</a>
+                <td>
+                  <a href="{{ url_for('view_paper', paper_id=paper.PAPER_ID) }}" target="_blank"><img src="{{ url_for('static', filename='images/view.png')}}" alt="view" /></a>
+                </td>
+                <td>
+                  <a href="{{ url_for('download_paper', paper_id=paper.PAPER_ID) }}"><img src="{{ url_for('static', filename='images/download.png')}}" alt="download" /></a>
                 </td>
               </tr>
             {% endfor %}

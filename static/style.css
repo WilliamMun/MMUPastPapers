@@ -332,7 +332,7 @@ select {
 }
 
 table {
-  font-family: 'Lexend', sans-serif;
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   width: 100%;
   border-collapse: collapse;
   background-color: whitesmoke;
@@ -341,19 +341,26 @@ table {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Table title */
 caption {
+  font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 22px;
   font-weight: bold;
-  color: #815B5B;
-  padding: 20px;
+  color: whitesmoke;
+  padding: 10px;
+
+  /* Simulate text border using text-shadow */
+  text-shadow: 
+    -1px -1px 0 #A76545,
+     1px -1px 0 #A76545,
+    -1px  1px 0 #A76545,
+     1px  1px 0 #A76545;
 }
 
 /* Header styling */
 th {
   background-color: #EDDBC7;
   color: #A75D5D;
-  padding: 14px;
+  padding: 10px;
   font-size: 15px;
   border-bottom: 2px solid #D5B4B4;
   border: 2px solid #D5B4B4;
@@ -364,7 +371,7 @@ th {
 td {
   font-size: 14px;
   color: #444;
-  padding: 12px;
+  padding: 10px;
   border-bottom: 1px solid #e0d4cb;
   border: 2px solid #D5B4B4;
   text-align: center;
@@ -372,7 +379,7 @@ td {
 
 /* First column (Bil) */
 td.bil {
-  width: 50px;
+  width: auto;
   font-weight: bold;
   color: #815B5B;
 }
@@ -390,25 +397,4 @@ tr:nth-child(odd) {
 tr:hover {
   background-color: #f0e9e2;
   cursor: pointer;
-}
-
-/* Button */
-.table-a {
-  width: 70%;
-  padding: 12px;
-  background-color: #E5E1DA;
-  color: black;
-  font-family: serif;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  margin-top: 15px;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-.table-a:hover {
-  background-color: #BCCCDC;
-  color: black;
 }
