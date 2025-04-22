@@ -375,7 +375,7 @@ def inject_data():
 def editProfile():
    return render_template("editProfile.html")
 
-@app.route('/viewPapers')
+@app.route('/view_papers')
 def view_papers():
     pastpapers_info = PASTPAPERS_INFO.query.all()
     return render_template("viewPapers.html", pastpapers_info=pastpapers_info)
