@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='script.js' )}}"></script>
+    </head>
+
+    <!-- Navigation bar -->
+    <header>
+        <!-- Logo -->
+        <div class="logo">
+            <a href="{{ url_for('viewPapers') }}"><img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" /></a>
+        </div>
+            
+        <!-- Menu -->
+        <!-- Delete this after finish decorating: The location of this menu should be at the middle of the navigation bar. Bcuz right side we need to put user profile button. -->
+        <nav class="####">
+            <a href="{{ url_for('viewPapers')}}">Papers</a>
+            <a href="#####">Class</a>
+        </nav>
+
+        <!-- User profile -->
+        <!-- Delete this after finish decorating: Put this align to right -->
+        <div class="avatar" onclick="toggleMenu()">
+            {{ initials }}  
+        </div>
+        
+        <!-- Delete this after you decorated: CSS code for user profile pic
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #4a90e2; /* any color you like */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            font-family: Arial, sans-serif;
+          }
+        -->
+
+        <!-- Drop down after clicking user profile -->
+        <div class="sub-menu-wrap" id="subMenu"> <!-- Delete this after finish decorating: inside js file, the open-menu should be used inside css also to open this menu when user image is clicked. -->
+            <div class="sub-menu">
+                <div class="user-info">
+                    <div class="avatar-pfp">{{ initials }}</div> <!-- Same as above, but size need to be  larger -->
+                    <h3>{{ name }}</h3>
+                    <h4>{{ email }}</h4>
+                </div>
+                <hr>
+
+                <a href="{{ url_for('editProfile') }}" class="sub-menu-link">
+                    <img src="{{ url_for('static', filename='images/editProfile.jpg') }}">
+                    <p>Edit Profile</p>
+                    <span>></span>
+                </a>
+
+                <a href="#" class="sub-menu-link">
+                    <img src="{{ url_for('static', filename='images/logOut.jpg') }}">
+                    <p>Logout</p>
+                    <span>></span>
+                </a>
+            </div>
+        </div>
+    </header>
+</html>

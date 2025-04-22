@@ -17,3 +17,22 @@ document.getElementById("resetForm").addEventListener("submit", function (e) {
         return;
     }
 })
+var subMenu = document.getElementById("subMenu");
+
+function toggleMenu() {
+    subMenu.classList.toggle("open-menu");
+}
+
+function showInput() {
+    var inputBox = document.getElementById("hidden-input-box");
+
+    if(inputBox.style.display === 'none' || inputBox.style.display === '') {
+        inputBox.style.display = 'block'
+    } else {
+        inputBox.style.display = 'none'
+    }
+}
+
+function changePage() {
+    window.location.href = "/securityQues";
+}

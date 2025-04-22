@@ -330,13 +330,106 @@ def resetPassword():
       db.session.rollback()
       flash("Email registered!")
       return redirect(url_for('/resetPassword'))
-    #except Exception as e:
-    #  db.session.rollback()
-    #  flash("Error occurred while registering user. Please try again later", "error")
-    #  print("Internal server error.")
-    #  return redirect(url_for('resetPassword'))
+    except Exception as e:
+      db.session.rollback()
+      flash("Error occurred while registering user. Please try again later", "error")
+      print("Internal server error.")
+      return redirect(url_for('resetPassword'))
     
   return render_template('resetPassword.html', questions=questions)
+
+def getInitials(name):
+  #name = session.get('name')
+  parts = name.strip().split()
+  
+  if len(parts) >= 2:
+     initials = parts[0][0]+parts[1][0]
+  elif len(parts) == 1:
+     initials = parts[0][0]
+  else:
+     initials = None 
+  
+  return initials 
+
+#For all html file
+@app.context_processor
+def inject_data():
+    if session.get('email'):
+      name = session.get('name')
+      initials = getInitials(name)
+      print(initials) #For debugging purposes 
+
+      return {
+        'email': session.get('email'),
+        'name': session.get('name'),
+        'roles': session.get('roles'),
+        'initials': initials
+      }
+    
+    else:
+       return { }
+
+@app.route('/editProfile')
+def editProfile():
+   return render_template("editProfile.html")
+
+@app.route('/view_papers')
+def viewPapers():
+   return render_template("viewPapers.html")
+
+@app.route('/securityQues', methods=['GET', 'POST'])
+def securityQues():
+  #Retrieve data from database:
+  email = session.get('email')
+
+  #Get Question List 
+  ques = db.session.query(SECURITY_QUES.SECURITY_QUES_ID, SECURITY_QUES.SECURITY_QUES_DESC).all()
+  securityQuesList = {id: question for id, question in db.session.query(SECURITY_QUES.SECURITY_QUES_ID, SECURITY_QUES.SECURITY_QUES_DESC).all()}
+  print("Security Question List:", securityQuesList) #For debugging purposes 
+
+  #Get User ID
+  emailObject = USER_INFO.query.filter_by(USER_EMAIL=email).first()
+  user_ID = emailObject.USER_ID
+  print("Email obtain:",email,"and respective user ID:",user_ID) #For debugging purposes 
+
+  #Get Answers 
+  answers = SECURITY_QUES_ANS.query.filter_by(USER_ID=user_ID).all()
+  answer_dict = {a.SECURITY_QUES_ID: a.ANSWER for a in answers}
+  print("Answer List:",answer_dict) #For debugging purposes 
+
+  #Merge questions and ans 
+  questions = SECURITY_QUES.query.all()
+  user_qa = [{'id': q.SECURITY_QUES_ID, 'question': q.SECURITY_QUES_DESC, 'answer': answer_dict.get(q.SECURITY_QUES_ID, '-')} for q in questions]
+  print("User Q&A List:",user_qa) #for debugging purposes 
+
+  if request.method == 'POST':
+      #Save data into database: 
+      user_ans = request.form.to_dict()
+      print("User answer list:", user_ans) #For debugging purposes 
+  
+      for ques_id, answer in user_ans.items():
+          record = SECURITY_QUES_ANS.query.filter_by(USER_ID=user_ID, SECURITY_QUES_ID=ques_id).first()
+     
+          #If record exists 
+          if record:
+              record.ANSWER = answer
+              record.LAST_MODIFIED_ON = datetime.now()
+              record.LAST_MODIFIED_BY = user_ID
+          else:
+              newRecord = SECURITY_QUES_ANS(
+                  USER_ID=user_ID,
+                  SECURITY_QUES_ID=ques_id,
+                  ANSWER=answer,
+                  CREATED_ON=datetime.now(),
+                  LAST_MODIFIED_ON=datetime.now(),
+                  LAST_MODIFIED_BY=user_ID)
+              db.session.add(newRecord)
+     
+      db.session.commit()
+      flash("Security questions edited successfully!", 'success')
+      print("Sucessfully saved new sec ques.") #For debugging purposes 
+      return render_template("securityQues.html")
+  return render_template("securityQues.html", user_qa=user_qa)
 
 if __name__ == "__main__":
     app.run(debug=True)

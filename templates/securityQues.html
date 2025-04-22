@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <title>Edit Profile | MMUPastPapers</title>
+    </head>
+    
+    <body>
+        <!-- Header -->
+        {% include 'header.html' %}
+
+        <!-- Main content -->
+        <main>
+            <h2>Edit Security Questions</h2>
+            <form method="POST" action="/securityQues">
+                <div class="ques-box">
+                    {% for qa in user_qa %}
+                    <div class="ques-box-input">
+                        <label for="answer">{{ qa.question or '' }}</label>
+                        <input type="text" name="{{ qa.id }}" id="{{ qa.id }}" class="answer" value="{{ qa.answer or '' }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="submit" id="submit-btn" class="submit-btn" value="Edit">
+            </form>
+        </main>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <script>
+            {% for category, message in messages %}
+            {% if category == 'error' %}
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops! An error occurred.',
+                    text: "{{ message }}"
+                });
+        
+            {% elif category == 'success' %}
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Yay! Success.',
+                    text: "{{ message }}"
+                }).then(() => {
+                    setTimeout(function() {
+                    window.location.href = "{{ url_for('editProfile') }}";
+                    }, 1000);
+          });
+          {% endif %}
+      {% endfor %}
+      </script>
+    {% endif %}
+{% endwith %}
+    </body>
+</html>
