@@ -378,7 +378,7 @@ def editProfile():
 @app.route('/view_papers')
 def view_papers():
     pastpapers_info = PASTPAPERS_INFO.query.all()
-    return render_template("viewPapers.html", pastpapers_info=pastpapers_info)
+    return render_template("view_papers.html", pastpapers_info=pastpapers_info)
 
 @app.route('/view_paper/<paper_id>')
 def view_paper(paper_id):
