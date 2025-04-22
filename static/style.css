@@ -347,8 +347,6 @@ caption {
   font-weight: bold;
   color: whitesmoke;
   padding: 10px;
-
-  /* Simulate text border using text-shadow */
   text-shadow: 
     -1px -1px 0 #A76545,
      1px -1px 0 #A76545,
