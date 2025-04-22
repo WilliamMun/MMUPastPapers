@@ -338,5 +338,13 @@ def resetPassword():
     
   return render_template('resetPassword.html', questions=questions)
 
+@app.route('/logout')
+def logout():
+   session.clear()
+   flash('Logged out successfully!', 'success')
+   response = redirect(url_for('main'))
+   response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+   return response
+
 if __name__ == "__main__":
     app.run(debug=True)

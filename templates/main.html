@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <title>Main | MMUPastPapers</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <!-- Header Bar -->
@@ -18,8 +19,26 @@
 
     <!-- Menu -->
     <nav class="menu">
-      <a href="{{ url_for('login') }}">Login</a>|
-      <a href="{{ url_for('register') }}">Register</a>
+      {% if 'email' in session %}
+        <a href="{{ url_for ('logout') }}">Logout</a>|
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a>|
+        <a href="{{ url_for('register') }}">Register</a>
+      {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <script>
+          {% for category, message in messages %}
+            Swal.fire({
+              icon: '{{ category }}',
+              title: '{{ message }}',
+            });
+          {% endfor %}
+        </script>
+      {% endif %}
+      {% endwith %}
+
     </nav>
   </div>
 </header>
