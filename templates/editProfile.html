@@ -1,0 +1,50 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <title>Edit Profile | MMUPastPapers</title>
+    </head>
+    
+    <body>
+        <!-- Header -->
+        {% include 'header.html' %}
+
+        <!-- Main content -->
+        <main>
+            <div class="profile-box">
+                <div class="user-pic-name-box">
+                    <!-- Avatar at the left side -->
+                    <div class="avatar-user-pic-name-box">
+                        {{ initials }}
+                    </div>
+                    <!-- Name and email -->
+                    <h2>{{ name }}</h2>
+                    <h3>{{ email }}</h3>
+                </div>
+
+                <div class="edit-user-box">
+                    <img src="{{ url_for('static', filename='images/editProfile.jpg' )}}" alt="Profile" class="clickable-img" onclick="showInput()">
+                    <h3>Edit Profile</h3>
+                    <p>You can edit your name and email here.</p>
+
+                    <div id="hidden-input-box" style="display: none;">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" class="name" placeholder="Enter new name" value="{{ name or '' }}">
+                        <label for="email">Email</label>
+                        <input type="text" id="email" class="email" placeholder="Enter your new email" value="{{ email or '' }}">
+                    </div>
+                </div>
+
+                <div class="edit-security-ques-box">
+                    <img src="{{ url_for('static', filename='images/editProfile.jpg' )}}" alt="Profile" class="clickable-img" onclick="changePage()">
+                    <h3>Edit Security Questions</h3>
+                    <p>You can edit your security questions here.</p>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

@@ -68,7 +68,7 @@
               text: "{{ message }}"
             }).then(() => {
              setTimeout(function() {
-                window.location.href = "{{ url_for('main') }}";
+                window.location.href = "{{ url_for('viewPapers') }}";
                 }, 1000);
           });
           {% endif %}
