@@ -258,7 +258,7 @@ def register():
            return redirect('/register')
     return render_template("register.html")
 
-@app.route('/')
+@app.route('/main')
 def main():
     return render_template("main.html")
 

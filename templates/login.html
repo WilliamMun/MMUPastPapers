@@ -16,17 +16,13 @@
     <div class="container">
       <!-- Logo -->
       <div class="logo">
-        <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
+        <a href="{{ url_for('main')}}"><img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" /></a>
       </div>
   
       <!-- Menu -->
       <nav class="menu">
-        {% if 'email' in session %}
-          <a href="{{ url_for ('logout') }}">Logout</a>|
-        {% else %}
           <a href="{{ url_for('login') }}">Login</a>|
           <a href="{{ url_for('register') }}">Register</a>
-        {% endif %}
       </nav>
     </div>
 </header>
@@ -72,7 +68,7 @@
               text: "{{ message }}"
             }).then(() => {
              setTimeout(function() {
-                window.location.href = "{{ url_for('viewPapers') }}";
+                window.location.href = "{{ url_for('view_papers') }}";
                 }, 1000);
           });
           {% endif %}
@@ -81,5 +77,6 @@
     {% endif %}
 {% endwith %}
 
+{% include 'footer.html' %}
 </body>
 </html>

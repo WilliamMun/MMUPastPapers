@@ -17,9 +17,9 @@ document.getElementById("resetForm").addEventListener("submit", function (e) {
         return;
     }
 })
-var subMenu = document.getElementById("subMenu");
 
 function toggleMenu() {
+    var subMenu = document.getElementById("subMenu");
     subMenu.classList.toggle("open-menu");
 }
 

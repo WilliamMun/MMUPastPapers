@@ -28,32 +28,32 @@
                 <input type="submit" id="submit-btn" class="submit-btn" value="Edit">
             </form>
         </main>
-
+        {% include 'footer.html' %}
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-            <script>
-            {% for category, message in messages %}
-            {% if category == 'error' %}
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops! An error occurred.',
-                    text: "{{ message }}"
-                });
+                <script>
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops! An error occurred.',
+                                text: "{{ message }}"
+                        });
         
-            {% elif category == 'success' %}
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Yay! Success.',
-                    text: "{{ message }}"
-                }).then(() => {
-                    setTimeout(function() {
-                    window.location.href = "{{ url_for('editProfile') }}";
-                    }, 1000);
-          });
-          {% endif %}
-      {% endfor %}
-      </script>
-    {% endif %}
-{% endwith %}
+                        {% elif category == 'success' %}
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Yay! Success.',
+                                text: "{{ message }}"
+                        }).then(() => {
+                            setTimeout(function() {
+                            window.location.href = "{{ url_for('editProfile') }}";
+                            }, 1000);
+                        });
+                        {% endif %}
+                    {% endfor %}
+                </script>
+            {% endif %}
+        {% endwith %}
     </body>
 </html>

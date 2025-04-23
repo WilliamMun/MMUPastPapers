@@ -14,31 +14,13 @@
   <div class="container">
     <!-- Logo -->
       <div class="logo">
-        <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
+        <a href="{{ url_for('main')}}"><img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" /></a>
       </div>
 
     <!-- Menu -->
     <nav class="menu">
-      {% if 'email' in session %}
-        <a href="{{ url_for ('logout') }}">Logout</a>|
-      {% else %}
         <a href="{{ url_for('login') }}">Login</a>|
         <a href="{{ url_for('register') }}">Register</a>
-      {% endif %}
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <script>
-          {% for category, message in messages %}
-            Swal.fire({
-              icon: '{{ category }}',
-              title: '{{ message }}',
-            });
-          {% endfor %}
-        </script>
-      {% endif %}
-      {% endwith %}
-
     </nav>
   </div>
 </header>
