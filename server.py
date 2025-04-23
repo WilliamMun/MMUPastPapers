@@ -357,9 +357,11 @@ def getInitials(name):
 @app.context_processor
 def inject_data():
     if session.get('email'):
+      email = session.get('email')
       name = session.get('name')
       initials = getInitials(name)
       print(initials) #For debugging purposes 
+      print(email)
 
       return {
         'email': session.get('email'),
@@ -413,6 +415,7 @@ def editProfile():
         record.LAST_MODIFIED_BY = newEmail 
         record.LAST_MODIFIED_ON = datetime.now()
         db.session.commit()
+        session.clear()
         flash('Edit profile successfully! Please login again.','success')
         print("Edit profile success.") #For debugging purposes 
         return render_template('editProfile.html')
@@ -424,7 +427,6 @@ def editProfile():
       flash('Error occurs while editing user profile. Please try again later.','error')
       print("Internal server error.") #For debugging purposes 
       return redirect('/editProfile')
-       
        
   return render_template("editProfile.html")
 
@@ -506,7 +508,8 @@ def securityQues():
               db.session.add(newRecord)
      
       db.session.commit()
-      flash("Security questions edited successfully!", 'success')
+      session.clear()
+      flash("Security questions edited successfully! Please log in again.", 'success')
       print("Sucessfully saved new sec ques.") #For debugging purposes 
       return render_template("securityQues.html")
   return render_template("securityQues.html", user_qa=user_qa)
