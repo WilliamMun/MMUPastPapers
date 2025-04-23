@@ -423,6 +423,7 @@ select {
   border-radius: 8px;
   font-size: 14px;
 }
+/**The End of Reset Password Page Settings**/
 
 /* View Papers (view_papers.html) */
 .table-container {
@@ -497,3 +498,119 @@ tr:hover {
   background-color: #f0e9e2;
   cursor: pointer;
 }
+/**The End of View Papers Page Settings**/
+
+/**Edit Profile Page**/
+.profile-box {
+  top: 0%;
+  width: 100%;
+  background-color: rgb(222, 218, 210);
+}
+
+.profile-box hr{
+  border: 0;
+  height: 1px; 
+  width: 100%;
+  background: #050505;
+  margin: 15px 0 10px;
+}
+
+.user-pic-name-box {
+  display: flex;
+  align-items: center;
+}
+
+.user-pic-name-box .avatar-user-pic-name-box {
+  width: 120px;
+  height: 120px;
+  background-color: #4a90e2; /* any color you like */
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 48px;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+.user-pic-name-box .text-profile {
+  text-align: left;
+  font-weight: 1000;
+  font-size: 25px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.edit-user-box {
+  display: flex;
+  align-items: center;
+}
+
+.edit-user-box .text-user {
+  text-align: left;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.edit-user-box .text-user h3{
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.edit-user-box .hidden-input-box {
+  width: 500px;
+  display: flex;
+  margin-left: 15px;
+}
+.edit-user-box .hidden-input-box label{
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.edit-user-box .hidden-input-box input[type="text"]{
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.edit-user-box .hidden-input-box input[type="submit"]{
+  width: 70%;
+  padding: 12px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.edit-security-ques-box {
+  display: flex;
+  align-items: center;
+}
+
+.edit-security-ques-box .text-sec-ques {
+  text-align: left;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.edit-security-ques-box .text-sec-ques h3{
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.edit-user-box img, 
+.edit-security-ques-box img {
+  width: 100px;
+  border-radius: 50%;
+  padding: 8px; 
+  margin-right: 15px;
+}
+
+/**The End of Edit Profile Page Settings**/
