@@ -547,9 +547,14 @@ tr:hover {
 
 /**Edit Profile Page**/
 .profile-box {
-  top: 0%;
-  width: 100%;
-  background-color: rgb(222, 218, 210);
+  background: white;
+  padding: 40px;
+  width: 1000px;
+  height: 600px;
+  max-width: 85%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
 .profile-box hr{
