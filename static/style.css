@@ -10,317 +10,389 @@
 }
 
 /** Topbar Settings (before login only) **/
-  .topbar {
-    background-color: whitesmoke;
-    height: auto;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  }
+.topbar {
+  background-color: whitesmoke;
+  height: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
 
-  /* Logo Settings */
-  .logo {
-    display: flex;
-    height: auto;
-    width: 300px;
-    align-items: left;
-    gap: 0.5rem;
-  }
+/* Logo Settings */
+.logo {
+  display: flex;
+  height: auto;
+  width: 300px;
+  align-items: left;
+  gap: 0.5rem;
+}
 
-  /* Menu Settings*/
-  .menu {
-    display: flex;
-    gap: 1.5rem;
-    font-size: auto;
-    font-display: 400px;
-  }
-  .menu a {
-    color: #374151;
-    transition: color 0.2s ease-in-out;
-  }
-  .menu a:hover { /**Change color when mouse point towards**/
-    color: #2563eb; 
-  }
+/* Menu Settings */
+.menu {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 16px;
+  font-weight: 400;
+}
+.menu a {
+  color: #374151;
+  transition: color 0.2s ease-in-out;
+}
+.menu a:hover { /**Change color when mouse point towards**/
+  color: #2563eb; 
+}
 
 /** The End of TopBar Settings **/
 
 /****** Main content - Background ******/
-  .main-content {
-    background-image: url("/static/images/mmuaerialview.png");
-    background-size: cover;           
-    background-position: center;               
-    background-repeat: no-repeat;
-    background-color: #f0f0f0;              
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 90vh;
-    text-align: center;
-    padding: 1rem;
-  }
-  
+.main-content {
+  background-image: url("/static/images/mmuaerialview.png");
+  background-size: cover;           
+  background-position: center;               
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;              
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 90vh;
+  text-align: center;
+  padding: 1rem;
+}
+
 /**Content Design Settings for Main Page**/
-  .content-section {
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    flex-wrap: wrap;
-    gap: 40px;
-    padding: 60px 20px;
-    background-color: none;
-  }
+.content-section {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: 60px 20px;
+  background-color: none;
+}
 
-  .info-box {
-    background: whitesmoke;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    flex: 1 1 300px;
-    max-width: 320px;
-    text-align: center;
-  }
-  
-  .info-box img { /**Image Size**/
-    width: 100%;
-    height: 150px;
-    max-height: 150px;
-    object-fit: cover;
-    border-radius: 15px;
-    margin-bottom: 15px;
-  }
+.info-box {
+  background: whitesmoke;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  flex: 1 1 300px;
+  max-width: 320px;
+  text-align: center;
+}
 
-  .info-box h3 { /**Text Box**/
-    font-family: "Montsterrat";
-    font-size: 23px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
+.info-box img { /**Image Size**/
+  width: 100%;
+  height: 150px;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
 
-  .info-box p {
-    font-size: 14px;
-    color: #444;
-  }
+.info-box h3 { /**Text Box**/
+  font-family: "Montserrat";
+  font-size: 23px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.info-box p {
+  font-size: 14px;
+  color: #444;
+}
 
 /**The End of Content Settings for Main Page**/
 
-
 /* Footer Bar */
-  .footerbar {
+.footerbar {
   background-color: whitesmoke;
-  }
+}
 
-  /* Footer Logo */
-  .logo-footer {
-    height: 100px;
-    width: 225px;
-  }
+/* Footer Logo */
+.logo-footer {
+  height: 100px;
+  width: 225px;
+}
 
-  .footer {
-    max-width: 1500px;
-    max-height: 100px;
-    margin: 0 auto;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.footer {
+  max-width: 1500px;
+  max-height: 100px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 /**The End of Footer Bar Settings for Main Page**/
 
 /** Login Page (login.html) **/
-  .loginBox {
-    background: white;
-    padding: 40px;
-    width: 450px;
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  }
+.loginBox {
+  background: white;
+  padding: 40px;
+  width: 450px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
 
-  .loginBox-img {
-    width: 230px;
-    height: 110px;
-    margin-top: -25px;
-    margin-left: 77px;
-    margin-right: 100px;
-    margin-bottom: -10px;
-  }
+.loginBox-img {
+  width: 230px;
+  height: 110px;
+  margin-top: -25px;
+  margin-left: 77px;
+  margin-right: 100px;
+  margin-bottom: -10px;
+}
 
-  .loginBox h1 {
-    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: -15px;
-    margin-bottom: 15px;
-    color: black;
-  }
+.loginBox h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
 
-  .loginBox h2 {
-    margin-bottom: 30px;
-    color: #003366;
-  }
+.loginBox h2 {
+  margin-bottom: 30px;
+  color: #003366;
+}
 
-  /* Input placeholder */
-  .emailBox,
-  .passwordBox {
-    font-family: "Georgia";
-    margin-bottom: 20px;
-    text-align: left;
-  }
+/* Input placeholder */
+.emailBox,
+.passwordBox {
+  font-family: "Georgia";
+  margin-bottom: 20px;
+  text-align: left;
+}
 
-  .emailBox label,
-  .passwordBox label {
-    display: block;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 6px;
-  }
+.emailBox label,
+.passwordBox label {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 6px;
+}
 
-  input[type="text"],
-  input[type="password"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-  }
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
 
-  /* Button */
-  button {
-    width: 70%;
-    padding: 12px;
-    background-color: #E5E1DA;
-    color: black;
-    font-family: serif;
-    font-display: bold;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    margin-top: 15px;
-    cursor: pointer;
-    transition: 0.3s ease;
-  }
+/* Button */
+button {
+  width: 70%;
+  padding: 12px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
 
-  button:hover {
-    background-color: #BCCCDC;
-    color: black;
-  }
+button:hover {
+  background-color: #BCCCDC;
+  color: black;
+}
 
-  /* Links */
-  .loginBox a {
-    color: #578FCA;
-  }
+/* Links */
+.loginBox a {
+  color: #578FCA;
+}
 
-  .loginBox a:hover {
-    color:#003366;
-  }
+.loginBox a:hover {
+  color: #003366;
+}
 
-  .loginBox p {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 14px;
-    color: #444;
-    margin-top: 10px;
-  }
+.loginBox p {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  color: #444;
+  margin-top: 10px;
+}
 /**The End of Login Page Settings**/
 
-
 /** Register Page (register.html) **/
-  .registerBox { /**Size of Register Box**/
-    background: white;
-    padding: 40px;
-    width: 500px;
-    height: 590px;
-    max-width: 95%;
-    margin: 40px auto;
-    border-radius: 20px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+.registerBox { /**Size of Register Box**/
+  background: white;
+  padding: 40px;
+  width: 500px;
+  height: 590px;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
 
-  .registerBox-img { /**Logo**/
-    width: 230px;
-    height: 110px;
-    display: block;
-    margin: -25px auto -10px auto;
-  }
+.registerBox-img { /**Logo**/
+  width: 230px;
+  height: 110px;
+  display: block;
+  margin: -25px auto -10px auto;
+}
 
-  .registerBox h1 { /**Font size for h1**/
-    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: -15px;
-    margin-bottom: 15px;
-    color: black;
-  }
+.registerBox h1 { /**Font size for h1**/
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
 
-  .registerBox h2 { /**Font size for h2**/
-    margin-bottom: 30px;
-    color: #003366;
-  }
+.registerBox h2 { /**Font size for h2**/
+  margin-bottom: 30px;
+  color: #003366;
+}
 
-  /** Input placeholder **/
-  .emailBox,
-  .passwordBox,
-  .nameBox {
-    font-family: "Georgia";
-    margin-bottom: 20px;
-    text-align: left;
-  }
+/** Input placeholder **/
+.emailBox,
+.passwordBox,
+.nameBox {
+  font-family: "Georgia";
+  margin-bottom: 20px;
+  text-align: left;
+}
 
-  .emailBox label,
-  .passwordBox label,
-  .nameBox label {
-    display: block;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 6px;
-  }
+.emailBox label,
+.passwordBox label,
+.nameBox label {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 6px;
+}
 
-  /* Grid container for two columns */
-  .register-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    margin-bottom: 2px;
-  }
+/* Grid container for two columns */
+.register-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 2px;
+}
 
-  /* Radio buttons center below the grid */
-  .radio-group {
-    text-align: center;
-  }
+/* Radio buttons center below the grid */
+.radio-group {
+  text-align: center;
+}
 
-  /* Links */
-  .registerBox a {
-    color: #578FCA;
-  }
+/* Links */
+.registerBox a {
+  color: #578FCA;
+}
 
-  .registerBox a:hover {
-    color:#003366;
-  }
+.registerBox a:hover {
+  color: #003366;
+}
 
-  .registerBox p, b {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 14px;
-    color: #444;
-    margin-top: 10px;
-  }
+.registerBox p, b {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  color: #444;
+  margin-top: 10px;
+}
 /**The End of Register Page Settings**/
 
 /**Reset Password Page**/
 .input-field label,
 .select-field label {
-    display: block;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 6px;
-  }
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 6px;
+}
 
-  .input-field,
-  .select-field {
-    font-family: "Georgia";
-    margin-bottom: 20px;
-    text-align: left;
-  }
+.input-field,
+.select-field {
+  font-family: "Georgia";
+  margin-bottom: 20px;
+  text-align: left;
+}
 
-  select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-  }
+select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* View Papers (view_papers.html) */
+.table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+table {
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: whitesmoke;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+caption {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 22px;
+  font-weight: bold;
+  color: whitesmoke;
+  padding: 10px;
+  text-shadow: 
+    -1px -1px 0 #A76545,
+     1px -1px 0 #A76545,
+    -1px  1px 0 #A76545,
+     1px  1px 0 #A76545;
+}
+
+/* Header styling */
+th {
+  background-color: #EDDBC7;
+  color: #A75D5D;
+  padding: 10px;
+  font-size: 15px;
+  border-bottom: 2px solid #D5B4B4;
+  border: 2px solid #D5B4B4;
+  text-align: center;
+}
+
+/* Table content */
+td {
+  font-size: 14px;
+  color: #444;
+  padding: 10px;
+  border-bottom: 1px solid #e0d4cb;
+  border: 2px solid #D5B4B4;
+  text-align: center;
+}
+
+/* First column (Bil) */
+td.bil {
+  width: auto;
+  font-weight: bold;
+  color: #815B5B;
+}
+
+/* Alternate row colors */
+tr:nth-child(even) {
+  background-color: whitesmoke;
+}
+
+tr:nth-child(odd) {
+  background-color: whitesmoke;
+}
+
+/* Row hover effect */
+tr:hover {
+  background-color: #f0e9e2;
+  cursor: pointer;
+}

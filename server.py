@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, session
+from flask import send_file, abort
+import os
 from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -374,8 +376,33 @@ def editProfile():
    return render_template("editProfile.html")
 
 @app.route('/view_papers')
-def viewPapers():
-   return render_template("viewPapers.html")
+def view_papers():
+    pastpapers_info = PASTPAPERS_INFO.query.all()
+    return render_template("view_papers.html", pastpapers_info=pastpapers_info)
+
+@app.route('/view_paper/<paper_id>')
+def view_paper(paper_id):
+    paper = PASTPAPERS_INFO.query.get(paper_id)
+    return send_file(paper.FILEPATH, mimetype='application/pdf')
+
+@app.route('/download_paper/<paper_id>')
+def download_paper(paper_id):
+    paper = PASTPAPERS_INFO.query.get(paper_id)
+
+    if paper and os.path.exists(paper.FILEPATH):
+        # Add the .pdf at the end of FIlename is the original name doesn't have .pdf
+        filename = paper.FILENAME
+        if not filename.lower().endswith('.pdf'):
+            filename += '.pdf'
+
+        return send_file(
+            paper.FILEPATH,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=filename
+        )
+    else:
+        abort(404, description="Paper not found or file missing.")
 
 @app.route('/securityQues', methods=['GET', 'POST'])
 def securityQues():
