@@ -357,9 +357,11 @@ def getInitials(name):
 @app.context_processor
 def inject_data():
     if session.get('email'):
+      email = session.get('email')
       name = session.get('name')
       initials = getInitials(name)
       print(initials) #For debugging purposes 
+      print(email)
 
       return {
         'email': session.get('email'),
