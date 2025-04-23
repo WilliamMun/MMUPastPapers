@@ -203,26 +203,75 @@
 /**The End of Content Settings for Main Page**/
 
 /* Footer Bar */
-.footerbar {
+footer {
   background-color: whitesmoke;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.1);
+  padding-bottom: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Footer Logo */
-.logo-footer {
-  height: 100px;
-  width: 225px;
-}
-
-.footer {
-  max-width: 1500px;
-  max-height: 100px;
+.footer-container {
+  max-width: 1350px;
   margin: 0 auto;
-  padding: 1rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
-/**The End of Footer Bar Settings for Main Page**/
+
+.footer-logo {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.footer-logo img {
+  width: 275px;
+  height: auto;
+  object-fit: contain;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 250px;
+}
+.footer-section h3 {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: bolder;
+  font-size: 18px;
+  margin: 1.5rem 0 1rem;
+  color: #374151;
+}
+.footer-section p {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.footer-links {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.footer-links li {
+  margin-bottom: 0.5rem;
+}
+.footer-links a {
+  color: #374151;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+.footer-links a:hover {
+  color: #2563eb;
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
 
 /** Login Page (login.html) **/
 .loginBox {
@@ -448,11 +497,7 @@ caption {
   font-weight: bold;
   color: whitesmoke;
   padding: 10px;
-  text-shadow: 
-    -1px -1px 0 #A76545,
-     1px -1px 0 #A76545,
-    -1px  1px 0 #A76545,
-     1px  1px 0 #A76545;
+  text-shadow: 1px 1px #A76545;
 }
 
 /* Header styling */

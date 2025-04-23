@@ -13,20 +13,6 @@
     
 <!-- Header Bar -->
 {% include 'header.html' %}
-<!-- <header class="topbar">
-    <div class="container">
-       Logo 
-      <div class="logo">
-        <img src="{{ url_for('static', filename='images/mmupplogo.png')}}" alt="Logo" class="logo" />
-      </div>
-  
-       Menu 
-      <nav class="menu">
-        <a href="{{ url_for('login') }}">Login</a>|
-        <a href="{{ url_for('register') }}">Register</a>
-      </nav>
-    </div>
-</header> -->
 
   <!-- Main Content -->
   <main class="main-content">
@@ -68,16 +54,8 @@
       </table>
     </div>
   </main>
-  {% include 'footer.html' %}
-  <!-- Footer Bar -->
-  <!-- <footer class="footerbar">
-    <div class="container">
-      <img src="{{ url_for('static', filename='images/mmupplogo2.png')}}" alt="Logo" class="logo-footer" />
-      <nav class="menu">
-        <a href="#">About Us</a>|
-        <a href="#">Contact</a>
-      </nav>
-    </div>
-  </footer> -->
+
+<!-- Footer Bar -->
+{% include 'footer.html' %}
 </body>
 </html>
