@@ -46,7 +46,7 @@
                     <span>></span>
                 </a>
 
-                <a href="#" class="sub-menu-link">
+                <a href="{{ url_for('logout')}}" class="sub-menu-link">
                     <img src="{{ url_for('static', filename='images/logOut.jpg') }}">
                     <p>Logout</p>
                     <span>></span>
@@ -54,4 +54,31 @@
             </div>
         </div>
     </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops! An error occurred.',
+                            text: "{{ message }}"
+                    });
+
+                    {% elif category == 'success' %}
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Yay! Success.',
+                            text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                        window.location.href = "{{ url_for('main') }}";
+                        }, 1000);
+                    });
+                    {% endif %}
+                {% endfor %}
+            </script>
+        {% endif %}
+    {% endwith %}
 </html>

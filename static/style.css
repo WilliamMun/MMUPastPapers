@@ -60,7 +60,7 @@
 .sub-menu-wrap {
   position: absolute;
   right: 5%; 
-  width: 400px;
+  width: 500px;
   max-height: 0px;
   overflow: hidden; 
   transition: max-height 0.5s;
