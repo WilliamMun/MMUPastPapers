@@ -14,21 +14,22 @@
         {% include 'header.html' %}
 
         <!-- Main content -->
-        <main>
-            <h2>Edit Security Questions</h2>
+        <main class="main-content">
+            <div class="ques-box">
+            <h1>Edit Security Questions</h1>
             <form method="POST" action="/securityQues">
-                <div class="ques-box">
                     {% for qa in user_qa %}
                     <div class="ques-box-input">
                         <label for="answer">{{ qa.question or '' }}</label>
                         <input type="text" name="{{ qa.id }}" id="{{ qa.id }}" class="answer" value="{{ qa.answer or '' }}">
                     </div>
                     {% endfor %}
-                </div>
-                <input type="submit" id="submit-btn" class="submit-btn" value="Edit">
+                <button type="submit" id="submit-btn" class="submit-btn" value="Edit">Edit</button>
             </form>
+            </div>
         </main>
-        {% include 'footer.html' %}
+
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <script>
@@ -38,22 +39,24 @@
                                 icon: 'error',
                                 title: 'Oops! An error occurred.',
                                 text: "{{ message }}"
-                        });
-        
+                            });
                         {% elif category == 'success' %}
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Yay! Success.',
                                 text: "{{ message }}"
-                        }).then(() => {
-                            setTimeout(function() {
-                            window.location.href = "{{ url_for('editProfile') }}";
-                            }, 1000);
-                        });
+                            }).then(() => {
+                                setTimeout(function() {
+                                    window.location.href = "{{ url_for('editProfile') }}";
+                                }, 1000);
+                            });
                         {% endif %}
                     {% endfor %}
                 </script>
             {% endif %}
         {% endwith %}
+
+<!-- Footer Bar -->
+{% include 'footer.html' %}
     </body>
 </html>
