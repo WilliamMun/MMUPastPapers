@@ -29,11 +29,12 @@
             <div class="footer-section">
                 <h3>Directory</h3>
                 <ul class="footer-links">
+                    {% if 'email' in session %}
+                    <li><a href="/view_papers">View Papers</a></li>
+                    {% else %}
                     <li><a href="/main">Main</a></li>
                     <li><a href="/login">Login</a></li>
                     <li><a href="/register">Register</a></li>
-                    {% if 'email' in session %}
-                    <li><a href="/view_papers">View Papers</a></li>
                     {% endif %}
                 </ul>
             </div>
