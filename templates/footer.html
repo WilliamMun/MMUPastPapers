@@ -21,7 +21,11 @@
             <div class="footer-section">
                 <h3>Quick Links</h3>
                 <ul class="footer-links">
+                    {% if 'email' in session %}
+                    <li><a href="/view_papers">Home</a></li>
+                    {% else %}
                     <li><a href="/main">Home</a></li>
+                    {% endif %}
                     <li><a href="/about">About</a></li>
                     <li><a href="/services">Services</a></li>
                 </ul>
