@@ -556,5 +556,9 @@ def open_class(class_id):
 @app.route('/createClass')
 def createClass():
    return render_template("create_class.html")
+
+@app.route('/joinClass')
+def joinClass():
+   return render_template("view_class.html")
 if __name__ == "__main__":
     app.run(debug=True)

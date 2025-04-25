@@ -36,3 +36,8 @@ function showInput() {
 function changePage() {
     window.location.href = "/securityQues";
 }
+
+function showClassCodeInput() {
+    var classCodeBox = document.getElementById("classCodeBox");
+    classCodeBox.classList.toggle("openClassCodeBox");
+}
