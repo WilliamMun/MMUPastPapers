@@ -5,13 +5,19 @@ from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 import re
 import uuid
 
 app = Flask(__name__)
 app.secret_key = "MmUPastPap3rs2510@CSP1123"
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mmupastpapers.db"
+app.config['UPLOAD_FOLDER'] = "uploads"
+app.config['ALLOWED_EXTENSION'] = {'pdf', 'docx'}
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
 db = SQLAlchemy(app)
+
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create upload folder if it doesn't exist
 
 #-----------------------------------------------------------------------------------------------------------
 #Create database tables  
@@ -133,6 +139,10 @@ class DISCUSSION_FORUM(db.Model):
 def isStrongPassword(password):
   pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{10,}$'
   return bool(re.match(pattern, password))
+
+def allowed_file(filename):
+   return '.' in filename and \
+          filename.rsplit('.', 1). lower() in app.config['ALLOWED_EXTENSION']
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -521,6 +531,56 @@ def logout():
    response = make_response(render_template("showAlert.html"))
    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
    return response
+
+@app.route('/upload_paper', methods=['GET', 'POST'])
+def upload_paper():
+    if 'email' not in session:
+        flash('Please login to upload papers', 'error')
+        return redirect('/login')
+    
+    try:
+        paper_desc = request.form.get('paper_desc').strip()
+        term_id = request.form.get('term_id')
+        file = request.files.get('file')
+
+        if not paper_desc or not term_id or not file:
+            flash('All fields are required!', 'error')
+            return redirect('/upload_paper')
+
+        if not allowed_file(file.filename):
+           flash ('Only PDF andDOCX files allowed!', "error")
+           return redirect('/upload_paper')
+        
+        orig_filename = secure_filename(file.filename)
+        unique_id = uuid.uuid4().hex[:8]
+        filename = f"{unique_id}_{orig_filename}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        paper_id = uuid.uuid4().hex[:10]
+        new_paper = PASTPAPERS_INFO(
+           PAPER_ID=paper_id, 
+           TERM_ID=term_id, 
+           FILENAME=orig_filename, 
+           FILEPATH=filepath, 
+           PAPER_DESC=paper_desc,
+           UPLOAD_BY=session['user'],
+           LASY_MODIFIED_BY=session['user']
+           )
+        
+        db.session.add(new_paper)
+        db.session.commit()
+        flash('Paper uploaded successfully!', 'success')
+        return redirect('/view_papers')
+
+    except Exception as e:
+        db.session.rollback()
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        flash('Error occurred while uploading paper. Please try again later.', 'error')
+        print("Internal server error:", e)
+
+    return render_template('upload_paper.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
