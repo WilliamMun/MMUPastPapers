@@ -173,6 +173,7 @@ def login():
           session['email'] = user.USER_EMAIL
           session['name'] = user.NAME
           session['roles'] = user.ROLES
+          session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
           return render_template('login.html')
@@ -522,5 +523,38 @@ def logout():
    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
    return response
 
+@app.route('/view_class', methods=['GET','POST'])
+def view_class():
+  records = USER_CLASS.query.filter_by(USER_ID=session.get('user_id')).all()
+  print("User class:",records) #For debugging purposes
+  classIds = [record.CLASS_ID for record in records]
+  print(f"Class ID under user {session.get('user_id')} : {classIds}") #For debugging purposes
+
+  classes = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds)).all()
+
+  class_records = []
+  for cls in classes:
+    lecturer = USER_INFO.query.filter_by(USER_ID=cls.CREATED_BY).first()
+    class_records.append({
+       'classID': cls.CLASS_ID,
+       'className': cls.CLASS_NAME,
+       'termID': cls.TERM_ID,
+       'lecturerName': lecturer.NAME if lecturer else 'Unknown'
+    })
+  
+  print("Final record:",class_records) #For debugging purposes 
+  return render_template("view_class.html", records=class_records)
+
+@app.route('/open_class/<class_id>', methods=['GET','POST'])
+def open_class(class_id):
+   class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
+   if not class_data:
+      message = "Class not found! Join a class?", 404
+      return message
+   return render_template("class_page.html",class_data=class_data)
+
+@app.route('/createClass')
+def createClass():
+   return render_template("create_class.html")
 if __name__ == "__main__":
     app.run(debug=True)
