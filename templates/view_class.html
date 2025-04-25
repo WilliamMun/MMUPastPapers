@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
+  <script src="{{ url_for('static', filename='script.js' )}}"></script>
+  <title>View Class | MMUPastPapers</title>
+</head>
+
+<body>
+    
+<!-- Header Bar -->
+{% include 'header.html' %}
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="btn-container">
+      <button class="btn">Join Class</button>
+      {% if session.get('roles') == 2 %}
+      <a href="{{ url_for('createClass') }}"><button class="btn">Create Class</button></a>
+      {% endif %}
+    </div>
+    <div class="class-container">
+        {% for record in records %}
+        <div class="class-box" id="{{ record.classID }}">
+            <a href="{{ url_for('open_class', class_id=record.classID) }}">
+                <img src="####">
+                <hr>
+                <p>{{ record.className }}</p>
+                <p>Lecturer/Instructor: {{ record.lecturerName }}</p>
+                <p>Term: {{ record.termID }}</p>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+  </main>
+
+<!-- Footer Bar -->
+{% include 'footer.html' %}
+</body>
+</html>
