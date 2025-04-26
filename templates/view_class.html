@@ -18,7 +18,14 @@
   <!-- Main Content -->
   <main class="main-content">
     <div class="btn-container">
-      <button class="btn">Join Class</button>
+      <button class="btn" onclick="showClassCodeInput()">Join Class</button>
+      <div class="hiddenClassCodeBox" id="classCodeBox">
+        <form action="/joinClass" method="POST">
+          <label for="classCode">Enter Class Code:</label>
+          <input type="text" name="classCode" id="classCode" class="classCode">
+          <input type="submit" name="submitClassCode" id="submitClassCode" class="submitClassCode" value="Join">
+        </form>
+      </div>
       {% if session.get('roles') == 2 %}
       <a href="{{ url_for('createClass') }}"><button class="btn">Create Class</button></a>
       {% endif %}
@@ -38,6 +45,34 @@
     </div>
   </main>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          <script>
+              var classCode = "{{ classCode }}";
+              console.log(classCode);
+              {% for category, message in messages %}
+                  {% if category == 'error' %}
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Oops! An error occurred.',
+                          text: "{{ message }}"
+                      });
+                  {% elif category == 'success' %}
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Yay! Success.',
+                          text: "{{ message }}"
+                      }).then(() => {
+                          setTimeout(function() {
+                              window.location.href = "/open_class/",classCode;
+                          }, 1000);
+                      });
+                  {% endif %}
+              {% endfor %}
+          </script>
+      {% endif %}
+  {% endwith %}
+  
 <!-- Footer Bar -->
 {% include 'footer.html' %}
 </body>

@@ -718,3 +718,14 @@ tr:hover {
   margin-top: 10px;
 }
 /**The End of Security Question Page Settings**/
+
+/** View Class Page Settings **/
+.hiddenClassCodeBox {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height 0.5s;
+}
+
+.hiddenClassCodeBox.openClassCodeBox {
+  max-height: 200px;
+}
