@@ -380,40 +380,32 @@ def editProfile():
     email = session.get('email')
     name = session.get('name')
     newName = request.form['name']
-    newEmail = request.form['email']
-    print("New name: ",newName," New email:",newEmail) #For debugging purposes 
+    print("New name: ",newName) #For debugging purposes 
 
     #Input verification / validation 
-    if not (newName or newEmail) or newName == '' or newEmail == '':
-      flash("All fields are required!",'error')
-      print("All/some fields are empty.") #For debugging purposes 
+    if not newName or newName.strip() == '':
+      flash("Name fields are required!",'error')
+      print("Name fields are empty.") #For debugging purposes 
       return redirect('/editProfile') 
-    if not re.match(r"^[\w\.-]+@([\w]+\.)*mmu\.edu\.my$", newEmail):
-      flash("Please enter a valid MMU email address.", 'error')
-      print("Email does not met requirement.") #For debugging purposes 
-      return redirect('/editProfile')
     
     #Retrieve data from database and compare 
-    emailRecord = USER_INFO.query.filter_by(USER_EMAIL=newEmail).all()
-    print("Email record only: ",emailRecord)
-    if emailRecord: 
-      flash('Email existed! Please enter another email.','error')
-      print("Email existed.") #For debugging purposes 
-      return redirect('/editProfile')
-
+    emailRecord = USER_INFO.query.filter_by(USER_EMAIL=email).first()
+    if not emailRecord:
+      flash('User not found.','error')
+      print("User not found.") #For debugging purposes 
+      return redirect('/editProfile') 
+       
     #Get user ID 
-    emailObject = USER_INFO.query.filter_by(USER_EMAIL=email).first()
-    user_ID = emailObject.USER_ID
-    print("Email obtain:",email,"and respective user ID:",user_ID) #For debugging purposes
+    user_ID = emailRecord.USER_ID
+    print("Email obtained:",email,"and respective user ID:",user_ID) #For debugging purposes
 
     #Get record 
     record = USER_INFO.query.filter_by(USER_ID=user_ID).first()
     print("Email + name:",record)
     try:
       if record: 
-        record.USER_EMAIL = newEmail 
         record.NAME = newName 
-        record.LAST_MODIFIED_BY = newEmail 
+        record.LAST_MODIFIED_BY = email 
         record.LAST_MODIFIED_ON = datetime.now()
         db.session.commit()
         session.clear()
@@ -421,8 +413,8 @@ def editProfile():
         print("Edit profile success.") #For debugging purposes 
         return render_template('editProfile.html')
       else:
-        flash('Email already existed! Please enter another email.','error')
-        print("Email existed! 2") #For debugging purposes 
+        flash('User record not found.','error')
+        print("User record not found.") #For debugging purposes 
         return redirect('/editProfile')
     except Exception as e:
       flash('Error occurs while editing user profile. Please try again later.','error')
@@ -438,12 +430,12 @@ def view_papers():
 
 @app.route('/view_paper/<paper_id>')
 def view_paper(paper_id):
-    paper = PASTPAPERS_INFO.query.get(paper_id)
+    paper = db.session.get(PASTPAPERS_INFO,paper_id)
     return send_file(paper.FILEPATH, mimetype='application/pdf')
 
 @app.route('/download_paper/<paper_id>')
 def download_paper(paper_id):
-    paper = PASTPAPERS_INFO.query.get(paper_id)
+    paper = db.session.get(PASTPAPERS_INFO,paper_id)
 
     if paper and os.path.exists(paper.FILEPATH):
         # Add the .pdf at the end of FIlename is the original name doesn't have .pdf

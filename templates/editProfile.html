@@ -32,7 +32,7 @@
                     <img src="{{ url_for('static', filename='images/editProfile.jpg' )}}" alt="Profile" class="clickable-img" onclick="showInput()">
                     <div class="text-user" onclick="showInput()">
                         <h3>Edit Profile</h3>
-                        <p>You can edit your name and email here.</p>
+                        <p>You can edit your name here.</p>
                     </div>
                     <div class="hidden-input-box" id="hidden-input-box" style="display: none;">
                         <form method="POST" action="/editProfile">
@@ -41,8 +41,8 @@
                                 <input type="text" name="name" id="name" class="name" placeholder="Enter new name" value="{{ name or '' }}">
                             </div>
                             <div class="email">
-                                <label for="email">Email</label>
-                                <input type="text" name="email" id="email" class="email" placeholder="Enter your new email" value="{{ email or '' }}">
+                                    <label for="email">Email</label>
+                                    <input type="text" name="email" id="email" class="readonly" value="{{ email or '' }}" readonly>
                             </div>
                             <input type="submit" class="submit" id="submit" name="submit" value="Edit">
                         </form>
