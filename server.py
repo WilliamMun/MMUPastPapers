@@ -519,7 +519,7 @@ def securityQues():
 def logout():
    session.clear()
    flash('Logged out successfully!', 'success')
-   response = make_response(render_template("showAlert.html"))
+   response = make_response(render_template("showAlert.html", showAlert=True))
    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
    return response
 
@@ -548,6 +548,7 @@ def view_class():
 @app.route('/open_class/<class_id>', methods=['GET','POST'])
 def open_class(class_id):
    class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
+   print(class_data)
    if not class_data:
       message = "Class not found! Join a class?", 404
       return message
@@ -557,8 +558,53 @@ def open_class(class_id):
 def createClass():
    return render_template("create_class.html")
 
-@app.route('/joinClass')
+@app.route('/joinClass', methods=['GET','POST'])
 def joinClass():
-   return render_template("view_class.html")
+
+  if request.method == 'POST':
+    user_id = session.get('user_id')
+    classCode = request.form['classCode']
+    print("Class Code from user: ",classCode) #For debugging purposes 
+
+    #Input verification 
+    if not classCode: 
+      flash('Please enter a class code!','error')
+      print("Empty class code received.") #For debugging purposes 
+      return redirect(url_for('view_class'))
+  
+    #Join class action 
+    classID = CLASS.query.filter_by(CLASS_ID=classCode).first()
+    print("Class code from db: ",classID) #For debugging purposes 
+
+    already_joined = USER_CLASS.query.filter_by(CLASS_ID=classCode, USER_ID=user_id).first()
+    print("User already joined:",already_joined) #For debugging purposes
+    try:
+      #If user joined 
+      if already_joined:
+        flash('You joined this class!','error')
+        print("User joined this class!") #For debugging purposes 
+        return redirect(url_for('view_class'))
+      
+      #If class ID exists 
+      if classID:
+        new_record = USER_CLASS(USER_ID=user_id, CLASS_ID=classCode, JOINED_AT=datetime.now())
+        db.session.add(new_record)
+        db.session.commit()
+        flash('Join class successfully!','success')
+        print("Join class action success.") #For debugging purposes 
+        return redirect(url_for('open_class', class_id=classCode, showAlert=False))
+      
+      #If class not exists 
+      elif not classID:
+        flash('Class not found. Please check your class code.','error')
+        print("Wrong class code input.") #For debugging purposes 
+        return redirect(url_for('view_class'))
+    except Exception as e:
+      flash('Error occurs while joining class. Please try again.','error')
+      print("Internal server error.") #For debugging purposes 
+      return redirect(url_for('view_class'))
+
+  return redirect(url_for('view_class')) #In case 'GET' method is passed 
+
 if __name__ == "__main__":
     app.run(debug=True)

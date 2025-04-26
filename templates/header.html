@@ -53,7 +53,7 @@
             </div>
         </div>
     </header>
-
+{% if showAlert == True %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <script>
@@ -80,4 +80,5 @@
             </script>
         {% endif %}
     {% endwith %}
+{% endif %}
 </html>
