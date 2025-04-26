@@ -556,7 +556,7 @@ def open_class(class_id):
 
 @app.route('/createClass')
 def createClass():
-   return render_template("create_class.html")
+  return render_template("create_class.html")
 
 @app.route('/joinClass', methods=['GET','POST'])
 def joinClass():

@@ -17,9 +17,62 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    
+    <div class="create-container">
+      <div class="head-box">
+        <h2>Create New Class</h2>
+      </div>
+      <hr>
+      <form action="/createClass" method="POST">
+        <div class="input-container">
+          <div class="class-name-input-box">
+            <label for="className">Class Name:</label>
+            <input type="text" name="className" id="className" class="className" placeholder="Enter a class name">
+          </div>
+          <div class="subject-select-box">
+            <label for="subject">Subject:</label>
+            <select id="subject" name="subject" class="subject">
+              <option value="####">Option 1</option>
+            </select>
+          </div>
+          <div class="term-select-box">
+            <label for="term">Term:</label>
+            <select id="term" name="term" class="term">
+              <option value="####">Option 1</option>
+            </select>
+          </div>
+        </div>
+        <input type="submit" name="create-new-class" value="Create">
+      </form>
+    </div>
   </main>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          <script>
+              var classCode = "{{ classCode }}";
+              console.log(classCode);
+              {% for category, message in messages %}
+                  {% if category == 'error' %}
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Oops! An error occurred.',
+                          text: "{{ message }}"
+                      });
+                  {% elif category == 'success' %}
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Yay! Success.',
+                          text: "{{ message }}"
+                      }).then(() => {
+                          setTimeout(function() {
+                              window.location.href = "";
+                          }, 1000);
+                      });
+                  {% endif %}
+              {% endfor %}
+          </script>
+      {% endif %}
+  {% endwith %}
 <!-- Footer Bar -->
 {% include 'footer.html' %}
 </body>
