@@ -31,13 +31,17 @@
           <div class="subject-select-box">
             <label for="subject">Subject:</label>
             <select id="subject" name="subject" class="subject">
-              <option value="####">Option 1</option>
+              {% for subject in subjectList %}
+                <option value="{{ subject.subject_id }}">{{ subject.subject_id }} - {{ subject.subject_name }}</option>
+              {% endfor %}
             </select>
           </div>
           <div class="term-select-box">
             <label for="term">Term:</label>
             <select id="term" name="term" class="term">
-              <option value="####">Option 1</option>
+              {% for term in termList %}
+                <option value="{{ term.term_id }}">{{ term.term_id }} - {{ term.term_name }}</option>
+              {% endfor %}
             </select>
           </div>
         </div>
@@ -65,7 +69,8 @@
                           text: "{{ message }}"
                       }).then(() => {
                           setTimeout(function() {
-                              window.location.href = "";
+                              console.log("/open_class/"+classCode);
+                              window.location.href = "/open_class/"+classCode;
                           }, 1000);
                       });
                   {% endif %}
