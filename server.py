@@ -83,9 +83,7 @@ class CLASS(db.Model):
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
-  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID)) 
-  STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey(STUDY_LVL_INFO.STUDY_LVL_ID)) 
-  FACULTY_ID = db.Column(db.String(3), db.ForeignKey(FACULTY_INFO.FACULTY_ID)) 
+  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))  
   TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID))  
  
 #ENTITY: USER_CLASS 
@@ -546,9 +544,67 @@ def open_class(class_id):
       return message
    return render_template("class_page.html",class_data=class_data)
 
-@app.route('/createClass')
+@app.route('/createClass', methods=['GET','POST'])
 def createClass():
-   return render_template("create_class.html")
+  #Show data in template
+  subjectRec = db.session.query(SUBJECT_INFO.SUBJECT_ID, SUBJECT_INFO.SUBJECT_DESC).all()
+  print(f"Subject list: {subjectRec}") #For debugging purposes 
+
+  subject_list = [
+     {'subject_id': subject_id, 'subject_name': subject_desc}
+     for subject_id, subject_desc in subjectRec
+  ]
+  print(f"Subject list to be returned: {subject_list}") #For debugging purposes 
+
+  termRec = db.session.query(TERM_INFO.TERM_ID, TERM_INFO.TERM_DESC).all()
+  print(f"Term list: {termRec}") #For debugging purposes 
+
+  term_list = [
+     {'term_id': term_id, 'term_name': term_desc}
+     for term_id, term_desc in termRec
+  ]
+  print(f"Term list to be returned: {term_list}") #For debugging purposes 
+
+  if request.method == 'POST':
+    className = request.form['className']
+    subject = request.form['subject']
+    term = request.form['term']
+
+    #Input verification 
+    if not className or not subject or not term:
+       flash('All fields are required!','error')
+       print("All/some fiedls are empty.") #For debugging purposes 
+       return redirect(url_for('createClass'))
+    
+    #Retrieve data from database and compare 
+    record = CLASS.query.filter_by(CLASS_NAME=className, SUBJECT_ID=subject, TERM_ID=term).first()
+    print(f"The class record is: {record}") #For debugging purposes 
+
+    if record: 
+      db.session.rollback()
+      flash('The class you want to create existed!','error')
+      print("Class existed!") #For debugging purposes 
+      return redirect(url_for('createClass'))
+    else: #Create a new class in db 
+      try: 
+        classID = uuid.uuid4().hex[:6]
+        new_record = CLASS(CLASS_ID=classID, CLASS_NAME=className, CREATED_BY=session.get('user_id'), SUBJECT_ID=subject, TERM_ID=term)
+        new_record2 = USER_CLASS(CLASS_ID=classID, USER_ID=session.get('user_id'), JOINED_AT=datetime.now())
+        db.session.add(new_record)
+        db.session.add(new_record2)
+        db.session.commit()
+        flash('Class created successfully!','success')
+        print(f"Class {className} created!") #For debugging purposes 
+        return render_template("create_class.html", classCode=classID)
+      except IntegrityError:
+        flash('The class you want to create existed!','error')
+        return redirect(url_for('createClass'))
+      except Exception as e:
+        flash('Error occurs while creating class. Please try again later.','error')
+        print(f"Internal server error: {e}")
+        return redirect(url_for('createClass'))
+       
+  return render_template("create_class.html", subjectList=subject_list, termList=term_list)
 
 @app.route('/joinClass', methods=['GET','POST'])
 def joinClass():
