@@ -582,5 +582,25 @@ def upload_paper():
 
     return render_template('upload_paper.html')
 
+@app.route('/delete_paper/<paper_id>', methods=['POST'])
+def delete_paper(paper_id):
+    if 'email' not in session:
+        flash('Please login to delete papers', 'error')
+        return redirect('/login')
+    paper = PASTPAPERS_INFO.query.get(paper_id)
+    if not paper:
+       flash("Paper not found", 'error')
+       return redirect('/view_papers')
+    
+    try:
+       if os.path.exists(paper.FILEPATH):
+          os.remove(paper.FILEPATH)
+       db.session.delete(paper)
+       db.sessioon.commit()
+       flash('Paper deleted successfully!', 'success')
+    except Exception as e:
+       db.session.rollback()
+       flash('Error occurred while deleting paper: {str(e)}', 'error')
+
 if __name__ == "__main__":
     app.run(debug=True)
