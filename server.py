@@ -534,46 +534,52 @@ def logout():
 
 @app.route('/upload_paper', methods=['GET', 'POST'])
 def upload_paper():
-    if 'email' not in session:
-        flash('Please login to upload papers', 'error')
+    if 'roles' not in session or session['roles'] != 2:
+        flash('Access denied: Only lecturers can upload papers', 'error')
         return redirect('/login')
     
-    try:
-        paper_desc = request.form.get('paper_desc').strip()
-        term_id = request.form.get('term_id')
-        file = request.files.get('file')
+    if request.method == 'POST':
+      try:
+         paper_desc = request.form.get('paper_desc').strip()
+         term_id = request.form.get('term_id')
+         file = request.files.get('file')
+         new_paper = PASTPAPERS_INFO(
+            UPLOAD_BY=session['email'],
+            LAST_MODIFIED_ON=datetime.now(),
+            LAST_MODIFIED_BY=session['email'],
+         )
 
-        if not paper_desc or not term_id or not file:
-            flash('All fields are required!', 'error')
-            return redirect('/upload_paper')
+         if not paper_desc or not term_id or not file:
+             flash('All fields are required!', 'error')
+             return redirect('/upload_paper')
 
-        if not allowed_file(file.filename):
-           flash ('Only PDF andDOCX files allowed!', "error")
-           return redirect('/upload_paper')
+         if not allowed_file(file.filename):
+             flash ('Only PDF and DOCX files allowed!', "error")
+             return redirect('/upload_paper')
         
-        orig_filename = secure_filename(file.filename)
-        unique_id = uuid.uuid4().hex[:8]
-        filename = f"{unique_id}_{orig_filename}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
+         orig_filename = secure_filename(file.filename)
+         unique_id = uuid.uuid4().hex[:8]
+         filename = f"{unique_id}_{orig_filename}"
+         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+         file.save(filepath)
 
-        paper_id = uuid.uuid4().hex[:10]
-        new_paper = PASTPAPERS_INFO(
-           PAPER_ID=paper_id, 
-           TERM_ID=term_id, 
-           FILENAME=orig_filename, 
-           FILEPATH=filepath, 
-           PAPER_DESC=paper_desc,
-           UPLOAD_BY=session['user'],
-           LASY_MODIFIED_BY=session['user']
-           )
+         paper_id = uuid.uuid4().hex[:10]
+         new_paper = PASTPAPERS_INFO(
+         PAPER_ID=paper_id, 
+         TERM_ID=term_id, 
+         FILENAME=orig_filename, 
+         FILEPATH=filepath, 
+         PAPER_DESC=paper_desc,
+         UPLOAD_BY=session['user'],
+         LASY_MODIFIED_BY=session['user']
+         )
         
-        db.session.add(new_paper)
-        db.session.commit()
-        flash('Paper uploaded successfully!', 'success')
-        return redirect('/view_papers')
+         db.session.add(new_paper)
+         db.session.commit()
+         flash('Paper uploaded successfully!', 'success')
+         return redirect('/view_papers')
 
-    except Exception as e:
+      except Exception as e:
         db.session.rollback()
         if os.path.exists(filepath):
             os.remove(filepath)
@@ -584,12 +590,17 @@ def upload_paper():
 
 @app.route('/delete_paper/<paper_id>', methods=['POST'])
 def delete_paper(paper_id):
-    if 'email' not in session:
-        flash('Please login to delete papers', 'error')
+    if 'roles' not in session or session['roles'] != 2:
+        flash('Access denied: Only lecturers can delete papers', 'error')
         return redirect('/login')
+    
     paper = PASTPAPERS_INFO.query.get(paper_id)
     if not paper:
        flash("Paper not found", 'error')
+       return redirect('/view_papers')
+    
+    if paper.UPLOAD_BY != session['email']:
+       flash("You can only delete papers you've uploaded", 'error')
        return redirect('/view_papers')
     
     try:
