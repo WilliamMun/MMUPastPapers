@@ -539,23 +539,24 @@ def upload_paper():
         return redirect('/login')
     
     if request.method == 'POST':
+      file = None
+      filepath = None
       try:
          paper_desc = request.form.get('paper_desc').strip()
          term_id = request.form.get('term_id')
          file = request.files.get('file')
-         new_paper = PASTPAPERS_INFO(
-            UPLOAD_BY=session['email'],
-            LAST_MODIFIED_ON=datetime.now(),
-            LAST_MODIFIED_BY=session['email'],
-         )
 
-         if not paper_desc or not term_id or not file:
-             flash('All fields are required!', 'error')
-             return redirect('/upload_paper')
-
+         if not all([paper_desc, term_id, file]):
+            flash('all fields are required!', 'error')
+            return redirect('/upload_paper')
+         
          if not allowed_file(file.filename):
-             flash ('Only PDF and DOCX files allowed!', "error")
-             return redirect('/upload_paper')
+            flash('Only PDF and DOCX files are allowed!', 'error')
+            return redirect('/upload_paper')
+         
+         if not TERM_INFO.query.get(term_id):
+            flash('Invalid term selected', 'error')
+            return redirect('/upload_paper')
         
          orig_filename = secure_filename(file.filename)
          unique_id = uuid.uuid4().hex[:8]
@@ -565,13 +566,13 @@ def upload_paper():
 
          paper_id = uuid.uuid4().hex[:10]
          new_paper = PASTPAPERS_INFO(
-         PAPER_ID=paper_id, 
-         TERM_ID=term_id, 
-         FILENAME=orig_filename, 
-         FILEPATH=filepath, 
-         PAPER_DESC=paper_desc,
-         UPLOAD_BY=session['user'],
-         LASY_MODIFIED_BY=session['user']
+            PAPER_ID=paper_id, 
+            TERM_ID=term_id, 
+            FILENAME=orig_filename, 
+            FILEPATH=filepath, 
+            PAPER_DESC=paper_desc,
+            UPLOAD_BY=session['user'],
+            LASY_MODIFIED_BY=session['user']
          )
         
          db.session.add(new_paper)
@@ -581,10 +582,10 @@ def upload_paper():
 
       except Exception as e:
         db.session.rollback()
-        if os.path.exists(filepath):
+        if filepath and os.path.exists(filepath):
             os.remove(filepath)
-        flash('Error occurred while uploading paper. Please try again later.', 'error')
-        print("Internal server error:", e)
+        flash(f'Error occurred while uploading paper: {str(e)}', 'error')
+        app.logger.error(f"upload error: {str(e)}", exc_info=True)
 
     return render_template('upload_paper.html')
 
@@ -607,11 +608,14 @@ def delete_paper(paper_id):
        if os.path.exists(paper.FILEPATH):
           os.remove(paper.FILEPATH)
        db.session.delete(paper)
-       db.sessioon.commit()
+       db.session.commit()
        flash('Paper deleted successfully!', 'success')
     except Exception as e:
        db.session.rollback()
-       flash('Error occurred while deleting paper: {str(e)}', 'error')
+       flash(f'Error occurred while deleting paper: {str(e)}', 'error')
+       app.logger.error(f"delete error: {str(e)}", exc_info=True)
+
+    return redirect('/view_papers')
 
 if __name__ == "__main__":
     app.run(debug=True)
