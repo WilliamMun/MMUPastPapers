@@ -17,6 +17,16 @@
   <!-- Main Content -->
   <main class="main-content">
     <div class="table-container">
+      <!--upload button-->
+      <div class="Button">
+        <a href="{{ url_for('upload_paper') }}" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Upload Paper
+        </a>
+      </div>
+
       <table>
         <caption>View Past Papers</caption>
         <thead>
