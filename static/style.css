@@ -841,7 +841,7 @@ tr:hover {
   background: white;
   padding: 40px;
   width: 500px; 
-  height: 500px;
+  height: auto;
   max-width: 95%;
   margin: 40px auto;
   border-radius: 20px; 
@@ -850,7 +850,7 @@ tr:hover {
 }
 
 .upload-box h1 {
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 20px;
   font-weight: bold;
   margin-top: -15px;
