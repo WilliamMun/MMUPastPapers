@@ -8,29 +8,32 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <title>Upload Paper | MMUPastPapers</title>
     </head>
-    <!-- Header Bar -->
-{% include 'header.html' %}
 
-    <body class="main-content">
-        <div class="table-container">
-        <form action="upload_paper" method="post" enctype="multipart/form-data">
-            <label for="paper_desc">Paper Description:</label>
-            <input type="text" name="paper_desc" required><br>
+    <body>
+        <!-- Header Bar -->
+        {% include 'header.html' %}
 
-            <label for="term_id">Term: </label>
-            <select class="text-box" name="term_id" id="term_id" required>
-                <option value="">--Select a Term</option>
-                {% for term in terms %}
-                    <option value="{{ term.TERM_ID }}">{{ term.TERM_DESC }}</option>
-                {% endfor %}
-            </select><br>
+        <!-- Main content -->
+        <main class="main-content">
+            <div class="table-container">
+                <form action="upload_paper" method="post" enctype="multipart/form-data">
+                    <label for="paper_desc">Paper Description:</label>
+                    <input type="text" name="paper_desc" required><br>
 
-            <label for="file">Uplaod File:</label>
-            <input class="button" type="file" name="file" accept=".pdf" required><br>
+                    <label for="term_id">Term: </label>
+                    <select class="text-box" name="term_id" id="term_id" required>
+                        <option value="">--Select a Term</option>
+                        {% for term in terms %}
+                            <option value="{{ term.TERM_ID }}">{{ term.TERM_DESC }}</option>
+                        {% endfor %}
+                    </select><br>
 
-            <input class="button" type="submit" value="Upload Paper">
-        </form>
-        </div>
+                    <label for="file">Uplaod File:</label>
+                    <input class="button" type="file" name="file" accept=".pdf" required><br>
+                </form>
+            </div>
+        </main>
+        <!-- Footer Bar -->
+        {% include 'footer.html' %}
     </body>
-    <!-- Footer Bar -->
-{% include 'footer.html' %}
+</html>
