@@ -93,6 +93,31 @@
     </div>
   </main>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          <script>
+              {% for category, message in messages %}
+                  {% if category == 'error' %}
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Oops! An error occurred.',
+                          text: "{{ message }}"
+                      });
+                  {% elif category == 'success' %}
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Yay! Success.',
+                          text: "{{ message }}"
+                      }).then(() => {
+                          setTimeout(function() {
+                              window.location.href = "{{ url_for('view_papers') }}";
+                          }, 100);
+                      });
+                  {% endif %}
+              {% endfor %}
+          </script>
+      {% endif %}
+  {% endwith %}
 <!-- Footer Bar -->
 {% include 'footer.html' %}
 </body>

@@ -631,6 +631,7 @@ def delete_paper(paper_id):
         db.session.delete(paper)
         db.session.commit()
         flash('Paper deleted successfully!', 'success')
+        return render_template("view_papers.html")
 
     except Exception as e:
         db.session.rollback()
