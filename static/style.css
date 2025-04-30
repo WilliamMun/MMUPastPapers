@@ -764,13 +764,18 @@ tr:hover {
   font-size: 20px;
   font-weight: bold;
   margin-top: -15px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   color: black;
 }
 
 .ques-box h2 { /**Font size for h2**/
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   color: #003366;
+}
+
+.ques-box p {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-bottom: 30px;
 }
 
 /** Input placeholder **/

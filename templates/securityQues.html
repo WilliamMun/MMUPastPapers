@@ -17,6 +17,9 @@
         <main class="main-content">
             <div class="ques-box">
             <h1>Edit Security Questions</h1>
+            {% if 'newRegistered' %}
+            <p>Setup your security questions first time!</p>
+            {% endif %}
             <form method="POST" action="/securityQues">
                     {% for qa in user_qa %}
                     <div class="ques-box-input">
@@ -47,7 +50,7 @@
                                 text: "{{ message }}"
                             }).then(() => {
                                 setTimeout(function() {
-                                    window.location.href = "{{ url_for('editProfile') }}";
+                                    window.location.href = "{{ url_for('logout') }}";
                                 }, 1000);
                             });
                         {% endif %}

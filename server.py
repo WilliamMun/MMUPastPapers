@@ -244,6 +244,8 @@ def register():
            db.session.commit()
            flash('User registered successfully!', 'success')
            print(f"User {email} succesfully registered")
+           session['newRegistered'] = True
+           print(session.get('newRegistered'))
            return render_template("register.html")
         except IntegrityError:
            db.session.rollback()
@@ -253,7 +255,7 @@ def register():
         except Exception as e:
            db.session.rollback()
            flash('Error occurred while registering user. Please try again later', 'error')
-           print("Internal server error.")
+           print(f"Internal server error: {e}")
            return redirect('/register')
     return render_template("register.html")
 
@@ -366,6 +368,7 @@ def inject_data():
         'email': session.get('email'),
         'name': session.get('name'),
         'roles': session.get('roles'),
+        'newRegistered': session.get('newRegistered'),
         'initials': initials
       }
     
