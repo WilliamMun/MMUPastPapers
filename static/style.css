@@ -45,7 +45,7 @@
 .avatar {
   width: 40px;
   height: 40px;
-  background-color: #4a90e2; /* any color you like */
+  background-image: linear-gradient(to right, #3571b4, #7b68bb, #b657aa, #e04584, #f04950);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -105,7 +105,7 @@
 .user-info .avatar-pfp {
   width: 80px;
   height: 80px;
-  background-color: #4a90e2; /* any color you like */
+  background-image: linear-gradient(to right, #3571b4, #7b68bb, #b657aa, #e04584, #f04950);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -173,18 +173,17 @@
   background-image: url("/static/images/mmuaerialview.png");
   background-size: cover;
   background-position: center center;
-  background-attachment: fixed; /* This creates the parallax effect */
+  background-attachment: fixed;
   background-repeat: no-repeat;
   background-color: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 90vh;
   text-align: center;
-  padding: 1rem;
+  padding: 20px 20px;
   position: relative;
-  z-index: 1; /* Keep this above the background */
-  height: 100vh; /* Full viewport height */
+  z-index: 1;
+  min-height: 90vh;
 }
 
 /**Content Design Settings for Main Page**/
@@ -379,6 +378,21 @@ button {
 button:hover {
   background-color: #BCCCDC;
   color: black;
+}
+
+.btn{
+  width: 15%;
+  padding: 12px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
 }
 
 /* Links */
@@ -587,9 +601,9 @@ tr:hover {
 /**Edit Profile Page**/
 .profile-box {
   background: white;
-  padding: 40px;
-  width: 1000px;
-  height: 600px;
+  padding: 30px;
+  width: 825px;
+  height: auto;
   max-width: 85%;
   margin: 40px auto;
   border-radius: 20px;
@@ -610,26 +624,36 @@ tr:hover {
 }
 
 .user-pic-name-box .avatar-user-pic-name-box {
-  width: 120px;
-  height: 120px;
-  background-color: #4a90e2; /* any color you like */
+  width: 60px;
+  height: 60px;
+  background-image: linear-gradient(to right, #3571b4, #7b68bb, #b657aa, #e04584, #f04950);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 48px;
+  font-size: 25px;
   text-transform: uppercase;
   font-family: Arial, sans-serif;
-  margin: 20px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
-.user-pic-name-box .text-profile {
+.user-pic-name-box .text-profile h2 {
   text-align: left;
   font-weight: 1000;
-  font-size: 25px;
+  font-size: 18px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-left: 10px;
+}
+
+.user-pic-name-box .text-profile h3 {
+  text-align: left;
+  font-weight: 500;
+  font-size: 16px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-left: 10px;
 }
 
 .edit-user-box {
@@ -637,35 +661,45 @@ tr:hover {
   align-items: center;
 }
 
-.edit-user-box .text-user {
+.edit-user-box .text-user h3{
   text-align: left;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.edit-user-box .text-user h3{
-  font-size: 20px;
-  font-weight: 600;
+.edit-user-box .text-user p{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 15px;
+  text-align: left
 }
 
 .edit-user-box .hidden-input-box {
   width: 500px;
   display: flex;
   margin-left: 15px;
+  font-weight: bold;
 }
 .edit-user-box .hidden-input-box label{
-  text-align: left;
-  display: flex;
+  text-align: center;
   flex-direction: row;
   align-items: center;
   font-family: Georgia, 'Times New Roman', Times, serif;
+  font-display: bold;
 }
 
 .edit-user-box .hidden-input-box input[type="text"]{
   font-family: Georgia, 'Times New Roman', Times, serif;
+  width: 80%;                
+  height: 40px;               
+  padding: 10px;              
+  box-sizing: border-box;
+  font-size: 15px;
+  margin-top: 10px;
 }
 
 .edit-user-box .hidden-input-box input[type="submit"]{
-  width: 70%;
+  width: 30%;
   padding: 12px;
   background-color: #E5E1DA;
   color: black;
@@ -674,7 +708,8 @@ tr:hover {
   border: none;
   border-radius: 8px;
   font-size: 16px;
-  margin-top: 15px;
+  margin-top: 10px;
+  margin-left: 50px;
   cursor: pointer;
   transition: 0.3s ease;
 }
@@ -686,20 +721,28 @@ tr:hover {
 
 .edit-security-ques-box .text-sec-ques {
   text-align: left;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 .edit-security-ques-box .text-sec-ques h3{
-  font-size: 20px;
-  font-weight: 600;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.edit-security-ques-box .text-sec-ques p{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 15px;
 }
 
 .edit-user-box img,
 .edit-security-ques-box img {
-  width: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   padding: 8px;
-  margin-right: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 /**The End of Edit Profile Page Settings**/
@@ -760,11 +803,29 @@ tr:hover {
 
 /** View Class Page Settings **/
 .hiddenClassCodeBox {
-  max-height: 0px;
+  max-height: 0; 
   overflow: hidden;
-  transition: max-height 0.5s;
+  padding: 0;
+  border-radius: 15px;
+  flex: 1 1 300px;
+  max-width: 320px;
+  align-items: center;
+  transition: 0.5s ease-in, padding 0.5s;
 }
 
 .hiddenClassCodeBox.openClassCodeBox {
-  max-height: 200px;
+  max-height: 500px;
+  padding: 20px;
+  background: whitesmoke;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  flex: 1 1 300px;
+  max-width: 320px;
+  position: relative;
+}
+
+.hiddenClassCodeBox.openClassCodeBox label {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: bold;
 }

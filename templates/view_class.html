@@ -11,68 +11,77 @@
 </head>
 
 <body>
-    
-<!-- Header Bar -->
-{% include 'header.html' %}
+  <!-- Header Bar -->
+  {% include 'header.html' %}
 
   <!-- Main Content -->
   <main class="main-content">
     <div class="viewclass">
-            <button class="btn" onclick="showClassCodeInput()">Join Class</button>
-            <div class="hiddenClassCodeBox" id="classCodeBox">
-                <form action="/joinClass" method="POST">
-                <label for="classCode">Enter Class Code:</label>
-                <input type="text" name="classCode" id="classCode" placeholder="Enter class code" class="classCode">
-                <input type="submit" name="submitClassCode" id="submitClassCode" class="submitClassCode" value="Join">
-                </form>
+      <button class="btn" onclick="showClassCodeInput()">Join Class</button>
+      <br>
+      <center>
+      <div class="hiddenClassCodeBox" id="classCodeBox">
+        <div class="openClassCodeBox">
+          <form action="/joinClass" method="POST">
+            <label>Enter Class Code:</label>
+            <input type="text" name="classCode" id="classCode" placeholder="Enter class code" class="classCode">
+            <button type="submit" name="submitClassCode" id="submitClassCode" class="submitClassCode" value="Join">Submit</button>
+          </form>
         </div>
-        {% if session.get('roles') == 2 %}
-        <a href="{{ url_for('createClass') }}"><button class="btn">Create Class</button></a>
-        {% endif %}
-        <div class="class-container">
-            {% for record in records %}
-            <div class="class-box" id="{{ record.classID }}">
-                <a href="{{ url_for('open_class', class_id=record.classID) }}">
-                    <img src="####">
-                    <hr>
-                    <p>{{ record.className }}</p>
-                    <p>Lecturer/Instructor: {{ record.lecturerName }}</p>
-                    <p>Term: {{ record.termID }}</p>
-                </a>
-            </div>
-            {% endfor %}
+      </div>
+      </center>
+
+      {% if session.get('roles') == 2 %}
+        <a href="{{ url_for('createClass') }}">
+          <button class="btn">Create Class</button>
+        </a>
+      {% endif %}
+
+      <div class="content-section">
+        {% for record in records %}
+          <div class="info-box" id="{{ record.classID }}">
+            <a href="{{ url_for('open_class', class_id=record.classID) }}">
+              <hr>
+              <img src="{{ url_for('static', filename='images/ppcover.png') }}" alt="Class Cover">
+              <b><p>{{ record.className }}</p></b>
+              <p>Lecturer/Instructor: {{ record.lecturerName }}</p>
+              <p>Term: {{ record.termID }}</p>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </main>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-          <script>
-              var classCode = "{{ classCode }}";
-              console.log(classCode);
-              {% for category, message in messages %}
-                  {% if category == 'error' %}
-                      Swal.fire({
-                          icon: 'error',
-                          title: 'Oops! An error occurred.',
-                          text: "{{ message }}"
-                      });
-                  {% elif category == 'success' %}
-                      Swal.fire({
-                          icon: 'success',
-                          title: 'Yay! Success.',
-                          text: "{{ message }}"
-                      }).then(() => {
-                          setTimeout(function() {
-                              window.location.href = "/open_class/",classCode;
-                          }, 1000);
-                      });
-                  {% endif %}
-              {% endfor %}
-          </script>
-      {% endif %}
+    {% if messages %}
+      <script>
+        var classCode = "{{ classCode }}";
+        console.log(classCode);
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops! An error occurred.',
+              text: "{{ message }}"
+            });
+          {% elif category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Yay! Success.',
+              text: "{{ message }}"
+            }).then(() => {
+              setTimeout(function() {
+                window.location.href = "/open_class/" + classCode;
+              }, 1000);
+            });
+          {% endif %}
+        {% endfor %}
+      </script>
+    {% endif %}
   {% endwith %}
-  
-<!-- Footer Bar -->
-{% include 'footer.html' %}
+
+  <!-- Footer Bar -->
+  {% include 'footer.html' %}
 </body>
 </html>
