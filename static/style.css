@@ -14,6 +14,7 @@
   background-color: whitesmoke;
   height: auto;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  z-index: 5;
 }
 
 /* Logo Settings */
@@ -37,14 +38,14 @@
   transition: color 0.2s ease-in-out;
 }
 .menu a:hover { /**Change color when mouse point towards**/
-  color: #2563eb; 
+  color: #2563eb;
 }
 
 /** Header Avatar Settings **/
 .avatar {
   width: 40px;
   height: 40px;
-  background-color: #4a90e2; /* any color you like */
+  background-image: linear-gradient(to right, #3571b4, #7b68bb, #b657aa, #e04584, #f04950);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -59,11 +60,13 @@
 /** Header Wrapped Menu Settings **/
 .sub-menu-wrap {
   position: absolute;
-  right: 5%; 
+  right: 5%;
   width: 500px;
   max-height: 0px;
-  overflow: hidden; 
+  overflow: hidden;
   transition: max-height 0.5s;
+  border-radius: 20px;
+  z-index: 20;
 }
 
 .sub-menu-wrap.open-menu {
@@ -74,22 +77,35 @@
   background: whitesmoke;
   padding: 20px;
   margin: 10px;
+  height: auto;
+  border-radius: 20px;
 }
 
 .user-info{
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .user-info .text {
+  font-size: 16px;
   font-weight: 1000;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.user-info .email {
+  font-size: 14px;
+  font-weight: 500;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
 .user-info .avatar-pfp {
   width: 80px;
   height: 80px;
-  background-color: #4a90e2; /* any color you like */
+  background-image: linear-gradient(to right, #3571b4, #7b68bb, #b657aa, #e04584, #f04950);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -104,7 +120,7 @@
 
 .sub-menu hr {
   border: 0;
-  height: 1px; 
+  height: 1px;
   width: 100%;
   background: #ccc;
   margin: 15px 0 10px;
@@ -114,7 +130,11 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-  margin: 12px 0;
+  position: center;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 8px;
+  flex: 1;
 }
 
 .sub-menu-link p{
@@ -124,12 +144,12 @@
 .sub-menu-link img{
   width: 40px;
   border-radius: 50%;
-  padding: 8px; 
+  padding: 8px;
   margin-right: 15px;
 }
 
 .sub-menu-link span{
-  font-size: 22px; 
+  font-size: 22px;
   transition: transform 0.5s;
 }
 
@@ -143,19 +163,27 @@
 
 /** The End of TopBar Settings **/
 
+/**Read-Only Placeholder Settings**/
+.readonly {
+  color:grey;
+}
+
 /****** Main content - Background ******/
 .main-content {
   background-image: url("/static/images/mmuaerialview.png");
-  background-size: cover;           
-  background-position: center;               
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
   background-repeat: no-repeat;
-  background-color: #f0f0f0;              
+  background-color: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 90vh;
   text-align: center;
-  padding: 1rem;
+  padding: 20px 20px;
+  position: relative;
+  z-index: 1;
+  min-height: 90vh;
 }
 
 /**Content Design Settings for Main Page**/
@@ -250,8 +278,9 @@ footer {
 }
 
 .footer-links {
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   list-style: none;
+  font-size: 14px;
   padding: 0;
   margin: 0;
 }
@@ -349,6 +378,21 @@ button {
 button:hover {
   background-color: #BCCCDC;
   color: black;
+}
+
+.btn{
+  width: 15%;
+  padding: 12px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
 }
 
 /* Links */
@@ -449,7 +493,7 @@ button:hover {
 }
 /**The End of Register Page Settings**/
 
-/**Reset Password Page**/
+/**Reset Password Page (resetPassword.html) & Create Class Page (create_class.html)**/
 .input-field label,
 .select-field label {
   display: block;
@@ -475,6 +519,17 @@ select {
 /**The End of Reset Password Page Settings**/
 
 /* View Papers (view_papers.html) */
+.viewPapers-box { /**Size of Register Box**/
+  background: white;
+  padding: 40px;
+  width: 1000px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
 .table-container {
   display: flex;
   justify-content: center;
@@ -488,7 +543,6 @@ table {
   border-collapse: collapse;
   background-color: whitesmoke;
   border-radius: 15px;
-  overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -496,19 +550,18 @@ caption {
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 22px;
   font-weight: bold;
-  color: whitesmoke;
+  color: black;
   padding: 10px;
-  text-shadow: 1px 1px #A76545;
 }
 
 /* Header styling */
 th {
-  background-color: #EDDBC7;
-  color: #A75D5D;
+  background-color: lightgrey;
+  color: black;
   padding: 10px;
   font-size: 15px;
-  border-bottom: 2px solid #D5B4B4;
-  border: 2px solid #D5B4B4;
+  border-bottom: 2px solid black;
+  border: 2px solid black;
   text-align: center;
 }
 
@@ -518,7 +571,7 @@ td {
   color: #444;
   padding: 10px;
   border-bottom: 1px solid #e0d4cb;
-  border: 2px solid #D5B4B4;
+  border: 2px solid black;
   text-align: center;
 }
 
@@ -531,11 +584,11 @@ td.bil {
 
 /* Alternate row colors */
 tr:nth-child(even) {
-  background-color: whitesmoke;
+  background-color: white;
 }
 
 tr:nth-child(odd) {
-  background-color: whitesmoke;
+  background-color: white;
 }
 
 /* Row hover effect */
@@ -548,9 +601,9 @@ tr:hover {
 /**Edit Profile Page**/
 .profile-box {
   background: white;
-  padding: 40px;
-  width: 1000px;
-  height: 600px;
+  padding: 30px;
+  width: 825px;
+  height: auto;
   max-width: 85%;
   margin: 40px auto;
   border-radius: 20px;
@@ -559,7 +612,7 @@ tr:hover {
 
 .profile-box hr{
   border: 0;
-  height: 1px; 
+  height: 1px;
   width: 100%;
   background: #050505;
   margin: 15px 0 10px;
@@ -571,26 +624,36 @@ tr:hover {
 }
 
 .user-pic-name-box .avatar-user-pic-name-box {
-  width: 120px;
-  height: 120px;
-  background-color: #4a90e2; /* any color you like */
+  width: 60px;
+  height: 60px;
+  background-image: linear-gradient(to right, #3571b4, #7b68bb, #b657aa, #e04584, #f04950);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 48px;
+  font-size: 25px;
   text-transform: uppercase;
   font-family: Arial, sans-serif;
-  margin: 20px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
-.user-pic-name-box .text-profile {
+.user-pic-name-box .text-profile h2 {
   text-align: left;
   font-weight: 1000;
-  font-size: 25px;
+  font-size: 18px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-left: 10px;
+}
+
+.user-pic-name-box .text-profile h3 {
+  text-align: left;
+  font-weight: 500;
+  font-size: 16px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-left: 10px;
 }
 
 .edit-user-box {
@@ -598,35 +661,45 @@ tr:hover {
   align-items: center;
 }
 
-.edit-user-box .text-user {
+.edit-user-box .text-user h3{
   text-align: left;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.edit-user-box .text-user h3{
-  font-size: 20px;
-  font-weight: 600;
+.edit-user-box .text-user p{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 15px;
+  text-align: left
 }
 
 .edit-user-box .hidden-input-box {
   width: 500px;
   display: flex;
   margin-left: 15px;
+  font-weight: bold;
 }
 .edit-user-box .hidden-input-box label{
-  text-align: left;
-  display: flex;
+  text-align: center;
   flex-direction: row;
   align-items: center;
   font-family: Georgia, 'Times New Roman', Times, serif;
+  font-display: bold;
 }
 
 .edit-user-box .hidden-input-box input[type="text"]{
   font-family: Georgia, 'Times New Roman', Times, serif;
+  width: 80%;                
+  height: 40px;               
+  padding: 10px;              
+  box-sizing: border-box;
+  font-size: 15px;
+  margin-top: 10px;
 }
 
 .edit-user-box .hidden-input-box input[type="submit"]{
-  width: 70%;
+  width: 30%;
   padding: 12px;
   background-color: #E5E1DA;
   color: black;
@@ -635,7 +708,8 @@ tr:hover {
   border: none;
   border-radius: 8px;
   font-size: 16px;
-  margin-top: 15px;
+  margin-top: 10px;
+  margin-left: 50px;
   cursor: pointer;
   transition: 0.3s ease;
 }
@@ -647,20 +721,28 @@ tr:hover {
 
 .edit-security-ques-box .text-sec-ques {
   text-align: left;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 .edit-security-ques-box .text-sec-ques h3{
-  font-size: 20px;
-  font-weight: 600;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.edit-user-box img, 
+.edit-security-ques-box .text-sec-ques p{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 15px;
+}
+
+.edit-user-box img,
 .edit-security-ques-box img {
-  width: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  padding: 8px; 
-  margin-right: 15px;
+  padding: 8px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 /**The End of Edit Profile Page Settings**/
@@ -718,3 +800,32 @@ tr:hover {
   margin-top: 10px;
 }
 /**The End of Security Question Page Settings**/
+
+/** View Class Page Settings **/
+.hiddenClassCodeBox {
+  max-height: 0; 
+  overflow: hidden;
+  padding: 0;
+  border-radius: 15px;
+  flex: 1 1 300px;
+  max-width: 320px;
+  align-items: center;
+  transition: 0.5s ease-in, padding 0.5s;
+}
+
+.hiddenClassCodeBox.openClassCodeBox {
+  max-height: 500px;
+  padding: 20px;
+  background: whitesmoke;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  flex: 1 1 300px;
+  max-width: 320px;
+  position: relative;
+}
+
+.hiddenClassCodeBox.openClassCodeBox label {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 16px;
+  font-weight: bold;
+}

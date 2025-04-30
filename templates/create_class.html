@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
+  <script src="{{ url_for('static', filename='script.js' )}}"></script>
+  <title>Create Class | MMUPastPapers</title>
+</head>
+
+<body>
+    
+<!-- Header Bar -->
+{% include 'header.html' %}
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="ques-box">
+    <h1>Create New Class</h1>
+      <form action="/createClass" method="POST">
+          <div class="ques-box-input">
+            <label for="className">Class Name:</label>
+            <input type="text" name="className" id="className" class="className" placeholder="Enter a class name">
+          </div>
+          <div class="ques-box-input">
+            <label for="subject">Subject:</label>
+            <select id="subject" name="subject" class="subject">
+              {% for subject in subjectList %}
+                <option value="{{ subject.subject_id }}">{{ subject.subject_id }} - {{ subject.subject_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="ques-box-input">
+            <label for="term">Term:</label>
+            <select id="term" name="term" class="term">
+              {% for term in termList %}
+                <option value="{{ term.term_id }}">{{ term.term_id }} - {{ term.term_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        <button type="submit" name="create-new-class" value="Create">Create</button>
+      </form>
+    </div>
+  </main>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          <script>
+              var classCode = "{{ classCode }}";
+              console.log(classCode);
+              {% for category, message in messages %}
+                  {% if category == 'error' %}
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Oops! An error occurred.',
+                          text: "{{ message }}"
+                      });
+                  {% elif category == 'success' %}
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Yay! Success.',
+                          text: "{{ message }}"
+                      }).then(() => {
+                          setTimeout(function() {
+                              console.log("/open_class/"+classCode);
+                              window.location.href = "/open_class/"+classCode;
+                          }, 1000);
+                      });
+                  {% endif %}
+              {% endfor %}
+          </script>
+      {% endif %}
+  {% endwith %}
+<!-- Footer Bar -->
+{% include 'footer.html' %}
+</body>
+</html>

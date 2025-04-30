@@ -96,9 +96,7 @@ class CLASS(db.Model):
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
-  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID)) 
-  STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey(STUDY_LVL_INFO.STUDY_LVL_ID)) 
-  FACULTY_ID = db.Column(db.String(3), db.ForeignKey(FACULTY_INFO.FACULTY_ID)) 
+  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))  
   TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID))  
  
 #ENTITY: USER_CLASS 
@@ -197,6 +195,7 @@ def login():
           session['roles'] = user.ROLES
           session['user_id'] = user.USER_ID
           session.permanent = True #Set session to permanent
+          session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
           return render_template('login.html')
@@ -403,40 +402,32 @@ def editProfile():
     email = session.get('email')
     name = session.get('name')
     newName = request.form['name']
-    newEmail = request.form['email']
-    print("New name: ",newName," New email:",newEmail) #For debugging purposes 
+    print("New name: ",newName) #For debugging purposes 
 
     #Input verification / validation 
-    if not (newName or newEmail) or newName == '' or newEmail == '':
-      flash("All fields are required!",'error')
-      print("All/some fields are empty.") #For debugging purposes 
+    if not newName or newName.strip() == '':
+      flash("Name fields are required!",'error')
+      print("Name fields are empty.") #For debugging purposes 
       return redirect('/editProfile') 
-    if not re.match(r"^[\w\.-]+@([\w]+\.)*mmu\.edu\.my$", newEmail):
-      flash("Please enter a valid MMU email address.", 'error')
-      print("Email does not met requirement.") #For debugging purposes 
-      return redirect('/editProfile')
     
     #Retrieve data from database and compare 
-    emailRecord = USER_INFO.query.filter_by(USER_EMAIL=newEmail).all()
-    print("Email record only: ",emailRecord)
-    if emailRecord: 
-      flash('Email existed! Please enter another email.','error')
-      print("Email existed.") #For debugging purposes 
-      return redirect('/editProfile')
-
+    emailRecord = USER_INFO.query.filter_by(USER_EMAIL=email).first()
+    if not emailRecord:
+      flash('User not found.','error')
+      print("User not found.") #For debugging purposes 
+      return redirect('/editProfile') 
+       
     #Get user ID 
-    emailObject = USER_INFO.query.filter_by(USER_EMAIL=email).first()
-    user_ID = emailObject.USER_ID
-    print("Email obtain:",email,"and respective user ID:",user_ID) #For debugging purposes
+    user_ID = emailRecord.USER_ID
+    print("Email obtained:",email,"and respective user ID:",user_ID) #For debugging purposes
 
     #Get record 
     record = USER_INFO.query.filter_by(USER_ID=user_ID).first()
     print("Email + name:",record)
     try:
       if record: 
-        record.USER_EMAIL = newEmail 
         record.NAME = newName 
-        record.LAST_MODIFIED_BY = newEmail 
+        record.LAST_MODIFIED_BY = email 
         record.LAST_MODIFIED_ON = datetime.now()
         db.session.commit()
         session.clear()
@@ -444,8 +435,8 @@ def editProfile():
         print("Edit profile success.") #For debugging purposes 
         return render_template('editProfile.html')
       else:
-        flash('Email already existed! Please enter another email.','error')
-        print("Email existed! 2") #For debugging purposes 
+        flash('User record not found.','error')
+        print("User record not found.") #For debugging purposes 
         return redirect('/editProfile')
     except Exception as e:
       flash('Error occurs while editing user profile. Please try again later.','error')
@@ -461,12 +452,12 @@ def view_papers():
 
 @app.route('/view_paper/<paper_id>')
 def view_paper(paper_id):
-    paper = PASTPAPERS_INFO.query.get(paper_id)
+    paper = db.session.get(PASTPAPERS_INFO,paper_id)
     return send_file(paper.FILEPATH, mimetype='application/pdf')
 
 @app.route('/download_paper/<paper_id>')
 def download_paper(paper_id):
-    paper = PASTPAPERS_INFO.query.get(paper_id)
+    paper = db.session.get(PASTPAPERS_INFO,paper_id)
 
     if paper and os.path.exists(paper.FILEPATH):
         # Add the .pdf at the end of FIlename is the original name doesn't have .pdf
@@ -542,7 +533,7 @@ def securityQues():
 def logout():
    session.clear()
    flash('Logged out successfully!', 'success')
-   response = make_response(render_template("showAlert.html"))
+   response = make_response(render_template("showAlert.html", showAlert=True))
    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
    return response
 
@@ -643,6 +634,147 @@ def delete_paper(paper_id):
         flash(f'Error deleting paper: {e}', 'error')
 
     return redirect('/view_papers')
+
+@app.route('/view_class', methods=['GET','POST'])
+def view_class():
+  records = USER_CLASS.query.filter_by(USER_ID=session.get('user_id')).all()
+  print("User class:",records) #For debugging purposes
+  classIds = [record.CLASS_ID for record in records]
+  print(f"Class ID under user {session.get('user_id')} : {classIds}") #For debugging purposes
+
+  classes = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds)).all()
+
+  class_records = []
+  for cls in classes:
+    lecturer = USER_INFO.query.filter_by(USER_ID=cls.CREATED_BY).first()
+    class_records.append({
+       'classID': cls.CLASS_ID,
+       'className': cls.CLASS_NAME,
+       'termID': cls.TERM_ID,
+       'lecturerName': lecturer.NAME if lecturer else 'Unknown'
+    })
+  
+  print("Final record:",class_records) #For debugging purposes 
+  return render_template("view_class.html", records=class_records)
+
+@app.route('/open_class/<class_id>', methods=['GET','POST'])
+def open_class(class_id):
+   class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
+   print(class_data)
+   if not class_data:
+      message = "Class not found! Join a class?", 404
+      return message
+   return render_template("class_page.html",class_data=class_data)
+
+@app.route('/createClass', methods=['GET','POST'])
+def createClass():
+  #Show data in template
+  subjectRec = db.session.query(SUBJECT_INFO.SUBJECT_ID, SUBJECT_INFO.SUBJECT_DESC).all()
+  print(f"Subject list: {subjectRec}") #For debugging purposes 
+
+  subject_list = [
+     {'subject_id': subject_id, 'subject_name': subject_desc}
+     for subject_id, subject_desc in subjectRec
+  ]
+  print(f"Subject list to be returned: {subject_list}") #For debugging purposes 
+
+  termRec = db.session.query(TERM_INFO.TERM_ID, TERM_INFO.TERM_DESC).all()
+  print(f"Term list: {termRec}") #For debugging purposes 
+
+  term_list = [
+     {'term_id': term_id, 'term_name': term_desc}
+     for term_id, term_desc in termRec
+  ]
+  print(f"Term list to be returned: {term_list}") #For debugging purposes 
+
+  if request.method == 'POST':
+    className = request.form['className']
+    subject = request.form['subject']
+    term = request.form['term']
+
+    #Input verification 
+    if not className or not subject or not term:
+       flash('All fields are required!','error')
+       print("All/some fiedls are empty.") #For debugging purposes 
+       return redirect(url_for('createClass'))
+    
+    #Retrieve data from database and compare 
+    record = CLASS.query.filter_by(CLASS_NAME=className, SUBJECT_ID=subject, TERM_ID=term).first()
+    print(f"The class record is: {record}") #For debugging purposes 
+
+    if record: 
+      db.session.rollback()
+      flash('The class you want to create existed!','error')
+      print("Class existed!") #For debugging purposes 
+      return redirect(url_for('createClass'))
+    else: #Create a new class in db 
+      try: 
+        classID = uuid.uuid4().hex[:6]
+        new_record = CLASS(CLASS_ID=classID, CLASS_NAME=className, CREATED_BY=session.get('user_id'), SUBJECT_ID=subject, TERM_ID=term)
+        new_record2 = USER_CLASS(CLASS_ID=classID, USER_ID=session.get('user_id'), JOINED_AT=datetime.now())
+        db.session.add(new_record)
+        db.session.add(new_record2)
+        db.session.commit()
+        flash('Class created successfully!','success')
+        print(f"Class {className} created!") #For debugging purposes 
+        return render_template("create_class.html", classCode=classID)
+      except IntegrityError:
+        flash('The class you want to create existed!','error')
+        return redirect(url_for('createClass'))
+      except Exception as e:
+        flash('Error occurs while creating class. Please try again later.','error')
+        print(f"Internal server error: {e}")
+        return redirect(url_for('createClass'))
+       
+  return render_template("create_class.html", subjectList=subject_list, termList=term_list)
+
+@app.route('/joinClass', methods=['GET','POST'])
+def joinClass():
+
+  if request.method == 'POST':
+    user_id = session.get('user_id')
+    classCode = request.form['classCode']
+    print("Class Code from user: ",classCode) #For debugging purposes 
+
+    #Input verification 
+    if not classCode: 
+      flash('Please enter a class code!','error')
+      print("Empty class code received.") #For debugging purposes 
+      return redirect(url_for('view_class'))
+  
+    #Join class action 
+    classID = CLASS.query.filter_by(CLASS_ID=classCode).first()
+    print("Class code from db: ",classID) #For debugging purposes 
+
+    already_joined = USER_CLASS.query.filter_by(CLASS_ID=classCode, USER_ID=user_id).first()
+    print("User already joined:",already_joined) #For debugging purposes
+    try:
+      #If user joined 
+      if already_joined:
+        flash('You joined this class!','error')
+        print("User joined this class!") #For debugging purposes 
+        return redirect(url_for('view_class'))
+      
+      #If class ID exists 
+      if classID:
+        new_record = USER_CLASS(USER_ID=user_id, CLASS_ID=classCode, JOINED_AT=datetime.now())
+        db.session.add(new_record)
+        db.session.commit()
+        flash('Join class successfully!','success')
+        print("Join class action success.") #For debugging purposes 
+        return redirect(url_for('open_class', class_id=classCode, showAlert=False))
+      
+      #If class not exists 
+      elif not classID:
+        flash('Class not found. Please check your class code.','error')
+        print("Wrong class code input.") #For debugging purposes 
+        return redirect(url_for('view_class'))
+    except Exception as e:
+      flash('Error occurs while joining class. Please try again.','error')
+      print("Internal server error.") #For debugging purposes 
+      return redirect(url_for('view_class'))
+
+  return redirect(url_for('view_class')) #In case 'GET' method is passed 
 
 if __name__ == "__main__":
     app.run(debug=True)

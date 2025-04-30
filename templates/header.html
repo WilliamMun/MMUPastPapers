@@ -15,10 +15,9 @@
             </div>
             
             <!-- Menu -->
-            <!-- Delete this after finish decorating: The location of this menu should be at the middle of the navigation bar. Bcuz right side we need to put user profile button. -->
             <nav class="menu">
                 <a href="{{ url_for('view_papers')}}">Papers</a>
-                <a href="#####">Class</a>
+                <a href="{{ url_for('view_class') }}">Class</a>
             </nav>
 
             <!-- User profile -->
@@ -35,7 +34,7 @@
                     <div class="avatar-pfp">{{ initials }}</div> <!-- Same as above, but size need to be  larger -->
                     <div class="text">
                         <h3>{{ name }}</h3>
-                        <h4>{{ email }}</h4>
+                        <i><h4 class="email">{{ email }}</h4></i>
                     </div>
                 </div>
                 <hr>
@@ -54,7 +53,7 @@
             </div>
         </div>
     </header>
-
+{% if showAlert == True %}
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <script>
@@ -81,4 +80,5 @@
             </script>
         {% endif %}
     {% endwith %}
+{% endif %}
 </html>

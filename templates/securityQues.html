@@ -21,7 +21,7 @@
                     {% for qa in user_qa %}
                     <div class="ques-box-input">
                         <label for="answer">{{ qa.question or '' }}</label>
-                        <input type="text" name="{{ qa.id }}" id="{{ qa.id }}" class="answer" value="{{ qa.answer or '' }}">
+                        <input type="text" name="{{ qa.id }}" id="{{ qa.id }}" placeholder="Enter your answer" class="answer" value="{{ qa.answer or '' }}">
                     </div>
                     {% endfor %}
                 <button type="submit" id="submit-btn" class="submit-btn" value="Edit">Edit</button>
