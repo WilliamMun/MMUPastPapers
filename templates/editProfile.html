@@ -24,7 +24,7 @@
                     <!-- Name and email -->
                     <div class="text-profile">
                         <h2>{{ name }}</h2>
-                        <h3>{{ email }}</h3>
+                        <i><h3>{{ email }}</h3></i>
                     </div>
                 </div>
                 <hr>
@@ -32,7 +32,7 @@
                     <img src="{{ url_for('static', filename='images/editProfile.jpg' )}}" alt="Profile" class="clickable-img" onclick="showInput()">
                     <div class="text-user" onclick="showInput()">
                         <h3>Edit Profile</h3>
-                        <p>You can edit your name here.</p>
+                        <p>You may edit your name here.</p>
                     </div>
                     <div class="hidden-input-box" id="hidden-input-box" style="display: none;">
                         <form method="POST" action="/editProfile">
@@ -53,7 +53,7 @@
                     <img src="{{ url_for('static', filename='images/editProfile.jpg' )}}" alt="Profile" class="clickable-img" onclick="changePage()">
                     <div class="text-sec-ques" onclick="changePage()">
                         <h3>Edit Security Questions</h3>
-                        <p>You can edit your security questions here.</p>
+                        <p>You may edit your security questions here.</p>
                     </div>
                 </div>
             </div>
