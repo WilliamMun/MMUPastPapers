@@ -596,6 +596,27 @@ tr:hover {
   background-color: #f0e9e2;
   cursor: pointer;
 }
+
+.button {
+  margin-top: 30px;
+  margin-bottom: -10px;;
+}
+
+.button .upload-button {
+  display: inline-flex; 
+  align-items: center; 
+  padding: 8px 12px; 
+  background: #E5E1DA; 
+  color: black; 
+  border-radius: 4px; 
+  text-decoration: none;
+}
+
+.button .upload-button:hover {
+  background-color: #BCCCDC;
+  color: black;
+}
+
 /**The End of View Papers Page Settings**/
 
 /**Edit Profile Page**/
