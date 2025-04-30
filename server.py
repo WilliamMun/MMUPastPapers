@@ -602,7 +602,7 @@ def upload_paper():
             session['last_activity'] = datetime.now().timestamp()
 
             flash('Paper uploaded successfully!', 'success')
-            return redirect('/view_papers')
+            return render_template("upload_paper.html")
 
         except Exception as e:
             db.session.rollback()
