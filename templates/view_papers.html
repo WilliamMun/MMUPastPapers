@@ -52,6 +52,31 @@
                 <td>
                   <a href="{{ url_for('download_paper', paper_id=paper.PAPER_ID) }}"><img src="{{ url_for('static', filename='images/download.png')}}" alt="download" /></a>
                 </td>
+                <td>
+                  <form id="deleteForm-{{ paper.PAPER_ID }}" action="{{ url_for('delete_paper', paper_id=paper.PAPER_ID) }}" method="POST" style="display:none;"></form>
+                    <button onclick="confirmDelete('{{ paper.PAPER_ID }}')">
+                      <img src="{{ url_for('static', filename='images/delete.png')}}" alt="delete" />
+                    </button>
+
+                    <script>
+                      function confirmDelete(paperId) {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: "You won't be able to revert this!",
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#3085d6',
+                          cancelButtonColor: '#d33',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            document.getElementById('deleteForm-' + paperId).submit();
+                          }
+                        });
+                      }
+                    </script>
+
+                </td>
               </tr>
             {% endfor %}
           {% else %}

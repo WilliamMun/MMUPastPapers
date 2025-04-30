@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <title>Upload Paper | MMUPastPapers</title>
+    </head>
+    <!-- Header Bar -->
+{% include 'header.html' %}
+
+    <body class="main-content">
+        <div class="table-container">
+        <form action="upload_paper" method="post" enctype="multipart/form-data">
+            <label for="paper_desc">Paper Description:</label>
+            <input type="text" name="paper_desc" required><br>
+
+            <label for="term_id">Term: </label>
+            <select class="text-box" name="term_id" id="term_id" required>
+                <option value="">--Select a Term</option>
+                {% for term in terms %}
+                    <option value="{{ term.TERM_ID }}">{{ term.TERM_DESC }}</option>
+                {% endfor %}
+            </select><br>
+
+            <label for="file">Uplaod File:</label>
+            <input class="button" type="file" name="file" accept=".pdf" required><br>
+
+            <input class="button" type="submit" value="Upload Paper">
+        </form>
+        </div>
+    </body>
+    <!-- Footer Bar -->
+{% include 'footer.html' %}
