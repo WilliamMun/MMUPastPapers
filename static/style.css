@@ -834,3 +834,28 @@ tr:hover {
   font-size: 16px;
   font-weight: bold;
 }
+/**The End of View Class Page Settings**/
+
+/** Upload Paper Page Settings **/
+.upload-box {
+  background: white;
+  padding: 40px;
+  width: 500px; 
+  height: 500px;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px; 
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+.upload-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+
+/**The End of Upload Paper Page Settings**/
