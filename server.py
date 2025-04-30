@@ -5,13 +5,26 @@ from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from datetime import timedelta
 import re
 import uuid
+import time
 
 app = Flask(__name__)
 app.secret_key = "MmUPastPap3rs2510@CSP1123"
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mmupastpapers.db"
+app.config['UPLOAD_FOLDER'] = "uploads"
+app.config['ALLOWED_EXTENSION'] = {'pdf'}
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
+app.config.update({
+    'PERMANENT_SESSION_LIFETIME': timedelta(days=7), #Session will expire after 7 days
+    'SESSION_COOKIE_SAMESITE': 'Lax', 
+    'SESSION_REFRESH_EACH_REQUEST': True #Refresh session on each request
+})
 db = SQLAlchemy(app)
+
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create upload folder if it doesn't exist
 
 #-----------------------------------------------------------------------------------------------------------
 #Create database tables  
@@ -71,8 +84,8 @@ class PASTPAPERS_INFO(db.Model):
   FILEPATH = db.Column(db.String(255), nullable=False) 
   PAPER_DESC = db.Column(db.Text, nullable=True) 
   UPLOAD_ON = db.Column(db.DateTime, default=datetime.now) 
-  UPLOAD_BY = db.Column(db.String(50)) 
-  LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
+  UPLOAD_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
+  LAST_MODIFIED_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID), nullable=True) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
  
 #ENTITY: CLASS 
@@ -132,6 +145,15 @@ def isStrongPassword(password):
   pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{10,}$'
   return bool(re.match(pattern, password))
 
+def allowed_file(filename):
+   ALLOWED_EXTENSION = {'pdf'}
+   return '.' in filename and filename.rsplit('.', 1)[1]. lower() in ALLOWED_EXTENSION
+
+@app.before_request
+def refresh_session():
+    session.permanent = True #Set session to permanent
+    app.permanent_session_lifetime = timedelta(days=7) #Set session to expire after 7 days
+
 @app.route('/login',methods=['GET','POST'])
 def login():
     status = True #Flag to determine whether user input is valid or invalid 
@@ -171,6 +193,8 @@ def login():
           session['email'] = user.USER_EMAIL
           session['name'] = user.NAME
           session['roles'] = user.ROLES
+          session['user_id'] = user.USER_ID
+          session.permanent = True #Set session to permanent
           session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
@@ -515,6 +539,104 @@ def logout():
    response = make_response(render_template("showAlert.html", showAlert=True))
    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
    return response
+
+@app.route('/upload_paper', methods=['GET', 'POST'])
+def upload_paper():
+    
+    file = None
+    filepath = None
+
+    if 'roles' not in session or session['roles'] != 2:
+        flash('Access denied: Only lecturers can upload papers', 'error')
+        return redirect('/login')
+
+    if request.method == 'POST':
+        try:
+            paper_desc = request.form.get('paper_desc').strip()
+            term_id = request.form.get('term_id')
+            file = request.files.get('file')
+            upload_dir = app.config['UPLOAD_FOLDER']
+
+            if not all([paper_desc, term_id, file]):
+                flash('All fields are required!', 'error')
+                return redirect('/upload_paper')
+
+            if not TERM_INFO.query.get(term_id):
+                flash('Invalid term selected', 'error')
+                return redirect('/upload_paper')
+
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir)
+                print(f"Upload directory created: {upload_dir}")
+
+            if not allowed_file(file.filename):
+                flash('Only PDF files are allowed!', 'error')
+                return redirect('/upload_paper')
+            
+            if not os.path.exists(upload_dir):
+               os.makedirs(upload_dir, exist_ok=True)
+               os.chmod(upload_dir, 0o755) # Set permissions to allow read/write/execute for owner, and read/execute for group and others
+
+            orig_filename = secure_filename(file.filename)
+            unique_id = uuid.uuid4().hex[:8]
+            timestamp = int(time.time())
+            saved_filename = f"{unique_id}_{int(time.time())}_{orig_filename}"
+            filepath = os.path.join(upload_dir, saved_filename)
+            file.save(filepath)
+
+            new_paper = PASTPAPERS_INFO(
+                PAPER_ID=uuid.uuid4().hex[:10],
+                TERM_ID=term_id,
+                FILENAME=orig_filename,
+                FILEPATH=filepath,
+                PAPER_DESC=paper_desc,
+                UPLOAD_BY=session['user_id'],
+                LAST_MODIFIED_BY=session['user_id']
+            )
+
+            db.session.add(new_paper)
+            db.session.flush()
+            db.session.commit()
+
+            session.modified = True
+            session['last_activity'] = datetime.now().timestamp()
+
+            flash('Paper uploaded successfully!', 'success')
+            return redirect('/view_papers')
+
+        except Exception as e:
+            db.session.rollback()
+            if filepath and os.path.exists(filepath):
+                os.remove(filepath)
+            print(f"Failed to upload file: {e}")
+            flash(f'Error occurred while uploading paper: {str(e)}', 'error')
+            app.logger.error(f"upload error: {str(e)}", exc_info=True)
+            session.setdefault('retry_count', 0)
+            session['retry_count'] += 1
+        return redirect(url_for('view_papers'))
+
+    terms = TERM_INFO.query.all()
+    return render_template('upload_paper.html', terms=terms)
+
+@app.route('/delete_paper/<paper_id>', methods=['POST'])
+def delete_paper(paper_id):
+    paper = PASTPAPERS_INFO.query.get_or_404(paper_id)
+
+    try:
+        # Delete the file from the file system if it exists
+        if paper.FILEPATH and os.path.exists(paper.FILEPATH):
+            os.remove(paper.FILEPATH)
+
+        # Delete the record from the database
+        db.session.delete(paper)
+        db.session.commit()
+        flash('Paper deleted successfully!', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting paper: {e}', 'error')
+
+    return redirect('/view_papers')
 
 @app.route('/view_class', methods=['GET','POST'])
 def view_class():

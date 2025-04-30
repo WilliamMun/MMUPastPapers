@@ -18,6 +18,16 @@
   <main class="main-content">
     <div class="table-container">
       <div class="viewPapers-box">
+      <!--upload button-->
+      <div class="Button">
+        <a href="{{ url_for('upload_paper') }}" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Upload Paper
+        </a>
+      </div>
+
       <table>
         <caption>View Past Papers</caption>
         <thead>
@@ -42,6 +52,31 @@
                 </td>
                 <td>
                   <a href="{{ url_for('download_paper', paper_id=paper.PAPER_ID) }}"><img src="{{ url_for('static', filename='images/download.png')}}" alt="download" /></a>
+                </td>
+                <td>
+                  <form id="deleteForm-{{ paper.PAPER_ID }}" action="{{ url_for('delete_paper', paper_id=paper.PAPER_ID) }}" method="POST" style="display:none;"></form>
+                    <button onclick="confirmDelete('{{ paper.PAPER_ID }}')">
+                      <img src="{{ url_for('static', filename='images/delete.png')}}" alt="delete" />
+                    </button>
+
+                    <script>
+                      function confirmDelete(paperId) {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: "You won't be able to revert this!",
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#3085d6',
+                          cancelButtonColor: '#d33',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            document.getElementById('deleteForm-' + paperId).submit();
+                          }
+                        });
+                      }
+                    </script>
+
                 </td>
               </tr>
             {% endfor %}
