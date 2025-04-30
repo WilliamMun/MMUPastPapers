@@ -17,7 +17,7 @@
         <main class="main-content">
             <div class="ques-box">
             <h1>Edit Security Questions</h1>
-            {% if 'newRegistered' %}
+            {% if 'newRegistered' == "True" %}
             <p>Setup your security questions first time!</p>
             {% endif %}
             <form method="POST" action="/securityQues">
