@@ -837,7 +837,7 @@ tr:hover {
 /**The End of View Class Page Settings**/
 
 /** Upload Paper Page Settings **/
-.table-container {
+.upload-box {
   background: white;
   padding: 40px;
   width: 500px; 
@@ -849,7 +849,7 @@ tr:hover {
   display: block;
 }
 
-.table-container h1 {
+.upload-box h1 {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 20px;
   font-weight: bold;
@@ -857,4 +857,5 @@ tr:hover {
   margin-bottom: 15px;
   color: black;
 }
+
 /**The End of Upload Paper Page Settings**/
