@@ -17,7 +17,7 @@
         <main class="main-content">
             <div class="ques-box">
             <h1>Edit Security Questions</h1>
-            {% if 'newRegistered' == "True" %}
+            {% if registerStatus == 1 %}
             <p>Setup your security questions first time!</p>
             {% endif %}
             <form method="POST" action="/securityQues">
@@ -50,7 +50,11 @@
                                 text: "{{ message }}"
                             }).then(() => {
                                 setTimeout(function() {
+                                    {% if registerStatus == 1 %}
+                                    window.location.href = "{{ url_for('view_papers') }}";
+                                    {% elif registerStatus == 2 %}
                                     window.location.href = "{{ url_for('logout') }}";
+                                    {% endif %}
                                 }, 1000);
                             });
                         {% endif %}
