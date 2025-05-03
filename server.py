@@ -162,6 +162,8 @@ def login():
         #Retrive user input 
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '').strip()
+        if not session.get('newRegistered'):
+          session['newRegistered'] = False 
         print(email, password) #For debugging purposes 
 
         #Input verification 
@@ -190,6 +192,17 @@ def login():
             return redirect('/login')
         
         if status == True:
+          print(f"User new registered ? {session.get('newRegistered')}")
+          if session.get('newRegistered') is True:
+            registerStatus = 1
+          elif session.get('newRegistered') is False:
+            registerStatus = 2
+          else:
+            registerStatus = 3
+            session.clear()
+            flash('Unknown user status. Please login properly.','error')
+            print("Unknown user register status?")
+            return redirect('/login')
           session['email'] = user.USER_EMAIL
           session['name'] = user.NAME
           session['roles'] = user.ROLES
@@ -198,13 +211,13 @@ def login():
           session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
-          return render_template('login.html')
+          return render_template('login.html',registerStatus=registerStatus)
         
     return render_template("login.html")
 
 @app.route('/register' ,methods=['GET','POST'])
 def register():
-    
+    print("Executing register action")
     if request.method == 'POST':
         #Retrive user input 
         email = request.form['email'].strip()
@@ -269,7 +282,8 @@ def register():
            flash('User registered successfully!', 'success')
            print(f"User {email} succesfully registered")
            session['newRegistered'] = True
-           print(session.get('newRegistered'))
+           print(f"New registered: {session.get('newRegistered')}")
+           print(f"Variable type: {type(session.get('newRegistered'))}")
            return render_template("register.html")
         except IntegrityError:
            db.session.rollback()
@@ -479,6 +493,7 @@ def download_paper(paper_id):
 
 @app.route('/securityQues', methods=['GET', 'POST'])
 def securityQues():
+  print("Executing security question page...")
   #Retrieve data from database:
   email = session.get('email')
 
@@ -502,6 +517,16 @@ def securityQues():
   user_qa = [{'id': q.SECURITY_QUES_ID, 'question': q.SECURITY_QUES_DESC, 'answer': answer_dict.get(q.SECURITY_QUES_ID, '-')} for q in questions]
   print("User Q&A List:",user_qa) #for debugging purposes 
 
+  if session.get('newRegistered') is True:
+     registerStatus = 1
+  elif session.get('newRegistered') is False:
+     registerStatus = 2
+  else:
+     registerStatus = 3
+
+  print(f"User new register ? {session.get('newRegistered')}")
+  print(f"Register status {registerStatus}")
+  
   if request.method == 'POST':
       #Save data into database: 
       user_ans = request.form.to_dict()
@@ -526,14 +551,17 @@ def securityQues():
               db.session.add(newRecord)
      
       db.session.commit()
-      session.clear()
-      flash("Security questions edited successfully! Please log in again.", 'success')
+      if registerStatus == 2:
+        flash("Security questions edited successfully! Please log in again.", 'success')
+      elif registerStatus == 1:
+        flash("Security questions sucessfully setup!",'success')
       print("Sucessfully saved new sec ques.") #For debugging purposes 
-      return render_template("securityQues.html")
+      return render_template("securityQues.html",registerStatus=registerStatus)
   return render_template("securityQues.html", user_qa=user_qa)
 
 @app.route('/logout')
 def logout():
+   print("Executing logout action...")
    session.clear()
    flash('Logged out successfully!', 'success')
    response = make_response(render_template("showAlert.html", showAlert=True))
