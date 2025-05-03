@@ -880,3 +880,18 @@ tr:hover {
 }
 
 /**The End of Upload Paper Page Settings**/
+
+/** View Class Page Settings **/
+.viewclass button {
+  width: 130px;
+  height: 50px;
+}
+
+.no-class {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+/**The End of View Class Page Settings**/
