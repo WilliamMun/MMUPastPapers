@@ -100,7 +100,7 @@ class CLASS(db.Model):
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
   SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))  
   TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID))  
- 
+
 #ENTITY: USER_CLASS 
 class USER_CLASS(db.Model): 
   USER_ID = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
@@ -679,33 +679,32 @@ def delete_paper(paper_id):
 
     return redirect('/view_papers')
 
-@app.route('/view_class', methods=['GET','POST'])
+@app.route('/view_class', methods=['GET', 'POST'])
 def view_class():
-  records = USER_CLASS.query.filter_by(USER_ID=session.get('user_id')).all()
-  print("User class:",records) #For debugging purposes
-  classIds = [record.CLASS_ID for record in records]
-  print(f"Class ID under user {session.get('user_id')} : {classIds}") #For debugging purposes
+    records = USER_CLASS.query.filter_by(USER_ID=session.get('user_id')).all()
+    print("User class:", records)
+    classIds = [record.CLASS_ID for record in records]
+    print(f"Class ID under user {session.get('user_id')} : {classIds}")
 
-  classes = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds)).all()
+    classes = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds)).all()
 
-  class_records = []
-  for cls in classes:
-    lecturer = USER_INFO.query.filter_by(USER_ID=cls.CREATED_BY).first()
-    class_records.append({
-       'classID': cls.CLASS_ID,
-       'className': cls.CLASS_NAME,
-       'termID': cls.TERM_ID,
-       'lecturerName': lecturer.NAME if lecturer else 'Unknown'
-    })
-  
-  print("Final record:",class_records) #For debugging purposes 
-  return render_template("view_class.html", records=class_records)
+    class_records = []
+    for cls in classes:
+        lecturer = USER_INFO.query.filter_by(USER_ID=cls.CREATED_BY).first()
+        class_records.append({
+            'classID': cls.CLASS_ID,
+            'className': cls.CLASS_NAME,
+            'termID': cls.TERM_ID,
+            'lecturerName': lecturer.NAME if lecturer else 'Unknown'
+        })
+
+    print("Final record:", class_records)
+    return render_template("view_class.html", records=class_records)
 
 @app.route('/open_class/<class_id>', methods=['GET','POST'])
 def open_class(class_id):
    session['current_class_id'] = class_id
    class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
-   print(class_data)
    if not class_data:
       message = "Class not found! Join a class?", 404
       return message
@@ -820,6 +819,87 @@ def joinClass():
       return redirect(url_for('view_class'))
 
   return redirect(url_for('view_class')) #In case 'GET' method is passed 
+
+@app.route('/manage_students/<class_id>', methods=['GET', 'POST'])
+def manage_students(class_id):
+
+    if 'user_id' not in session or session['roles'] != 2:
+        abort(403)
+    
+    class_data = CLASS.query.get(class_id)
+    if not class_data or class_data.CREATED_BY != session['user_id']:
+        abort(403)
+
+    if request.method == 'POST':
+        student_id = request.form.get('student_id')
+        member = USER_CLASS.query.filter_by(
+            CLASS_ID=class_id, 
+            USER_ID=student_id
+        ).first()
+        
+        if member:
+            db.session.delete(member)
+            db.session.commit()
+            flash('Student Removed Successfully', 'success')
+        
+        return redirect(url_for('manage_students', class_id=class_id))
+
+    members = USER_CLASS.query.filter_by(CLASS_ID=class_id).join(
+        USER_INFO, USER_INFO.USER_ID == USER_CLASS.USER_ID
+    ).add_columns(USER_INFO.USER_ID, USER_INFO.NAME, USER_INFO.USER_EMAIL).all()
+
+    return render_template("manage_students.html",
+                         class_data=class_data,
+                         members=members)
+
+@app.route('/student_upload_paper/<class_id>', methods=['GET', 'POST'])
+def student_upload_paper(class_id):
+    if 'roles' not in session or session['roles'] != 1:
+        abort(403)
+    
+    class_data = CLASS.query.get(class_id)
+    if not class_data:
+        abort(404)
+
+    if request.method == 'POST':
+        try:
+            file = request.files['file']
+            paper_desc = request.form.get('paper_desc', '').strip()
+            
+            if not file or not allowed_file(file.filename):
+                flash('Please upload a valid PDF file', 'error')
+                return redirect(url_for('student_upload_paper', class_id=class_id))
+
+            # Generate unique filename
+            orig_filename = secure_filename(file.filename)
+            unique_id = uuid.uuid4().hex[:8]
+            saved_filename = f"student_{unique_id}_{orig_filename}"
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], saved_filename)
+            file.save(filepath)
+
+            # Create paper record
+            new_paper = PASTPAPERS_INFO(
+                PAPER_ID=uuid.uuid4().hex[:10],
+                TERM_ID=class_data.TERM_ID,
+                CLASS_ID=class_id,
+                FILENAME=orig_filename,
+                FILEPATH=filepath,
+                PAPER_DESC=paper_desc,
+                UPLOAD_BY=session['user_id'],
+                LAST_MODIFIED_BY=session['user_id']
+            )
+
+            db.session.add(new_paper)
+            db.session.commit()
+            flash('Paper uploaded successfully!', 'success')
+            return redirect(url_for('open_class', class_id=class_id))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error uploading paper: {str(e)}', 'error')
+            return redirect(url_for('student_upload_paper', class_id=class_id))
+
+    return render_template('student_upload_paper.html', class_data=class_data)
 
 if __name__ == "__main__":
     app.run(debug=True)

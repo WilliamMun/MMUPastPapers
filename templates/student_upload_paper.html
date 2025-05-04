@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <title>Upload Paper</title>
+</head>
+<body>
+    {% include 'header.html' %}
+    
+    {% block content %}
+    <div class="container mx-auto p-6">
+        <h2 class="text-2xl mb-4">Upload Paper to {{ class_data.CLASS_NAME }}</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label class="block mb-2">Description:</label>
+                <textarea name="paper_desc" class="w-full p-2 border rounded"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block mb-2">PDF File:</label>
+                <input type="file" name="file" accept=".pdf" class="border p-2">
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+                Upload Paper
+            </button>
+        </form>
+    </div>
+    {% endblock %}
+
+    {% include 'footer.html' %}
+</body>

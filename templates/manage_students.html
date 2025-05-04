@@ -1,0 +1,91 @@
+<!-- templates/manage_students.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
+    <script src="{{ url_for('static', filename='script.js' )}}"></script>
+    <title>Manage Students - {{ class_data.CLASS_ID }}</title>
+</head>
+<body class="bg-white">
+    {% include 'header.html' %}
+  
+    <main class="main-container flex">
+      <aside class="sidebar">
+        <nav class="sidebar-nav">        
+          <ul class="flex flex-col space-y-4 p-4">
+            <li><a href="{{ url_for('open_class', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">My Class</a></li>
+            {% if session.roles == 2 %}
+              <li><a href="{{ url_for('manage_students', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">Manage Students</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </aside>
+  
+      <div class="main-content flex-1 p-6">
+        <div class="class-header mb-8">
+          <h1 class="text-3xl font-bold">{{ class_data.CLASS_NAME }}</h1>
+        </div>
+  
+        {% if session.roles == 2 %}
+        <div class="management-tools bg-white p-4 rounded shadow mt-6">
+          <h3 class="text-lg font-semibold mb-4">Class Management</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <h4 class="font-medium mb-2">Add Student</h4>
+              <form action="/invite_student" method="POST">
+                <input type="hidden" name="class_id" value="{{ class_data.CLASS_ID }}">
+                <div class="flex gap-2">
+                  <input type="email" name="email" placeholder="Enter student email" 
+                        class="flex-1 p-2 border rounded" required>
+                  <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+                    Send Invite
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div>
+              <h4 class="font-medium mb-2">Class Settings</h4>
+              <button onclick="toggleClassCode()" class="bg-gray-100 px-4 py-2 rounded">
+                Show Class Code
+              </button>
+              <div id="classCodeBox" class="hiddenClassCodeBox mt-2">
+                <div class="bg-gray-100 p-3 rounded">
+                  <span class="font-mono">{{ class_data.CLASS_ID }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %} 
+      </div>
+    </main>
+  
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script>
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops! An error occurred.',
+              text: "{{ message }}"
+            });
+          {% elif category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: "{{ message }}"
+            });
+          {% endif %}
+        {% endfor %}
+      </script>
+    {% endif %}
+    {% endwith %}
+  
+    {% include 'footer.html' %}
+  </body>
+</html>
