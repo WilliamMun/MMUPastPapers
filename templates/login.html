@@ -68,10 +68,12 @@
               text: "{{ message }}"
             }).then(() => {
              setTimeout(function() {
-                {% if 'newRegistered' == "True" %}
+                {% if registerStatus == 1 %}
                 window.location.href = "{{ url_for('securityQues') }}";
-                {% else %}
+                {% elif registerStatus == 2 %}
                 window.location.href = "{{ url_for('view_papers') }}";
+                {% else %}
+                window.location.href = "{{ url_for('login') }}";
                 {% endif %}
                 }, 1000);
           });
