@@ -409,7 +409,8 @@ def inject_data():
         'name': session.get('name'),
         'roles': session.get('roles'),
         'newRegistered': session.get('newRegistered'),
-        'initials': initials
+        'initials': initials,
+        'class_id': session.get('current_class_id')
       }
     
     else:
@@ -702,11 +703,12 @@ def view_class():
 
 @app.route('/open_class/<class_id>', methods=['GET','POST'])
 def open_class(class_id):
+   session['current_class_id'] = class_id
    class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
    if not class_data:
       message = "Class not found! Join a class?", 404
       return message
-   return render_template("class_page.html",class_data=class_data)
+   return render_template("class_page.html",class_data=class_data, class_id=class_id)
 
 @app.route('/createClass', methods=['GET','POST'])
 def createClass():

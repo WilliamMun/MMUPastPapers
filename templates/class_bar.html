@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='script.js' ) }}"></script>
+        <script src="{{ url_for('static', filename='sweetalert.js') }}"></script>
+    </head>
+
+    <!-- Class Page Sidebar -->
+    <body>
+        <div class="sidebar">
+            <a href="{{ url_for('open_class', class_id=class_id) }}" class="dashboard">Dashboard</a>
+            <a href="###" class="people">People</a>
+            <a href="###" class="class-info">Class Info</a>
+        </div>
+    </body>
+</html>

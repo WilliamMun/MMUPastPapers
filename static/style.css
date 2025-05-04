@@ -880,3 +880,52 @@ tr:hover {
 }
 
 /**The End of Upload Paper Page Settings**/
+
+/** View Class Page Settings **/
+.viewclass button {
+  width: 130px;
+  height: 50px;
+}
+
+.no-class {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+/**The End of View Class Page Settings**/
+
+/** Class Bar Settings **/
+.sidebar a {
+  position: absolute; 
+  left: -80px; 
+  transition: 0.3s; 
+  padding: 15px; 
+  width: 150px; 
+  text-decoration: none; 
+  font-size: 18px; 
+  color: rgb(12, 12, 12); 
+  border-radius: 0 5px 5px 0; 
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.sidebar a:hover {
+  left: 0px;
+}
+
+.sidebar .dashboard {
+  top: 20px;
+  background-color: whitesmoke; 
+}
+
+.sidebar .people {
+  top: 100px;
+  background-color: whitesmoke;
+}
+
+.sidebar .class-info {
+  top: 180px;
+  background-color: whitesmoke;
+}
+/**The End of Class Bar Page Settings**/
