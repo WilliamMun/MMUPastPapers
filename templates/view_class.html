@@ -38,7 +38,7 @@
       {% endif %}
 
       <div class="content-section">
-        {% if record %}
+        {% if records %}
           {% for record in records %}
             <div class="info-box" id="{{ record.classID }}">
               <a href="{{ url_for('open_class', class_id=record.classID) }}">
