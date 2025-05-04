@@ -10,42 +10,141 @@
   <title>{{ class_data.CLASS_NAME }}</title>
 </head>
 
-<body>
-    
-<!-- Header Bar -->
-{% include 'header.html' %}
+<body class="bg-white">
+  {% include 'header.html' %}
 
-  <!-- Main Content -->
-  <main class="main-content">
-    
+  <main class="main-container flex">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <ul class="flex flex-col space-y-4 p-4">
+          <li><a href="{{ url_for('class_overview', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">Overview</a></li>
+          <li><a href="{{ url_for('class_papers', class_id=class_data.CLASS_ID) }}" class="active"></li>
+          <li><a href="{{ url_for('assignments', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">Assignments</a></li>
+          <li><a href="{{ url_for('grades', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">Grades</a></li>
+          {% if is_lecturer %}
+            <li><a href="{{ url_for('manage_students', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">Manage Students</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="main-content flex-1 p-6">
+      <div class="class-header mb-8">
+        <h1 class="text-3xl font-bold">{{ class_data.CLASS_NAME }}</h1>
+        <div class="class-meta mt-2 text-gray-600">
+          <span>Class code: {{ class_data.CLASS_ID }}</span>
+          <span class="ml-4">Role: {% if is_lecturer %}Instructor{% else %}Student{% endif %}</span>
+        </div>
+      </div>
+
+      {% if is_lecturer %}
+      <div class="management-tools bg-white p-4 rounded shadow mt-6">
+          <h3 class="text-lg font-semibold mb-4">Class Management</h3>
+          <div class="grid grid-cols-2 gap-4">
+              <div>
+                  <h4 class="font-medium mb-2">Add Student</h4>
+                  <form action="/invite_student" method="POST">
+                      <input type="hidden" name="class_id" value="{{ class_data.CLASS_ID }}">
+                      <div class="flex gap-2">
+                          <input type="email" name="email" placeholder="enter student email" class="flex-1 p-2 border rounded" required>
+                                class="flex-1 p-2 border rounded" required>
+                          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+                              send invite
+                          </button>
+                      </div>
+                  </form>
+              </div>
+              <div>
+                  <h4 class="font-medium mb-2">Class Settings</h4>
+                  <button onclick="toggleClassCode()" class="bg-gray-100 px-4 py-2 rounded">
+                      Show Class Code
+                  </button>
+                  <div id="classCodeBox" class="hiddenClassCodeBox mt-2">
+                      <div class="bg-gray-100 p-3 rounded">
+                          <span class="font-mono">{{ class_data.CLASS_ID }}</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      {% endif %}
+
+      <div class="content-area bg-gray-50 p-6 rounded-lg">
+        {% if is_lecturer %}
+          <div class="space-y-6">
+            <div class="bg-white p-4 rounded shadow">
+              <h2 class="text-xl font-semibold mb-4">Class Analytics</h2>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="stat-box">
+                  <span class="text-gray-600">Average Grades</span>
+                  <div class="text-2xl font-bold">84.5%</div>
+                </div>
+                <div class="stat-box">
+                  <span class="text-gray-600">Total Students</span>
+                  <div class="text-2xl font-bold">{{ students|length }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded shadow">
+              <h2 class="text-xl font-semibold mb-4">Student Roster</h2>
+              <table class="w-full">
+                <thead>
+                  <tr class="text-left border-b">
+                    <th class="pb-2">Name</th>
+                    <th class="pb-2">Grade</th>
+                    <th class="pb-2">Attendance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for student in students %}
+                  <tr class="border-b">
+                    <td class="py-2">{{ student.name }}</td>
+                    <td>{{ student.grade }}%</td>
+                    <td>95%</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        {% else %}
+          <div class="space-y-6">
+            <div class="bg-white p-4 rounded shadow">
+              <h2 class="text-xl font-semibold mb-4">Your Progress</h2>
+              <div class="text-center">
+                <div class="text-4xl font-bold">{{ current_grade }}%</div>
+                <div class="text-gray-600">Current Average</div>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded shadow">
+              <h2 class="text-xl font-semibold mb-4">Assignments</h2>
+              <div class="space-y-3">
+                {% for assignment in assignments %}
+                <div class="assignment-item p-3 border rounded">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <h3 class="font-medium">{{ assignment.title }}</h3>
+                      <div class="text-sm text-gray-500">Due: {{ assignment.due_date }}</div>
+                    </div>
+                    <span class="status-badge px-2 py-1 rounded-full text-sm 
+                      {% if assignment.status == 'submitted' %}bg-green-100 text-green-800
+                      {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                      {{ assignment.status|capitalize }}
+                    </span>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
   </main>
 
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-      <script>
-          var classCode = "{{ classCode }}";
-          console.log(classCode);
-          {% for category, message in messages %}
-              {% if category == 'error' %}
-                  Swal.fire({
-                      icon: 'error',
-                      title: 'Oops! An error occurred.',
-                      text: "{{ message }}"
-                  });
-              {% elif category == 'success' %}
-                  Swal.fire({
-                      icon: 'success',
-                      title: 'Yay! Success.',
-                      text: "{{ message }}"
-                  });
-              {% endif %}
-          {% endfor %}
-      </script>
-  {% endif %}
-{% endwith %}
-
-<!-- Footer Bar -->
-{% include 'footer.html' %}
+  {% include 'footer.html' %}
 </body>
 </html>

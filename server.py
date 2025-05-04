@@ -98,12 +98,14 @@ class CLASS(db.Model):
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
   SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))  
   TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID))  
+  members = db.relationship('USER_CLASS', backref='class_info', lazy='dynamic')
  
 #ENTITY: USER_CLASS 
 class USER_CLASS(db.Model): 
   USER_ID = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
   CLASS_ID = db.Column(db.String(50), db.ForeignKey(CLASS.CLASS_ID)) 
   JOINED_AT = db.Column(db.DateTime, default=datetime.now) 
+  user = db.relationship('USER_INFO', backref='classes')
 
   __table_args__ = (db.PrimaryKeyConstraint('USER_ID','CLASS_ID'),)
  
@@ -148,6 +150,12 @@ def isStrongPassword(password):
 def allowed_file(filename):
    ALLOWED_EXTENSION = {'pdf'}
    return '.' in filename and filename.rsplit('.', 1)[1]. lower() in ALLOWED_EXTENSION
+
+def get_student_grades(self):
+   return db.session.query(ANSWER).join(
+      USER_CLASS, (USER_CLASS.USER_ID == ANSWER.ANSWER_BY) &
+      (USER_CLASS.CLASS_ID == self.CLASS_ID)
+   ).all()
 
 @app.before_request
 def refresh_session():
@@ -639,27 +647,39 @@ def delete_paper(paper_id):
 
     return redirect('/view_papers')
 
-@app.route('/view_class', methods=['GET','POST'])
-def view_class():
-  records = USER_CLASS.query.filter_by(USER_ID=session.get('user_id')).all()
-  print("User class:",records) #For debugging purposes
-  classIds = [record.CLASS_ID for record in records]
-  print(f"Class ID under user {session.get('user_id')} : {classIds}") #For debugging purposes
-
-  classes = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds)).all()
-
-  class_records = []
-  for cls in classes:
-    lecturer = USER_INFO.query.filter_by(USER_ID=cls.CREATED_BY).first()
-    class_records.append({
-       'classID': cls.CLASS_ID,
-       'className': cls.CLASS_NAME,
-       'termID': cls.TERM_ID,
-       'lecturerName': lecturer.NAME if lecturer else 'Unknown'
-    })
+@app.route('/view_class/<class_id>', methods=['GET','POST'])
+def view_class(class_id):
+  if 'user_id' not in session:
+     return redirect(url_for('login'))
   
-  print("Final record:",class_records) #For debugging purposes 
-  return render_template("view_class.html", records=class_records)
+  class_data = CLASS.query.get(class_id)
+  if not class_data:
+     abort(404)
+
+  members = USER_CLASS.query.filter_by(CLASS_ID=class_id).join(
+     USER_INFO, USER_INFO.USER_ID == USER_CLASS.USER_ID
+  ).add_columns(USER_INFO.NAME, USER_INFO.USER_EMAIL).all()
+
+  subject = SUBJECT_INFO.query.get(class_data.SUBJECT_ID)
+
+  is_lecturer = session['roles'] == 2 and class_data.CREATED_BY == session['user_id']
+  
+  if request.method == 'POST' and not is_lecturer:
+     if not USER_CLASS.query.filter_by(USER_ID=session['user_id'], CLASS_ID=class_id).first():
+        new_member = USER_CLASS(
+           USER_ID=session['user_id'],
+           CLASS_ID=class_id,
+           JOINED_AT=datetime.now()
+        )
+        db.session.add(new_member)
+        db.session.commit()
+        flash('Joined class successfully!', 'success')
+  
+  return render_template("class_detail.html",
+                         class_data=class_data,
+                         members=members,
+                         subject=subject,
+                         is_lecturer=is_lecturer)
 
 @app.route('/open_class/<class_id>', methods=['GET','POST'])
 def open_class(class_id):
@@ -779,6 +799,31 @@ def joinClass():
       return redirect(url_for('view_class'))
 
   return redirect(url_for('view_class')) #In case 'GET' method is passed 
+
+@app.route('manage_students/<class_id>', methods=['GET','POST'])
+def manage_students(class_id):
+  if 'user_id' not in session or session['roles'] != 2:
+     abort(403) #Forbidden access
+
+  class_data = CLASS.query.get(class_id)
+  if not class_data or class_data.CREATED_BY != session['user_id']:
+     abort(403)
+
+  if request.method == 'POST':
+     student_id = request.form.get('student_id')
+     member = USER_CLASS.query.filter_by(CLASS_ID=class_id, USER_ID=student_id).first()
+     if member:
+        db.session.delete(member)
+        db.session.commit()
+        flash('Student removed successfully!', 'success')
+
+  members = USER_CLASS.query.filter_by(CLASS_ID=class_id).join(
+     USER_INFO, USER_INFO.USER_ID == USER_CLASS.USER_ID
+  ).add_columns(USER_INFO.USER_ID, USER_INFO.NAME, USER_INFO.USER_EMAIL).all()
+
+  return render_template("manage_students.html",
+                         class_data=class_data,
+                         members=members)
 
 if __name__ == "__main__":
     app.run(debug=True)
