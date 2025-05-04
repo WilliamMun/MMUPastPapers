@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response
 from flask import send_file, abort
+from flask import request
+from math import ceil
 import os
 from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
@@ -464,8 +466,17 @@ def editProfile():
 
 @app.route('/view_papers')
 def view_papers():
-    pastpapers_info = PASTPAPERS_INFO.query.all()
-    return render_template("view_papers.html", pastpapers_info=pastpapers_info)
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    pagination = PASTPAPERS_INFO.query.paginate(page=page, per_page=per_page)
+    total_papers = PASTPAPERS_INFO.query.count()
+
+    return render_template(
+        "view_papers.html",
+        pastpapers_info=pagination.items,
+        pagination=pagination,
+        total_papers=total_papers
+    )
 
 @app.route('/view_paper/<paper_id>')
 def view_paper(paper_id):
