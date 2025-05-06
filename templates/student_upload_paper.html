@@ -10,6 +10,7 @@
 <body>
     {% include 'header.html' %}
     
+    <main class="main-content">
     {% block content %}
     <div class="container mx-auto p-6">
         <h2 class="text-2xl mb-4">Upload Paper to {{ class_data.CLASS_NAME }}</h2>
@@ -28,6 +29,7 @@
         </form>
     </div>
     {% endblock %}
+    </main>
 
     {% include 'footer.html' %}
 </body>
