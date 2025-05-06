@@ -12,23 +12,8 @@
 
 <body class="bg-white">
   {% include 'header.html' %}
-
-  <main class="main-container flex">
+  <main class="main-content">
     {% include 'class_bar.html' %}
-    <aside class="sidebar">
-      <nav class="sidebar-nav">        
-        <ul class="flex flex-col space-y-4 p-4">
-          <li><a href="{{ url_for('open_class', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">My Class</a></li>
-          {% if session.roles == 1 %}
-          <li><a href="{{ url_for('student_upload_paper', class_id=class_data.CLASS_ID) }}" 
-            class="text-gray-700 hover:text-blue-500">Upload Paper</a></li>
-          {% endif %}
-          {% if session.roles == 2 %}
-            <li><a href="{{ url_for('manage_students', class_id=class_data.CLASS_ID) }}" class="text-gray-700 hover:text-blue-500">Manage Students</a></li>
-          {% endif %}
-        </ul>
-      </nav>
-    </aside>
 
     <div class="main-content flex-1 p-6">
       <div class="class-header mb-8">
@@ -61,7 +46,7 @@
             class="text-gray-700 hover:text-blue-500">Upload Paper</a></li>
       {% endif %}
     </div>
-
+    </main>
   {% include 'footer.html' %}
 </body>
 </html>
