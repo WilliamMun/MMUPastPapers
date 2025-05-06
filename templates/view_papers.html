@@ -30,6 +30,7 @@
         <thead>
           <tr>
             <th>Term ID</th>
+            <th>Subject ID</th>
             <th>File Name</th>
             <th>Description</th>
             {% if session.get('roles') == 2 %}
@@ -44,6 +45,7 @@
             {% for paper in pastpapers_info %}
               <tr>
                 <td>{{ paper.TERM_ID }}</td>
+                <td>{{ paper.SUBJECT_ID }}</td>
                 <td>{{ paper.FILENAME }}</td>
                 <td>{{ paper.PAPER_DESC }}</td>
                 <td>

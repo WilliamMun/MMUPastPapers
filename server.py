@@ -90,6 +90,7 @@ class PASTPAPERS_INFO(db.Model):
   UPLOAD_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
   LAST_MODIFIED_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID), nullable=True) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
+  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))
  
 #ENTITY: CLASS 
 class CLASS(db.Model): 
