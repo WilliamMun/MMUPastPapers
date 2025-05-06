@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for, ses
 from flask import send_file, abort
 from flask import request
 from math import ceil
+from sqlalchemy import or_
 import os
 from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
@@ -467,10 +468,25 @@ def editProfile():
 
 @app.route('/view_papers')
 def view_papers():
+    search_query = request.args.get('search', '').strip()
     page = request.args.get('page', 1, type=int)
     per_page = 5
-    pagination = PASTPAPERS_INFO.query.paginate(page=page, per_page=per_page)
-    total_papers = PASTPAPERS_INFO.query.count()
+
+    query = PASTPAPERS_INFO.query
+
+    if search_query:
+        search_term = f"%{search_query}%"
+        query = query.filter(
+            db.or_(
+                PASTPAPERS_INFO.PAPER_ID.ilike(search_term),
+                PASTPAPERS_INFO.TERM_ID.ilike(search_term),
+                PASTPAPERS_INFO.FILENAME.ilike(search_term),
+                PASTPAPERS_INFO.PAPER_DESC.ilike(search_term)
+            )
+        )
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    total_papers = query.count()
 
     return render_template(
         "view_papers.html",
@@ -478,6 +494,7 @@ def view_papers():
         pagination=pagination,
         total_papers=total_papers
     )
+
 
 @app.route('/view_paper/<paper_id>')
 def view_paper(paper_id):

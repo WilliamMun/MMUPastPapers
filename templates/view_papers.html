@@ -18,12 +18,17 @@
   <main class="main-content">
     <div class="table-container">
       <div class="viewPapers-box">
+        <!-- Search Form -->
+        <form method="GET" action="{{ url_for('view_papers') }}" class="search-box-input" style="display: flex; align-items: center;">
+          <input type="text" name="search" placeholder="Search by subject, term or description" value="{{ request.args.get('search', '') }}" class="px-4 py-2 border border-gray-300 rounded-md w-full"/>
+          {% if request.args.get('search') %}
+          {% endif %}
+        </form>
 
       <table>
         <caption>View Past Papers</caption>
         <thead>
           <tr>
-            <th>Paper ID</th>
             <th>Term ID</th>
             <th>File Name</th>
             <th>Description</th>
@@ -38,7 +43,6 @@
           {% if pastpapers_info %}
             {% for paper in pastpapers_info %}
               <tr>
-                <td class="bil">{{ paper.PAPER_ID }}</td>
                 <td>{{ paper.TERM_ID }}</td>
                 <td>{{ paper.FILENAME }}</td>
                 <td>{{ paper.PAPER_DESC }}</td>
