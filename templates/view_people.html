@@ -20,9 +20,9 @@
                     <input type="text" id="search-input" placeholder="Search members..." onkeyup="searchMembers()">
                 </div>
                 <div class="member-section">
-                    <h2>Lecturers ({{ lectures|length }})</h2>
+                    <h2>Lecturers ({{ lecturers|length }})</h2>
                     <ul class="member-list">
-                        {% for lecturer in lectures %}
+                        {% for lecturer in lecturers %}
                             <li class="member-item">
                                 <span class="member-name">{{ lecturer.NAME }}</span>
                                 <span class="member-role">(Lecturer)</span>
