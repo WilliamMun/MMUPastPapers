@@ -57,7 +57,7 @@
                 {% if session.get('roles') == 2 %}
                 <td>
                   <form id="deleteForm-{{ paper.PAPER_ID }}" action="{{ url_for('delete_paper', paper_id=paper.PAPER_ID) }}" method="POST" style="display:none;"></form>
-                      <img src="{{ url_for('static', filename='images/delete.jpg')}}" alt="delete" onclick="confirmDelete('{{ paper.PAPER_ID }}')"/>
+                      <img src="{{ url_for('static', filename='images/delete.png')}}" alt="delete" onclick="confirmDelete('{{ paper.PAPER_ID }}')"/>
                         <script>
                           function confirmDelete(paperId) {
                             Swal.fire({

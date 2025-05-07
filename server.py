@@ -599,9 +599,8 @@ def logout():
    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
    return response
 
-@app.route('/upload_paper', methods=['GET', 'POST'])
+@app.route('/upload_paper', methods=['GET', 'POST']) 
 def upload_paper():
-    
     file = None
     filepath = None
 
@@ -613,39 +612,41 @@ def upload_paper():
         try:
             paper_desc = request.form.get('paper_desc').strip()
             term_id = request.form.get('term_id')
+            subject_id = request.form.get('subject_id')  # <-- New: get subject_id from form
             file = request.files.get('file')
             upload_dir = app.config['UPLOAD_FOLDER']
 
-            if not all([paper_desc, term_id, file]):
+            if not all([paper_desc, term_id, subject_id, file]):
                 flash('All fields are required!', 'error')
                 return redirect('/upload_paper')
 
             if not TERM_INFO.query.get(term_id):
                 flash('Invalid term selected', 'error')
                 return redirect('/upload_paper')
+            
+            if not SUBJECT_INFO.query.get(subject_id):
+                flash('Invalid subject selected', 'error')
+                return redirect('/upload_paper')
 
             if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
-                print(f"Upload directory created: {upload_dir}")
+                os.makedirs(upload_dir, exist_ok=True)
+                os.chmod(upload_dir, 0o755)
 
             if not allowed_file(file.filename):
                 flash('Only PDF files are allowed!', 'error')
                 return redirect('/upload_paper')
-            
-            if not os.path.exists(upload_dir):
-               os.makedirs(upload_dir, exist_ok=True)
-               os.chmod(upload_dir, 0o755) # Set permissions to allow read/write/execute for owner, and read/execute for group and others
 
             orig_filename = secure_filename(file.filename)
             unique_id = uuid.uuid4().hex[:8]
             timestamp = int(time.time())
-            saved_filename = f"{unique_id}_{int(time.time())}_{orig_filename}"
+            saved_filename = f"{unique_id}_{timestamp}_{orig_filename}"
             filepath = os.path.join(upload_dir, saved_filename)
             file.save(filepath)
 
             new_paper = PASTPAPERS_INFO(
                 PAPER_ID=uuid.uuid4().hex[:10],
                 TERM_ID=term_id,
+                SUBJECT_ID=subject_id,  # <-- New: Save subject_id
                 FILENAME=orig_filename,
                 FILEPATH=filepath,
                 PAPER_DESC=paper_desc,
@@ -661,7 +662,7 @@ def upload_paper():
             session['last_activity'] = datetime.now().timestamp()
 
             flash('Paper uploaded successfully!', 'success')
-            return render_template("upload_paper.html")
+            return render_template("upload_paper.html", terms=TERM_INFO.query.all(), subjects=SUBJECT_INFO.query.all())
 
         except Exception as e:
             db.session.rollback()
@@ -675,7 +676,9 @@ def upload_paper():
         return redirect(url_for('view_papers'))
 
     terms = TERM_INFO.query.all()
-    return render_template('upload_paper.html', terms=terms)
+    subjects = SUBJECT_INFO.query.all()  # <-- New: get subjects
+    return render_template('upload_paper.html', terms=terms, subjects=subjects)
+
 
 @app.route('/delete_paper/<paper_id>', methods=['POST'])
 def delete_paper(paper_id):
@@ -941,6 +944,45 @@ def student_upload_paper(class_id):
 
     return render_template('student_upload_paper.html', class_data=class_data)
 
+@app.route('/view_people/<class_id>')
+def view_people(class_id):
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    # Get class info
+    class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
+    if not class_data:
+        abort(404, description="Class not found")
+
+    # Query members for the class
+    members_query = db.session.query(
+        USER_INFO.USER_ID,
+        USER_INFO.NAME,
+        USER_INFO.ROLES
+    ).join(
+        USER_CLASS, USER_CLASS.USER_ID == USER_INFO.USER_ID
+    ).filter(
+        USER_CLASS.CLASS_ID == class_id
+    )
+
+    pagination = members_query.paginate(page=page, per_page=per_page, error_out=False)
+    members = pagination.items
+
+    # Split into roles
+    lecturers = [m for m in members if m.ROLES == 2]
+    students = [m for m in members if m.ROLES == 1]
+
+    return render_template(
+        "view_people.html",
+        class_data=class_data,
+        class_id=class_id,
+        lecturers=lecturers,
+        students=students,
+        total_members=pagination.total,
+        pagination=pagination
+    )
+
+    
 @app.route('/create_assignment/<class_id>', methods=['GET','POST'])
 def create_assignment(class_id):
    print(f"Class ID: {class_id}")

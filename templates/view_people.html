@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Class Members | MMUPastPapers</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </head>
+    <body>
+        {% include 'header.html' %}
+        <main class="main-content">
+            {% include 'class_bar.html' %}
+
+            <div class="viewPeople-box">
+                <h1>Class Members</h1>
+                <p>Total Members: {{ total_members }}</p>
+                <br>
+                <input type="text" id="search-input" class="input-field" placeholder="Search members" onkeyup="searchMembers()">
+                <div class="member-section">
+                   <div class="member-section">
+                <h2>Lecturers</h2>
+                {% if lecturers %}
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th>Lecturer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lecturer in lecturers %}
+                        <tr class="member-row">
+                            <td class="member-name">{{ lecturer.NAME }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p>No lecturers found.</p>
+                {% endif %}
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Students -->
+            <div class="member-section">
+                <h2>Students</h2>
+                {% if students %}
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr class="member-row">
+                            <td class="member-name">{{ student.NAME }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p>No students found.</p>
+                {% endif %}
+            </div>
+                <div class="viewPeople-button">
+                    <a href="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}">Back</a>
+                </div>
+                <script>
+                    function searchMembers() {
+                        const input = document.getElementById('search-input');
+                        const filter = input.value.toUpperCase();
+                        const rows = document.querySelectorAll('.member-row');
+                
+                        rows.forEach(row => {
+                            const nameCell = row.querySelector('.member-name');
+                            const name = nameCell.textContent.toUpperCase();
+                            row.style.display = name.includes(filter) ? '' : 'none';
+                        });
+                    }
+                </script>
+                
+        </main>
+        <footer>
+            {% include 'footer.html' %}
+        </footer>
+        
+    </body>
+</html>
