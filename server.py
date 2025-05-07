@@ -598,9 +598,8 @@ def logout():
    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
    return response
 
-@app.route('/upload_paper', methods=['GET', 'POST'])
+@app.route('/upload_paper', methods=['GET', 'POST']) 
 def upload_paper():
-    
     file = None
     filepath = None
 
@@ -612,39 +611,41 @@ def upload_paper():
         try:
             paper_desc = request.form.get('paper_desc').strip()
             term_id = request.form.get('term_id')
+            subject_id = request.form.get('subject_id')  # <-- New: get subject_id from form
             file = request.files.get('file')
             upload_dir = app.config['UPLOAD_FOLDER']
 
-            if not all([paper_desc, term_id, file]):
+            if not all([paper_desc, term_id, subject_id, file]):
                 flash('All fields are required!', 'error')
                 return redirect('/upload_paper')
 
             if not TERM_INFO.query.get(term_id):
                 flash('Invalid term selected', 'error')
                 return redirect('/upload_paper')
+            
+            if not SUBJECT_INFO.query.get(subject_id):
+                flash('Invalid subject selected', 'error')
+                return redirect('/upload_paper')
 
             if not os.path.exists(upload_dir):
-                os.makedirs(upload_dir)
-                print(f"Upload directory created: {upload_dir}")
+                os.makedirs(upload_dir, exist_ok=True)
+                os.chmod(upload_dir, 0o755)
 
             if not allowed_file(file.filename):
                 flash('Only PDF files are allowed!', 'error')
                 return redirect('/upload_paper')
-            
-            if not os.path.exists(upload_dir):
-               os.makedirs(upload_dir, exist_ok=True)
-               os.chmod(upload_dir, 0o755) # Set permissions to allow read/write/execute for owner, and read/execute for group and others
 
             orig_filename = secure_filename(file.filename)
             unique_id = uuid.uuid4().hex[:8]
             timestamp = int(time.time())
-            saved_filename = f"{unique_id}_{int(time.time())}_{orig_filename}"
+            saved_filename = f"{unique_id}_{timestamp}_{orig_filename}"
             filepath = os.path.join(upload_dir, saved_filename)
             file.save(filepath)
 
             new_paper = PASTPAPERS_INFO(
                 PAPER_ID=uuid.uuid4().hex[:10],
                 TERM_ID=term_id,
+                SUBJECT_ID=subject_id,  # <-- New: Save subject_id
                 FILENAME=orig_filename,
                 FILEPATH=filepath,
                 PAPER_DESC=paper_desc,
@@ -660,7 +661,7 @@ def upload_paper():
             session['last_activity'] = datetime.now().timestamp()
 
             flash('Paper uploaded successfully!', 'success')
-            return render_template("upload_paper.html")
+            return render_template("upload_paper.html", terms=TERM_INFO.query.all(), subjects=SUBJECT_INFO.query.all())
 
         except Exception as e:
             db.session.rollback()
@@ -674,7 +675,9 @@ def upload_paper():
         return redirect(url_for('view_papers'))
 
     terms = TERM_INFO.query.all()
-    return render_template('upload_paper.html', terms=terms)
+    subjects = SUBJECT_INFO.query.all()  # <-- New: get subjects
+    return render_template('upload_paper.html', terms=terms, subjects=subjects)
+
 
 @app.route('/delete_paper/<paper_id>', methods=['POST'])
 def delete_paper(paper_id):
