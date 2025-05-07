@@ -919,5 +919,41 @@ def student_upload_paper(class_id):
 
     return render_template('student_upload_paper.html', class_data=class_data)
 
+@app.route('/view_people/<class_id>')
+def view_people(class_id):
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    
+    class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
+    if not class_data:
+        abort(404, description="Class not found")
+    
+    members_query = db.session.query(
+        USER_INFO.USER_ID,
+        USER_INFO.NAME,
+        USER_INFO.ROLES
+    ).join(
+        USER_CLASS, USER_CLASS.USER_ID == USER_INFO.USER_ID
+    ).filter(
+        USER_CLASS.CLASS_ID == class_id
+    )
+    
+    pagination = members_query.paginate(page=page, per_page=per_page, error_out=False)
+    members = pagination.items
+    
+    lecturers = [m for m in members if m.ROLES == 2]
+    students = [m for m in members if m.ROLES == 1]
+    total_members = pagination.total
+    
+    return render_template(
+        "view_people.html",
+        class_data=class_data,
+        class_id=class_id,
+        lecturers=lecturers,
+        students=students,
+        total_members=total_members,
+        pagination=pagination
+    )
+    
 if __name__ == "__main__":
     app.run(debug=True)

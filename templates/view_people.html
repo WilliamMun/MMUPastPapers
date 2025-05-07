@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Class Members</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </head>
+    <body>
+        {% include 'header.html' %}
+        <main class="main-content">
+            {% include 'class_bar.html' %}
+
+            <div class="container">
+                <h1>Class Members</h1>
+                <div class="total-members">
+                    <p>Total Members: <strong>{{ total_members }}</strong></p>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search members..." onkeyup="searchMembers()">
+                </div>
+                <div class="member-section">
+                    <h2>Lecturers ({{ lectures|length }})</h2>
+                    <ul class="member-list">
+                        {% for lecturer in lectures %}
+                            <li class="member-item">
+                                <span class="member-name">{{ lecturer.NAME }}</span>
+                                <span class="member-role">(Lecturer)</span>
+                            </li>
+                        {% else %}
+                            <li class="no-members">No lecturers found</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="member-section">
+                    <h2>Students ({{ students|length }})</h2>
+                    <ul class="member-list">
+                        {% for student in students %}
+                            <li class="member-item">
+                                <span class="member-name">{{ student.NAME }}</span>
+                                <span class="member-role">(Student)</span>
+                            </li>
+                        {% else %}
+                            <li class="no-members">No students found</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="back-button">
+                    <a href="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}" class="btn btn-primary">Back</a>
+                </div>
+                <div class="pagination">
+                    {% if pagination.has_prev %}
+                        <a href="{{ url_for('view_people', class_id=class_data.CLASS_ID, page=pagination.prev_num) }}">Previous</a>
+                    {% endif %}
+
+                    {% for page_num in pagination.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == pagination.page %}
+                                <strong>{{ page_num }}</strong>
+                            {% else %}
+                                <a href="{{ url_for('view_people', class_id=class_data.CLASS_ID, page=page_num) }}">{{ page_num }}</a>
+                            {% endif %}
+                        {% else %}
+                            <span>...</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                        <a href="{{ url_for('view_people', class_id=class_data.CLASS_ID, page=pagination.next_num) }}">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <script>
+                function searchMembers() {
+                    const input = document.getElementaById('searchInput');
+                    const filter = input.value.toUpperCase();
+                    const memberItems = document.querySelectorAll('.member-item');
+
+                    memberItems.forEach(item => {
+                        const name = item.querySelector('.member-name').textContent.toUpperCase();
+                        if (name.includes(filter)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+            </script>
+        </main>
+        <footer>
+            {% include 'footer.html' %}
+        </footer>
+        
+    </body>
+</html>
