@@ -2,8 +2,9 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Class Members</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+        <title>Class Members | MMUPastPapers</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <script src="{{ url_for('static', filename='script.js') }}"></script>
     </head>
     <body>
@@ -11,84 +12,75 @@
         <main class="main-content">
             {% include 'class_bar.html' %}
 
-            <div class="container">
+            <div class="viewPeople-box">
                 <h1>Class Members</h1>
-                <div class="total-members">
-                    <p>Total Members: <strong>{{ total_members }}</strong></p>
-                </div>
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Search members..." onkeyup="searchMembers()">
-                </div>
+                <p>Total Members: {{ total_members }}</p>
+                <br>
+                <input type="text" id="search-input" class="input-field" placeholder="Search members" onkeyup="searchMembers()">
                 <div class="member-section">
-                    <h2>Lecturers ({{ lecturers|length }})</h2>
-                    <ul class="member-list">
+                   <div class="member-section">
+                <h2>Lecturers</h2>
+                {% if lecturers %}
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th>Lecturer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {% for lecturer in lecturers %}
-                            <li class="member-item">
-                                <span class="member-name">{{ lecturer.NAME }}</span>
-                                <span class="member-role">(Lecturer)</span>
-                            </li>
-                        {% else %}
-                            <li class="no-members">No lecturers found</li>
+                        <tr class="member-row">
+                            <td class="member-name">{{ lecturer.NAME }}</td>
+                        </tr>
                         {% endfor %}
-                    </ul>
-                </div>
-
-                <div class="member-section">
-                    <h2>Students ({{ students|length }})</h2>
-                    <ul class="member-list">
-                        {% for student in students %}
-                            <li class="member-item">
-                                <span class="member-name">{{ student.NAME }}</span>
-                                <span class="member-role">(Student)</span>
-                            </li>
-                        {% else %}
-                            <li class="no-members">No students found</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <div class="back-button">
-                    <a href="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}" class="btn btn-primary">Back</a>
-                </div>
-                <div class="pagination">
-                    {% if pagination.has_prev %}
-                        <a href="{{ url_for('view_people', class_id=class_data.CLASS_ID, page=pagination.prev_num) }}">Previous</a>
-                    {% endif %}
-
-                    {% for page_num in pagination.iter_pages() %}
-                        {% if page_num %}
-                            {% if page_num == pagination.page %}
-                                <strong>{{ page_num }}</strong>
-                            {% else %}
-                                <a href="{{ url_for('view_people', class_id=class_data.CLASS_ID, page=page_num) }}">{{ page_num }}</a>
-                            {% endif %}
-                        {% else %}
-                            <span>...</span>
-                        {% endif %}
-                    {% endfor %}
-
-                    {% if pagination.has_next %}
-                        <a href="{{ url_for('view_people', class_id=class_data.CLASS_ID, page=pagination.next_num) }}">Next</a>
-                    {% endif %}
-                </div>
+                    </tbody>
+                </table>
+                {% else %}
+                    <p>No lecturers found.</p>
+                {% endif %}
             </div>
-            
-            <script>
-                function searchMembers() {
-                    const input = document.getElementaById('searchInput');
-                    const filter = input.value.toUpperCase();
-                    const memberItems = document.querySelectorAll('.member-item');
 
-                    memberItems.forEach(item => {
-                        const name = item.querySelector('.member-name').textContent.toUpperCase();
-                        if (name.includes(filter)) {
-                            item.style.display = '';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                }
-            </script>
+            <hr class="my-4">
+
+            <!-- Students -->
+            <div class="member-section">
+                <h2>Students</h2>
+                {% if students %}
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr class="member-row">
+                            <td class="member-name">{{ student.NAME }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <p>No students found.</p>
+                {% endif %}
+            </div>
+                <div class="viewPeople-button">
+                    <a href="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}">Back</a>
+                </div>
+                <script>
+                    function searchMembers() {
+                        const input = document.getElementById('search-input');
+                        const filter = input.value.toUpperCase();
+                        const rows = document.querySelectorAll('.member-row');
+                
+                        rows.forEach(row => {
+                            const nameCell = row.querySelector('.member-name');
+                            const name = nameCell.textContent.toUpperCase();
+                            row.style.display = name.includes(filter) ? '' : 'none';
+                        });
+                    }
+                </script>
+                
         </main>
         <footer>
             {% include 'footer.html' %}

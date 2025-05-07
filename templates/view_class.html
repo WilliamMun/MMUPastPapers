@@ -42,7 +42,6 @@
           {% for record in records %}
             <div class="info-box" id="{{ record.classID }}">
               <a href="{{ url_for('open_class', class_id=record.classID) }}">
-                <hr>
                 <img src="{{ url_for('static', filename='images/ppcover.png') }}" alt="Class Cover">
                 <b><p>{{ record.className }}</p></b>
                 <p>Lecturer/Instructor: {{ record.lecturerName }}</p>

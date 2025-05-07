@@ -925,12 +925,14 @@ def student_upload_paper(class_id):
 @app.route('/view_people/<class_id>')
 def view_people(class_id):
     page = request.args.get('page', 1, type=int)
-    per_page = 20
-    
+    per_page = 10
+
+    # Get class info
     class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
     if not class_data:
         abort(404, description="Class not found")
-    
+
+    # Query members for the class
     members_query = db.session.query(
         USER_INFO.USER_ID,
         USER_INFO.NAME,
@@ -940,23 +942,24 @@ def view_people(class_id):
     ).filter(
         USER_CLASS.CLASS_ID == class_id
     )
-    
+
     pagination = members_query.paginate(page=page, per_page=per_page, error_out=False)
     members = pagination.items
-    
+
+    # Split into roles
     lecturers = [m for m in members if m.ROLES == 2]
     students = [m for m in members if m.ROLES == 1]
-    total_members = pagination.total
-    
+
     return render_template(
         "view_people.html",
         class_data=class_data,
         class_id=class_id,
         lecturers=lecturers,
         students=students,
-        total_members=total_members,
+        total_members=pagination.total,
         pagination=pagination
     )
+
     
 if __name__ == "__main__":
     app.run(debug=True)
