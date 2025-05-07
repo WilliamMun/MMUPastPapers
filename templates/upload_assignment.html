@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <title>Create Assignment | MMUPastPapers</title>
+    </head>
+    
+    <body>
+        <!-- Header Bar -->
+        {% include 'header.html' %}
+
+        <main class="main-content">
+            <div class="upload-box">
+                <h1>Create New Assignment</h1>
+                    <form action="{{ url_for('upload_assignment', class_id=session.get('current_class_id')) }}" method="POST">
+                        <div class="input-field">
+                            <label for="assignment_desc">Assignment Description</label>
+                            <input type="text" id="assignment_des" name="assignment_des" placeholder="Enter assignment description">
+                        </div>
+                        <div class="select-field">
+                            <label for="paper">Paper</label>
+                            <select class="text-box" name="paper" id="paper" required>
+                                <option value="">-- Select a Paper --</option>
+                                {% for paper in papers %}
+                                    <option value="{{ paper.paper_id }}">{{ paper.subject_id }} - {{ paper.term }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button>Create Assignment</button>
+                    </form>
+                    <form action="{{ url_for('open_class', class_id=session.get('current_class_id')) }}" method="POST">
+                        <button>Back</button>
+                    </form>
+            </div>
+        </main>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <script>
+                    var classCode = {{ classCode | tojson }};
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops! An error occurred.',
+                                text: "{{ message }}"
+                            });
+                        {% elif category == 'success' %}
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Yay! Success.',
+                                text: "{{ message }}"
+                            }).then(() => {
+                                setTimeout(function() {
+                                    window.location.href = "/open_class/" + classCode;
+                                }, 1000);
+                            });
+                        {% endif %}
+                    {% endfor %}
+                </script>
+            {% endif %}
+        {% endwith %}
+      
+    <!-- Footer Bar -->
+    {% include 'footer.html' %}
+  </body>
