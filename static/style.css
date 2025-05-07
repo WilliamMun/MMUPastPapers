@@ -1104,9 +1104,9 @@ hr{
 .no-assignment{
   background: white;
   padding: 20px;
-  width: 80%;
+  width: 60%;
   height: auto;
-  max-width: 95%;
+  max-width: 60%;
   margin: 20px auto;
   border-radius: 20px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
