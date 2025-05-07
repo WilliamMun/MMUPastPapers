@@ -20,7 +20,7 @@
       <div class="viewPapers-box">
         <!-- Search Form -->
         <form method="GET" action="{{ url_for('view_papers') }}" class="search-box-input" style="display: flex; align-items: center;">
-          <input type="text" name="search" placeholder="Search by subject, term or description" value="{{ request.args.get('search', '') }}" class="px-4 py-2 border border-gray-300 rounded-md w-full"/>
+          <input type="text" name="search" placeholder="Search by term, filename or description" value="{{ request.args.get('search', '') }}" class="px-4 py-2 border border-gray-300 rounded-md w-full"/>
           {% if request.args.get('search') %}
           {% endif %}
         </form>
