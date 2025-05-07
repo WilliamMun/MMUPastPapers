@@ -133,6 +133,7 @@ class DISCUSSION_SPACE(db.Model):
   CLASS_ID = db.Column(db.String(50), db.ForeignKey(CLASS.CLASS_ID)) 
   CREATED_BY = db.Column(db.String(50), nullable=False) 
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
+  ASSIGNMENT_NAME = db.Column(db.Text)
  
 #ENTITY: DISCUSSION_FORUM 
 class DISCUSSION_FORUM(db.Model): 
@@ -726,7 +727,25 @@ def open_class(class_id):
    if not class_data:
       message = "Class not found! Join a class?", 404
       return message
-   return render_template("class_page.html",class_data=class_data, class_id=class_id)
+   
+   assignments = DISCUSSION_SPACE.query.filter_by(CLASS_ID=class_id).all()
+   print(f"Assignment record: {assignments}")
+   
+   assignment_info = [] 
+
+   for assignment in assignments:
+      creator = USER_INFO.query.filter_by(USER_ID=assignment.CREATED_BY).first() 
+      creatorName = creator.NAME 
+      
+      assignment_info.append({
+         'assignment_id': assignment.DISCUSSION_ID,
+         'assignment_name': assignment.ASSIGNMENT_NAME,
+         'creator': creatorName
+      })
+
+   print(f"Final record Assignment Info: {assignment_info}")
+
+   return render_template("class_page.html",class_data=class_data, class_id=class_id, assignment_info=assignment_info)
 
 @app.route('/createClass', methods=['GET','POST'])
 def createClass():
@@ -841,12 +860,15 @@ def joinClass():
 @app.route('/manage_students/<class_id>', methods=['GET', 'POST'])
 def manage_students(class_id):
 
-    if 'user_id' not in session or session['roles'] != 2:
-        abort(403)
+    #if 'user_id' not in session or session['roles'] != 2:
+    #    print("Possibility 1")
+    #    abort(403)
     
     class_data = CLASS.query.get(class_id)
-    if not class_data or class_data.CREATED_BY != session['user_id']:
-        abort(403)
+    print(class_data)
+    #if not class_data or class_data.CREATED_BY != session['user_id']:
+    #    print("Possibility 2")
+    #    abort(403)
 
     if request.method == 'POST':
         student_id = request.form.get('student_id')
@@ -918,6 +940,67 @@ def student_upload_paper(class_id):
             return redirect(url_for('student_upload_paper', class_id=class_id))
 
     return render_template('student_upload_paper.html', class_data=class_data)
+
+@app.route('/create_assignment/<class_id>', methods=['GET','POST'])
+def create_assignment(class_id):
+   print(f"Class ID: {class_id}")
+   class_info = CLASS.query.filter_by(CLASS_ID=class_id).first()
+   print(class_info)
+   current_subject_id = class_info.SUBJECT_ID
+   print(current_subject_id)
+   papers = PASTPAPERS_INFO.query.filter_by(SUBJECT_ID=current_subject_id).all()
+   
+   papers_record = []
+   for paper in papers: 
+      papers_record.append({
+         'paper_id': paper.PAPER_ID,
+         'term': paper.TERM_ID,
+         'subject_id': paper.SUBJECT_ID
+      })
+   
+   print(f"Final papers record: {papers_record}")
+
+   return render_template("upload_assignment.html", papers=papers_record)
+
+@app.route('/upload_assignment/<class_id>', methods=['GET','POST'])
+def upload_assignment(class_id):
+   if request.method == 'POST':
+      assignment_name = request.form.get('assignment_des')
+      paper_id = request.form.get('paper')
+
+      if not assignment_name or not paper_id:
+         flash("All fields are required!",'error')
+         print("All/some fields are empty.") #For debugging purposes 
+         return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+
+      record = DISCUSSION_SPACE.query.filter_by(PAPER_ID=paper_id, CLASS_ID=session.get('current_class_id')).all()
+      if record:
+         flash("Sorry, assignment you want to create existed!",'error')
+         print("Assignment created existed.") #For debugging purposes 
+         return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+      else:
+         try:
+            discussion_id = uuid.uuid4().hex[:8]
+            new_record = DISCUSSION_SPACE(DISCUSSION_ID=discussion_id, PAPER_ID=paper_id, CLASS_ID=class_id, CREATED_BY=session.get('user_id'), CREATED_ON=datetime.now(), ASSIGNMENT_NAME=assignment_name)
+            db.session.add(new_record)
+            db.session.commit()
+            flash("Assignment created successfully!",'success')
+            print("Assignment created successfully!") #For debugging purposes 
+            return render_template("upload_assignment.html", classCode=session.get('current_class_id'))
+         except IntegrityError:
+            flash("Sorry, assignment you want to create existed!",'error')
+            print("Assignment created existed.") #For debugging purposes 
+            return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+         except Exception as e:
+            flash("Error occurs while creating assignment. Try again later.",'error')
+            print("Internal server error.",e) #For debugging purposes 
+            return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+
+   return render_template("upload_assignment.html", classCode=session.get('current_class_id'))
+
+@app.route('/open_assignment/<class_id>/<discussion_id>', methods=['GET','POST'])
+def open_assignment(class_id, discussion_id):
+   return render_template("view_assignment.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

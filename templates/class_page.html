@@ -13,36 +13,37 @@
   {% include 'header.html' %}
   <main class="main-content">
     {% include 'class_bar.html' %}
-
+    <div class="student-assignment">
       <!-- Main-Content -->
-      <div class="studentPapers-box">
+      <div class="class-title-box">
+        <img src="{{ url_for('static', filename='images/ppcover.png')}}">
         <h1>{{ class_data.CLASS_NAME }}</h1>
-        <h2>Student Papers</h2>
         <br>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% for paper in class_papers %}
-            <div class="paper-card border p-4 rounded">
-                <h3 class="font-medium">{{ paper.PAPER_DESC }}</h3>
-                <p class="text-sm text-gray-600">Uploaded by: {{ paper.uploader.NAME }}</p>
-                <div class="mt-2">
-                    <a href="{{ url_for('view_paper', paper_id=paper.PAPER_ID) }}" 
-                      class="text-blue-500 mr-4">View</a>
-                    <a href="{{ url_for('download_paper', paper_id=paper.PAPER_ID) }}"
-                      class="text-green-500">Download</a>
-                </div>
-            </div>
-            {% else %}
-            <p class="">No student papers uploaded yet</p>
-            {% endfor %}
-        </div>
       </div>
 
-      <!-- Inside sidebar-nav -->
-      {% if session.roles == 1 %}
-      <li><a href="{{ url_for('student_upload_paper', class_id=class_data.CLASS_ID) }}" 
-            class="text-gray-700 hover:text-blue-500">Upload Paper</a></li>
+      {% if assignment_info %}
+        {% for assignment in assignment_info %}
+          <div class="assignment-box">
+            <a href="{{ url_for('open_assignment', class_id='class_id', discussion_id=assignment.assignment_id) }}">
+              <p><b>{{ assignment.creator }}</b> assigned a task: <b>{{ assignment.assignment_name }}</b></p>
+            </a>
+          </div>
+        {% endfor %}
+      {% else %}
+          <div class="no-assignment">
+            <p>No assignment assigned in your class.</p>
+          </div>
+      {% endif %}
+
+      {% if session.get('roles') == 2 %}
+        <div class="btn-container">
+          <form action="{{ url_for('create_assignment', class_id=session.get('current_class_id')) }}" method="POST">
+            <input type="submit" class="create-asgnmt" value="Create Assignment">
+          </form>
+        </div>
       {% endif %}
     </div>
+
     </main>
   {% include 'footer.html' %}
 </body>
