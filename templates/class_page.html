@@ -13,7 +13,7 @@
   {% include 'header.html' %}
   <main class="main-content">
     {% include 'class_bar.html' %}
-    <div class="student-assignment">
+    <div class="student-answer-board">
       <!-- Main-Content -->
       <div class="class-title-box">
         <img src="{{ url_for('static', filename='images/ppcover.png')}}">
@@ -21,24 +21,24 @@
         <br>
       </div>
 
-      {% if assignment_info %}
-        {% for assignment in assignment_info %}
-          <div class="assignment-box">
-            <a href="{{ url_for('open_assignment', class_id='class_id', discussion_id=assignment.assignment_id) }}">
-              <p><b>{{ assignment.creator }}</b> assigned a task: <b>{{ assignment.assignment_name }}</b></p>
+      {% if answer_board_info %}
+        {% for answer_board in answer_board_info %}
+          <div class="answer-board-box">
+            <a href="{{ url_for('open_answer_board', class_id='class_id', answer_board_id=answer_board.answer_board_id) }}">
+              <p><b>{{ answer_board.creator }}</b> created an answer board: <b>{{ answer_board.answer_board_name }}</b></p>
             </a>
           </div>
         {% endfor %}
       {% else %}
-          <div class="no-assignment">
-            <p>No assignment assigned in your class.</p>
+          <div class="no-answer-board">
+            <p>No answer board created in your class.</p>
           </div>
       {% endif %}
 
       {% if session.get('roles') == 2 %}
         <div class="btn-container">
-          <form action="{{ url_for('create_assignment', class_id=session.get('current_class_id')) }}" method="POST">
-            <input type="submit" class="create-asgnmt" value="Create Assignment">
+          <form action="{{ url_for('create_answer_board', class_id=session.get('current_class_id')) }}" method="POST">
+            <input type="submit" class="create-ans-board" value="Create Answer Board">
           </form>
         </div>
       {% endif %}

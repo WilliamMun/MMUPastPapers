@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <title>Create Assignment | MMUPastPapers</title>
+        <title>Create Answer Board | MMUPastPapers</title>
     </head>
     
     <body>
@@ -15,11 +15,11 @@
 
         <main class="main-content">
             <div class="upload-box">
-                <h1>Create New Assignment</h1>
-                    <form action="{{ url_for('upload_assignment', class_id=session.get('current_class_id')) }}" method="POST">
+                <h1>Create New Answer Board</h1>
+                    <form action="{{ url_for('upload_answer_board', class_id=session.get('current_class_id')) }}" method="POST">
                         <div class="input-field">
-                            <label for="assignment_desc">Assignment Description</label>
-                            <input type="text" id="assignment_des" name="assignment_des" placeholder="Enter assignment description">
+                            <label for="answer_board_desc">Answer Board Description</label>
+                            <input type="text" id="answer_board_des" name="answer_board_des" placeholder="Enter answer board description">
                         </div>
                         <div class="select-field">
                             <label for="paper">Paper</label>
@@ -30,7 +30,7 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <button>Create Assignment</button>
+                        <button>Create Answer Board</button>
                     </form>
                     <form action="{{ url_for('open_class', class_id=session.get('current_class_id')) }}" method="POST">
                         <button>Back</button>
