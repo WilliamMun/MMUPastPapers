@@ -1078,7 +1078,7 @@ hr{
   width: 2500px;
 }
 
-.assignment-box{
+.answer-board-box{
   background: white;
   padding: 20px;
   width: 60%;
@@ -1091,17 +1091,17 @@ hr{
   padding-left: 30px;
 }
 
-.assignment-box p{
+.answer-board-box p{
   font-size: 20px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
-.assignment-box b{
+.answer-board-box b{
   font-size: 20px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
-.no-assignment{
+.no-answer-board{
   background: white;
   padding: 20px;
   width: 60%;
@@ -1113,7 +1113,7 @@ hr{
   text-align: center;
 }
 
-.no-assignment p{
+.no-answer-board p{
   font-family: 20px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
@@ -1122,7 +1122,7 @@ hr{
   display: block;
 }
 
-.create-asgnmt {
+.create-ans-board {
   width: 300px;
   padding: 12px;
   background-color: #E5E1DA;
@@ -1137,7 +1137,7 @@ hr{
   transition: 0.3s ease;
 }
 
-.create-asgnmt:hover {
+.create-ans-board:hover {
   background-color: #BCCCDC;
   color: black;
 }

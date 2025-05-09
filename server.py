@@ -110,6 +110,15 @@ class USER_CLASS(db.Model):
   JOINED_AT = db.Column(db.DateTime, default=datetime.now) 
 
   __table_args__ = (db.PrimaryKeyConstraint('USER_ID','CLASS_ID'),)
+
+#ENTITY: ANSWER_BOARD 
+class ANSWER_BOARD(db.Model): 
+  ANSWER_BOARD_ID = db.Column(db.String(50), primary_key=True) 
+  PAPER_ID = db.Column(db.String(50), db.ForeignKey(PASTPAPERS_INFO.PAPER_ID)) 
+  CLASS_ID = db.Column(db.String(50), db.ForeignKey(CLASS.CLASS_ID)) 
+  CREATED_BY = db.Column(db.String(50), nullable=False) 
+  CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
+  ANSWER_BOARD_NAME = db.Column(db.Text)
  
 #ENTITY: ANSWER_FIELD 
 class ANSWER_FIELD(db.Model): 
@@ -117,7 +126,8 @@ class ANSWER_FIELD(db.Model):
   PAPER_ID = db.Column(db.String(50), db.ForeignKey(PASTPAPERS_INFO.PAPER_ID)) 
   ANSWER_FIELD_DESC = db.Column(db.Text, nullable=True) 
   ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload image 
- 
+  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+
 #ENTITY: ANSWER  
 class ANSWER(db.Model): 
   ANSWER_ID = db.Column(db.String(50), primary_key=True)
@@ -125,21 +135,12 @@ class ANSWER(db.Model):
   ANSWER_BY = db.Column(db.String(50), nullable=False) 
   ANSWER_ON = db.Column(db.DateTime, default=datetime.now) 
   ANSWER_CONTENT = db.Column(db.Text) 
- 
-#ENTITY: DISCUSSION_SPACE 
-class DISCUSSION_SPACE(db.Model): 
-  DISCUSSION_ID = db.Column(db.String(50), primary_key=True) 
-  PAPER_ID = db.Column(db.String(50), db.ForeignKey(PASTPAPERS_INFO.PAPER_ID)) 
-  CLASS_ID = db.Column(db.String(50), db.ForeignKey(CLASS.CLASS_ID)) 
-  CREATED_BY = db.Column(db.String(50), nullable=False) 
-  CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
-  ASSIGNMENT_NAME = db.Column(db.Text)
- 
+
 #ENTITY: DISCUSSION_FORUM 
 class DISCUSSION_FORUM(db.Model): 
   COMMENT_ID = db.Column(db.String(100), primary_key=True) 
   COMMENT = db.Column(db.Text) 
-  DISCUSSION_ID = db.Column(db.String(50), db.ForeignKey(DISCUSSION_SPACE.DISCUSSION_ID)) 
+  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID)) 
   POSTED_BY = db.Column(db.String(50), nullable=False) 
   POSTED_ON = db.Column(db.DateTime, default=datetime.now)
 
@@ -731,24 +732,23 @@ def open_class(class_id):
       message = "Class not found! Join a class?", 404
       return message
    
-   assignments = DISCUSSION_SPACE.query.filter_by(CLASS_ID=class_id).all()
-   print(f"Assignment record: {assignments}")
+   answer_boards = ANSWER_BOARD.query.filter_by(CLASS_ID=class_id).all()
+   print(f"Answer Board record: {answer_boards}")
    
-   assignment_info = [] 
+   answer_board_info = [] 
 
-   for assignment in assignments:
-      creator = USER_INFO.query.filter_by(USER_ID=assignment.CREATED_BY).first() 
+   for answer_board in answer_boards:
+      creator = USER_INFO.query.filter_by(USER_ID=answer_board.CREATED_BY).first() 
       creatorName = creator.NAME 
       
-      assignment_info.append({
-         'assignment_id': assignment.DISCUSSION_ID,
-         'assignment_name': assignment.ASSIGNMENT_NAME,
+      answer_board_info.append({
+         'answer_board_id': answer_board.ANSWER_BOARD_ID,
+         'answer_board_name': answer_board.ANSWER_BOARD_NAME,
          'creator': creatorName
       })
 
-   print(f"Final record Assignment Info: {assignment_info}")
-
-   return render_template("class_page.html",class_data=class_data, class_id=class_id, assignment_info=assignment_info)
+   print(f"Final record Answer Board Info: {answer_board_info}")
+   return render_template("class_page.html",class_data=class_data, class_id=class_id, answer_board_info=answer_board_info)
 
 @app.route('/createClass', methods=['GET','POST'])
 def createClass():
@@ -983,8 +983,8 @@ def view_people(class_id):
     )
 
     
-@app.route('/create_assignment/<class_id>', methods=['GET','POST'])
-def create_assignment(class_id):
+@app.route('/create_answer_board/<class_id>', methods=['GET','POST'])
+def create_answer_board(class_id):
    print(f"Class ID: {class_id}")
    class_info = CLASS.query.filter_by(CLASS_ID=class_id).first()
    print(class_info)
@@ -1002,47 +1002,47 @@ def create_assignment(class_id):
    
    print(f"Final papers record: {papers_record}")
 
-   return render_template("upload_assignment.html", papers=papers_record)
+   return render_template("upload_answer_board.html", papers=papers_record)
 
-@app.route('/upload_assignment/<class_id>', methods=['GET','POST'])
-def upload_assignment(class_id):
+@app.route('/upload_answer_board/<class_id>', methods=['GET','POST'])
+def upload_answer_board(class_id):
    if request.method == 'POST':
-      assignment_name = request.form.get('assignment_des')
+      answer_board_name = request.form.get('answer_board_des')
       paper_id = request.form.get('paper')
 
-      if not assignment_name or not paper_id:
+      if not answer_board_name or not paper_id:
          flash("All fields are required!",'error')
          print("All/some fields are empty.") #For debugging purposes 
-         return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+         return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
 
-      record = DISCUSSION_SPACE.query.filter_by(PAPER_ID=paper_id, CLASS_ID=session.get('current_class_id')).all()
+      record = ANSWER_BOARD.query.filter_by(PAPER_ID=paper_id, CLASS_ID=session.get('current_class_id')).all()
       if record:
-         flash("Sorry, assignment you want to create existed!",'error')
-         print("Assignment created existed.") #For debugging purposes 
-         return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+         flash("Sorry, answer_board you want to create existed!",'error')
+         print("answer_board created existed.") #For debugging purposes 
+         return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
       else:
          try:
-            discussion_id = uuid.uuid4().hex[:8]
-            new_record = DISCUSSION_SPACE(DISCUSSION_ID=discussion_id, PAPER_ID=paper_id, CLASS_ID=class_id, CREATED_BY=session.get('user_id'), CREATED_ON=datetime.now(), ASSIGNMENT_NAME=assignment_name)
+            answer_board_id = uuid.uuid4().hex[:8]
+            new_record = ANSWER_BOARD(ANSWER_BOARD_ID=answer_board_id, PAPER_ID=paper_id, CLASS_ID=class_id, CREATED_BY=session.get('user_id'), CREATED_ON=datetime.now(), ANSWER_BOARD_NAME=answer_board_name)
             db.session.add(new_record)
             db.session.commit()
-            flash("Assignment created successfully!",'success')
-            print("Assignment created successfully!") #For debugging purposes 
-            return render_template("upload_assignment.html", classCode=session.get('current_class_id'))
+            flash("Answer board created successfully!",'success')
+            print("Answer board created successfully!") #For debugging purposes 
+            return render_template("upload_answer_board.html", classCode=session.get('current_class_id'))
          except IntegrityError:
-            flash("Sorry, assignment you want to create existed!",'error')
-            print("Assignment created existed.") #For debugging purposes 
-            return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+            flash("Sorry, answer board you want to create existed!",'error')
+            print("Answer board created existed.") #For debugging purposes 
+            return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
          except Exception as e:
-            flash("Error occurs while creating assignment. Try again later.",'error')
+            flash("Error occurs while creating answer board. Try again later.",'error')
             print("Internal server error.",e) #For debugging purposes 
-            return redirect(f"/upload_assignment/{session.get('current_class_id')}")
+            return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
 
-   return render_template("upload_assignment.html", classCode=session.get('current_class_id'))
+   return render_template("upload_answer_board.html", classCode=session.get('current_class_id'))
 
-@app.route('/open_assignment/<class_id>/<discussion_id>', methods=['GET','POST'])
-def open_assignment(class_id, discussion_id):
-   return render_template("view_assignment.html")
+@app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
+def open_answer_board(class_id, answer_board_id):
+   return render_template("view_answer_board.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
