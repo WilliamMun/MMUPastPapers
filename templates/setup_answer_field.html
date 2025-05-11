@@ -1,0 +1,87 @@
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Setup Answer Field | MMUPastPapers</title>
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <main class="main-content">
+        {% include 'class_bar.html' %}
+
+        <div class="setup-box">
+            <h1>Setup Answer Field for Your Students!</h1>
+            <hr>
+            <p>Papers you selected:</p>
+            <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px"
+                height="1000px"></iframe>
+            <br>
+            <form
+                action="{{ url_for('setup_answer_field', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id'))}}"
+                method="POST">
+                <div class="answer-fields" id="answer-fields" data-answer-count="2">
+                    <div class="answer-field">
+                        <input type="text" name="question" id="question1" placeholder="Enter Question Number/Question">
+                        <label for="type-ans">Type of Answer Field: </label>
+                        <select class="type-ans" name="type-ans" id="type-ans1" onchange="handleAnswerFieldType(this)">
+                            <option value="text">Text</option>
+                            <option value="mcq">MCQ</option>
+                            <option value="file">File</option>
+                        </select>
+
+                        <div class="mcq-setup" id="mcq-setup" style="display: none;" data-option-count="2">
+                            <div class="mcq-option" id="mcq-option">
+                                <div class="option" id="option">
+                                    <input type="radio" name="mcqAnswer" id="mcqAnswer" class="mcqAnswer" value="option1">
+                                    <input type="text" name="question1-option1-text" id="question1-option1-text" class="question1-option-text"
+                                        placeholder="Enter your answer question 1 option 1.">
+                                </div>
+                            </div>
+                            <button type="button" onclick="addMcqOptions(this)">Add Answer Option</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="addAnswerField(this)">Add Answer Field</button>
+                <input type="submit" name="submit-answer-field" id="submit-answer-field" value="Create Answer Field">
+            </form>
+        </div>
+
+    </main>
+
+    {% include 'footer.html' %}
+</body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            var classCode = {{ classCode | tojson }};
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "/open_class/" + classCode;
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
+</html>

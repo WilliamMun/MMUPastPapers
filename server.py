@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response, send_from_directory
 from flask import send_file, abort
 from flask import request
 from math import ceil
@@ -10,6 +10,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import timedelta
+from collections import defaultdict
 import re
 import uuid
 import time
@@ -122,10 +123,9 @@ class ANSWER_BOARD(db.Model):
  
 #ENTITY: ANSWER_FIELD 
 class ANSWER_FIELD(db.Model): 
-  ANSWER_FIELD_ID = db.Column(db.String(50), primary_key=True) 
-  PAPER_ID = db.Column(db.String(50), db.ForeignKey(PASTPAPERS_INFO.PAPER_ID)) 
+  ANSWER_FIELD_ID = db.Column(db.String(50), primary_key=True)
   ANSWER_FIELD_DESC = db.Column(db.Text, nullable=True) 
-  ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload image 
+  ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload file 
   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
 
 #ENTITY: ANSWER  
@@ -144,6 +144,12 @@ class DISCUSSION_FORUM(db.Model):
   POSTED_BY = db.Column(db.String(50), nullable=False) 
   POSTED_ON = db.Column(db.DateTime, default=datetime.now)
 
+#ENTITY: MCQ_OPTION
+class MCQ_OPTION(db.Model):
+   MCQ_OPTION_ID = db.Column(db.String(50), primary_key=True)
+   MCQ_OPTION_DESC = db.Column(db.Text)
+   MCQ_OPTION_FLAG = db.Column(db.Integer, nullable=True)
+   ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
 
@@ -860,90 +866,6 @@ def joinClass():
 
   return redirect(url_for('view_class')) #In case 'GET' method is passed 
 
-@app.route('/manage_students/<class_id>', methods=['GET', 'POST'])
-def manage_students(class_id):
-
-    #if 'user_id' not in session or session['roles'] != 2:
-    #    print("Possibility 1")
-    #    abort(403)
-    
-    class_data = CLASS.query.get(class_id)
-    print(class_data)
-    #if not class_data or class_data.CREATED_BY != session['user_id']:
-    #    print("Possibility 2")
-    #    abort(403)
-
-    if request.method == 'POST':
-        student_id = request.form.get('student_id')
-        member = USER_CLASS.query.filter_by(
-            CLASS_ID=class_id, 
-            USER_ID=student_id
-        ).first()
-        
-        if member:
-            db.session.delete(member)
-            db.session.commit()
-            flash('Student Removed Successfully', 'success')
-        
-        return redirect(url_for('manage_students', class_id=class_id))
-
-    members = USER_CLASS.query.filter_by(CLASS_ID=class_id).join(
-        USER_INFO, USER_INFO.USER_ID == USER_CLASS.USER_ID
-    ).add_columns(USER_INFO.USER_ID, USER_INFO.NAME, USER_INFO.USER_EMAIL).all()
-
-    return render_template("manage_students.html",
-                         class_data=class_data,
-                         members=members)
-
-@app.route('/student_upload_paper/<class_id>', methods=['GET', 'POST'])
-def student_upload_paper(class_id):
-    if 'roles' not in session or session['roles'] != 1:
-        abort(403)
-    
-    class_data = CLASS.query.get(class_id)
-    if not class_data:
-        abort(404)
-
-    if request.method == 'POST':
-        try:
-            file = request.files['file']
-            paper_desc = request.form.get('paper_desc', '').strip()
-            
-            if not file or not allowed_file(file.filename):
-                flash('Please upload a valid PDF file', 'error')
-                return redirect(url_for('student_upload_paper', class_id=class_id))
-
-            # Generate unique filename
-            orig_filename = secure_filename(file.filename)
-            unique_id = uuid.uuid4().hex[:8]
-            saved_filename = f"student_{unique_id}_{orig_filename}"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], saved_filename)
-            file.save(filepath)
-
-            # Create paper record
-            new_paper = PASTPAPERS_INFO(
-                PAPER_ID=uuid.uuid4().hex[:10],
-                TERM_ID=class_data.TERM_ID,
-                CLASS_ID=class_id,
-                FILENAME=orig_filename,
-                FILEPATH=filepath,
-                PAPER_DESC=paper_desc,
-                UPLOAD_BY=session['user_id'],
-                LAST_MODIFIED_BY=session['user_id']
-            )
-
-            db.session.add(new_paper)
-            db.session.commit()
-            flash('Paper uploaded successfully!', 'success')
-            return redirect(url_for('open_class', class_id=class_id))
-
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error uploading paper: {str(e)}', 'error')
-            return redirect(url_for('student_upload_paper', class_id=class_id))
-
-    return render_template('student_upload_paper.html', class_data=class_data)
-
 @app.route('/view_people/<class_id>')
 def view_people(class_id):
     page = request.args.get('page', 1, type=int)
@@ -982,7 +904,6 @@ def view_people(class_id):
         pagination=pagination
     )
 
-    
 @app.route('/create_answer_board/<class_id>', methods=['GET','POST'])
 def create_answer_board(class_id):
    print(f"Class ID: {class_id}")
@@ -1028,7 +949,8 @@ def upload_answer_board(class_id):
             db.session.commit()
             flash("Answer board created successfully!",'success')
             print("Answer board created successfully!") #For debugging purposes 
-            return render_template("upload_answer_board.html", classCode=session.get('current_class_id'))
+            session['current_answer_board_id'] = answer_board_id
+            return render_template("upload_answer_board.html", classCode=session.get('current_class_id'), answerBoardId=session.get('current_answer_board_id'))
          except IntegrityError:
             flash("Sorry, answer board you want to create existed!",'error')
             print("Answer board created existed.") #For debugging purposes 
@@ -1038,7 +960,103 @@ def upload_answer_board(class_id):
             print("Internal server error.",e) #For debugging purposes 
             return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
 
-   return render_template("upload_answer_board.html", classCode=session.get('current_class_id'))
+   return render_template("upload_answer_board.html", classCode=session.get('current_class_id'), answerBoardId=session.get('current_answer_board_id'))
+
+@app.route('/get_pdf/<filepath>')
+def get_pdf(filepath):
+   print('Final file path:',filepath)
+   directory = os.path.dirname(filepath)  
+   file = os.path.basename(filepath)
+   print(f"Directory: {directory}, file: {file}")
+   return send_from_directory(directory, file)
+
+@app.route('/setup_answer_field/<class_id>/<answer_board_id>', methods=['GET','POST'])
+def setup_answer_field(class_id, answer_board_id):
+  ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+  print(f"Answer board: {ans_board}")
+  paper_id = ans_board.PAPER_ID
+  print(f"Paper ID: {paper_id}")
+  if paper_id:
+    paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=paper_id).first()
+    print(f"Paper Info: {paper_info}")
+    paper_path = paper_info.FILEPATH
+    print(f"Paper path: {paper_path}")
+  else:
+    flash("Unexpected error.",'error')
+    print("No paper id found!")
+    return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
+  
+  #When user submit form
+  if request.method == 'POST':
+    #Get user input from form 
+    form_data = request.form
+    print(f"Inputs received: {form_data}")
+    question_data = []
+
+    options_by_question = defaultdict(list)
+
+    for key in form_data:
+      match = re.match(r'question(\d+)-option\d+-text', key)
+      if match:
+        question_id = match.group(1)
+        option_text = form_data[key]
+        if option_text.strip():  # Avoid empty options
+            options_by_question[question_id].append(option_text)
+
+    for key in form_data:
+      if key.startswith('question') and '-' not in key:  # only top-level question fields
+        question_id = key.replace('question', '') 
+        if not question_id:
+           question_id = 1
+        question_text = form_data[key]
+        answer_type = form_data.get(f'type-ans{question_id}', 'text')
+
+        question_entry = {
+            'question': question_text,
+            'type': answer_type,
+            'options': []
+        }
+
+        if answer_type == 'mcq':
+            question_entry['options'] = options_by_question.get(question_id, [])
+
+        print(f"Question {question_id} record: {question_entry}")
+        question_data.append(question_entry)
+    
+    try:
+      #Handle data from user and save into database 
+      for question in question_data:
+        question_desc = question['question']
+        question_type = question['type']
+        if question_type == "text":
+            question_type_no = 1
+        elif question_type == "mcq":
+            question_type_no = 2
+        elif question_type == "file":
+            question_type_no = 3
+        options = question['options']
+        ans_field_id = uuid.uuid4().hex[:10]
+        new_record1 = ANSWER_FIELD(ANSWER_FIELD_ID=ans_field_id, ANSWER_FIELD_DESC=question_desc, ANSWER_FIELD_TYPE=question_type_no, ANSWER_BOARD_ID=answer_board_id)
+        print(f"Record will insert into ANSWER_FIELD: {new_record1}")
+        db.session.add(new_record1)
+
+        #Handle MCQ options if exists
+        if options:
+            for option in options:
+              optionId = uuid.uuid4().hex[:10]
+              new_record2 = MCQ_OPTION(MCQ_OPTION_ID=optionId, MCQ_OPTION_DESC=option, ANSWER_FIELD_ID=ans_field_id)
+              print(f"Record will insert into MCQ_OPTION: {new_record2}")
+              db.session.add(new_record2)
+      db.session.commit()
+
+      flash("Answer field setup successfully!",'success')
+      return render_template("setup_answer_field.html",paperPath=paper_path,classCode=session.get('current_class_id'))
+    except Exception as e:
+      flash("Error occurs while setup answer field. Please try again.",'error')
+      print("Error occurs while setup answer field.",e)
+      return redirect(f'/setup_answer_field/{session.get('current_class_id')}/{answer_board_id}')
+    
+  return render_template("setup_answer_field.html",paperPath=paper_path, classCode=session.get('current_class_id'))
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
 def open_answer_board(class_id, answer_board_id):
