@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response, send_from_directory
 from flask import send_file, abort
 from flask import request
 from math import ceil
@@ -860,90 +860,6 @@ def joinClass():
 
   return redirect(url_for('view_class')) #In case 'GET' method is passed 
 
-@app.route('/manage_students/<class_id>', methods=['GET', 'POST'])
-def manage_students(class_id):
-
-    #if 'user_id' not in session or session['roles'] != 2:
-    #    print("Possibility 1")
-    #    abort(403)
-    
-    class_data = CLASS.query.get(class_id)
-    print(class_data)
-    #if not class_data or class_data.CREATED_BY != session['user_id']:
-    #    print("Possibility 2")
-    #    abort(403)
-
-    if request.method == 'POST':
-        student_id = request.form.get('student_id')
-        member = USER_CLASS.query.filter_by(
-            CLASS_ID=class_id, 
-            USER_ID=student_id
-        ).first()
-        
-        if member:
-            db.session.delete(member)
-            db.session.commit()
-            flash('Student Removed Successfully', 'success')
-        
-        return redirect(url_for('manage_students', class_id=class_id))
-
-    members = USER_CLASS.query.filter_by(CLASS_ID=class_id).join(
-        USER_INFO, USER_INFO.USER_ID == USER_CLASS.USER_ID
-    ).add_columns(USER_INFO.USER_ID, USER_INFO.NAME, USER_INFO.USER_EMAIL).all()
-
-    return render_template("manage_students.html",
-                         class_data=class_data,
-                         members=members)
-
-@app.route('/student_upload_paper/<class_id>', methods=['GET', 'POST'])
-def student_upload_paper(class_id):
-    if 'roles' not in session or session['roles'] != 1:
-        abort(403)
-    
-    class_data = CLASS.query.get(class_id)
-    if not class_data:
-        abort(404)
-
-    if request.method == 'POST':
-        try:
-            file = request.files['file']
-            paper_desc = request.form.get('paper_desc', '').strip()
-            
-            if not file or not allowed_file(file.filename):
-                flash('Please upload a valid PDF file', 'error')
-                return redirect(url_for('student_upload_paper', class_id=class_id))
-
-            # Generate unique filename
-            orig_filename = secure_filename(file.filename)
-            unique_id = uuid.uuid4().hex[:8]
-            saved_filename = f"student_{unique_id}_{orig_filename}"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], saved_filename)
-            file.save(filepath)
-
-            # Create paper record
-            new_paper = PASTPAPERS_INFO(
-                PAPER_ID=uuid.uuid4().hex[:10],
-                TERM_ID=class_data.TERM_ID,
-                CLASS_ID=class_id,
-                FILENAME=orig_filename,
-                FILEPATH=filepath,
-                PAPER_DESC=paper_desc,
-                UPLOAD_BY=session['user_id'],
-                LAST_MODIFIED_BY=session['user_id']
-            )
-
-            db.session.add(new_paper)
-            db.session.commit()
-            flash('Paper uploaded successfully!', 'success')
-            return redirect(url_for('open_class', class_id=class_id))
-
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error uploading paper: {str(e)}', 'error')
-            return redirect(url_for('student_upload_paper', class_id=class_id))
-
-    return render_template('student_upload_paper.html', class_data=class_data)
-
 @app.route('/view_people/<class_id>')
 def view_people(class_id):
     page = request.args.get('page', 1, type=int)
@@ -982,7 +898,6 @@ def view_people(class_id):
         pagination=pagination
     )
 
-    
 @app.route('/create_answer_board/<class_id>', methods=['GET','POST'])
 def create_answer_board(class_id):
    print(f"Class ID: {class_id}")
@@ -1028,7 +943,8 @@ def upload_answer_board(class_id):
             db.session.commit()
             flash("Answer board created successfully!",'success')
             print("Answer board created successfully!") #For debugging purposes 
-            return render_template("upload_answer_board.html", classCode=session.get('current_class_id'))
+            session['current_answer_board_id'] = answer_board_id
+            return render_template("upload_answer_board.html", classCode=session.get('current_class_id'), answerBoardId=session.get('current_answer_board_id'))
          except IntegrityError:
             flash("Sorry, answer board you want to create existed!",'error')
             print("Answer board created existed.") #For debugging purposes 
@@ -1038,7 +954,33 @@ def upload_answer_board(class_id):
             print("Internal server error.",e) #For debugging purposes 
             return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
 
-   return render_template("upload_answer_board.html", classCode=session.get('current_class_id'))
+   return render_template("upload_answer_board.html", classCode=session.get('current_class_id'), answerBoardId=session.get('current_answer_board_id'))
+
+@app.route('/get_pdf/<filepath>')
+def get_pdf(filepath):
+   print('Final file path:',filepath)
+   directory = os.path.dirname(filepath)  
+   file = os.path.basename(filepath)
+   print(f"Directory: {directory}, file: {file}")
+   return send_from_directory(directory, file)
+
+@app.route('/setup_answer_field/<class_id>/<answer_board_id>', methods=['GET','POST'])
+def setup_answer_field(class_id, answer_board_id):
+   ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+   print(f"Answer board: {ans_board}")
+   paper_id = ans_board.PAPER_ID
+   print(f"Paper ID: {paper_id}")
+   if paper_id:
+    paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=paper_id).first()
+    print(f"Paper Info: {paper_info}")
+    paper_path = paper_info.FILEPATH
+    print(f"Paper path: {paper_path}")
+   else:
+    flash("Unexpected error.",'error')
+    print("No paper id found!")
+    return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
+  
+   return render_template("setup_answer_field.html",paperPath=paper_path)
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
 def open_answer_board(class_id, answer_board_id):
