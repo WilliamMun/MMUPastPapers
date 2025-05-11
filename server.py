@@ -10,6 +10,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import timedelta
+from collections import defaultdict
 import re
 import uuid
 import time
@@ -122,10 +123,9 @@ class ANSWER_BOARD(db.Model):
  
 #ENTITY: ANSWER_FIELD 
 class ANSWER_FIELD(db.Model): 
-  ANSWER_FIELD_ID = db.Column(db.String(50), primary_key=True) 
-  PAPER_ID = db.Column(db.String(50), db.ForeignKey(PASTPAPERS_INFO.PAPER_ID)) 
+  ANSWER_FIELD_ID = db.Column(db.String(50), primary_key=True)
   ANSWER_FIELD_DESC = db.Column(db.Text, nullable=True) 
-  ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload image 
+  ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload file 
   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
 
 #ENTITY: ANSWER  
@@ -144,6 +144,12 @@ class DISCUSSION_FORUM(db.Model):
   POSTED_BY = db.Column(db.String(50), nullable=False) 
   POSTED_ON = db.Column(db.DateTime, default=datetime.now)
 
+#ENTITY: MCQ_OPTION
+class MCQ_OPTION(db.Model):
+   MCQ_OPTION_ID = db.Column(db.String(50), primary_key=True)
+   MCQ_OPTION_DESC = db.Column(db.Text)
+   MCQ_OPTION_FLAG = db.Column(db.Integer, nullable=True)
+   ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
 
@@ -966,21 +972,91 @@ def get_pdf(filepath):
 
 @app.route('/setup_answer_field/<class_id>/<answer_board_id>', methods=['GET','POST'])
 def setup_answer_field(class_id, answer_board_id):
-   ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
-   print(f"Answer board: {ans_board}")
-   paper_id = ans_board.PAPER_ID
-   print(f"Paper ID: {paper_id}")
-   if paper_id:
+  ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+  print(f"Answer board: {ans_board}")
+  paper_id = ans_board.PAPER_ID
+  print(f"Paper ID: {paper_id}")
+  if paper_id:
     paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=paper_id).first()
     print(f"Paper Info: {paper_info}")
     paper_path = paper_info.FILEPATH
     print(f"Paper path: {paper_path}")
-   else:
+  else:
     flash("Unexpected error.",'error')
     print("No paper id found!")
     return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
   
-   return render_template("setup_answer_field.html",paperPath=paper_path)
+  #When user submit form
+  if request.method == 'POST':
+    #Get user input from form 
+    form_data = request.form
+    print(f"Inputs received: {form_data}")
+    question_data = []
+
+    options_by_question = defaultdict(list)
+
+    for key in form_data:
+      match = re.match(r'question(\d+)-option\d+-text', key)
+      if match:
+        question_id = match.group(1)
+        option_text = form_data[key]
+        if option_text.strip():  # Avoid empty options
+            options_by_question[question_id].append(option_text)
+
+    for key in form_data:
+      if key.startswith('question') and '-' not in key:  # only top-level question fields
+        question_id = key.replace('question', '') 
+        if not question_id:
+           question_id = 1
+        question_text = form_data[key]
+        answer_type = form_data.get(f'type-ans{question_id}', 'text')
+
+        question_entry = {
+            'question': question_text,
+            'type': answer_type,
+            'options': []
+        }
+
+        if answer_type == 'mcq':
+            question_entry['options'] = options_by_question.get(question_id, [])
+
+        print(f"Question {question_id} record: {question_entry}")
+        question_data.append(question_entry)
+    
+    try:
+      #Handle data from user and save into database 
+      for question in question_data:
+        question_desc = question['question']
+        question_type = question['type']
+        if question_type == "text":
+            question_type_no = 1
+        elif question_type == "mcq":
+            question_type_no = 2
+        elif question_type == "file":
+            question_type_no = 3
+        options = question['options']
+        ans_field_id = uuid.uuid4().hex[:10]
+        new_record1 = ANSWER_FIELD(ANSWER_FIELD_ID=ans_field_id, ANSWER_FIELD_DESC=question_desc, ANSWER_FIELD_TYPE=question_type_no, ANSWER_BOARD_ID=answer_board_id)
+        print(f"Record will insert into ANSWER_FIELD: {new_record1}")
+        db.session.add(new_record1)
+
+        #Handle MCQ options if exists
+        if options:
+            for option in options:
+              optionId = uuid.uuid4().hex[:10]
+              new_record2 = MCQ_OPTION(MCQ_OPTION_ID=optionId, MCQ_OPTION_DESC=option, ANSWER_FIELD_ID=ans_field_id)
+              print(f"Record will insert into MCQ_OPTION: {new_record2}")
+              db.session.add(new_record2)
+      db.session.commit()
+
+      flash("Answer field setup successfully!",'success')
+      return render_template("setup_answer_field.html",paperPath=paper_path,classCode=session.get('current_class_id'))
+    except Exception as e:
+      flash("Error occurs while setup answer field. Please try again.",'error')
+      print("Error occurs while setup answer field.",e)
+      return redirect(f'/setup_answer_field/{session.get('current_class_id')}/{answer_board_id}')
+    
+  return render_template("setup_answer_field.html",paperPath=paper_path, classCode=session.get('current_class_id'))
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
 def open_answer_board(class_id, answer_board_id):

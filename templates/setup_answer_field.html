@@ -26,11 +26,11 @@
             <form
                 action="{{ url_for('setup_answer_field', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id'))}}"
                 method="POST">
-                <div class="answer-fields" id="answer-fields">
+                <div class="answer-fields" id="answer-fields" data-answer-count="2">
                     <div class="answer-field">
-                        <input type="text" name="question" id="question" placeholder="Enter Question Number/Question">
+                        <input type="text" name="question" id="question1" placeholder="Enter Question Number/Question">
                         <label for="type-ans">Type of Answer Field: </label>
-                        <select class="type-ans" name="type-ans" id="type-ans" onchange="handleAnswerFieldType(this)">
+                        <select class="type-ans" name="type-ans" id="type-ans1" onchange="handleAnswerFieldType(this)">
                             <option value="text">Text</option>
                             <option value="mcq">MCQ</option>
                             <option value="file">File</option>
@@ -40,15 +40,15 @@
                             <div class="mcq-option" id="mcq-option">
                                 <div class="option" id="option">
                                     <input type="radio" name="mcqAnswer" id="mcqAnswer" class="mcqAnswer" value="option1">
-                                    <input type="text" name="option1-text" id="option1-text" class="option1-text"
-                                        placeholder="Enter your answer option 1.">
+                                    <input type="text" name="question1-option1-text" id="question1-option1-text" class="question1-option-text"
+                                        placeholder="Enter your answer question 1 option 1.">
                                 </div>
                             </div>
                             <button type="button" onclick="addMcqOptions(this)">Add Answer Option</button>
                         </div>
                     </div>
                 </div>
-                <button type="button" onclick="addAnswerField()">Add Answer Field</button>
+                <button type="button" onclick="addAnswerField(this)">Add Answer Field</button>
                 <input type="submit" name="submit-answer-field" id="submit-answer-field" value="Create Answer Field">
             </form>
         </div>
@@ -58,4 +58,30 @@
     {% include 'footer.html' %}
 </body>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            var classCode = {{ classCode | tojson }};
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "/open_class/" + classCode;
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
 </html>
