@@ -483,23 +483,29 @@ def editProfile():
 
 @app.route('/view_papers')
 def view_papers():
-    search_query = request.args.get('search', '').strip()
+    # Get search filter inputs individually
+    term = request.args.get('term', '').strip()
+    subject = request.args.get('subject', '').strip()
+    filename = request.args.get('filename', '').strip()
+    description = request.args.get('description', '').strip()
+
     page = request.args.get('page', 1, type=int)
     per_page = 5
 
+    # Base query
     query = PASTPAPERS_INFO.query
 
-    if search_query:
-        search_term = f"%{search_query}%"
-        query = query.filter(
-            db.or_(
-                PASTPAPERS_INFO.PAPER_ID.ilike(search_term),
-                PASTPAPERS_INFO.TERM_ID.ilike(search_term),
-                PASTPAPERS_INFO.FILENAME.ilike(search_term),
-                PASTPAPERS_INFO.PAPER_DESC.ilike(search_term)
-            )
-        )
+    # Apply filters conditionally
+    if term:
+        query = query.filter(PASTPAPERS_INFO.TERM_ID.ilike(f"%{term}%"))
+    if subject:
+        query = query.filter(PASTPAPERS_INFO.SUBJECT_ID.ilike(f"%{subject}%"))
+    if filename:
+        query = query.filter(PASTPAPERS_INFO.FILENAME.ilike(f"%{filename}%"))
+    if description:
+        query = query.filter(PASTPAPERS_INFO.PAPER_DESC.ilike(f"%{description}%"))
 
+    # Pagination and total count
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     total_papers = query.count()
 
@@ -509,7 +515,6 @@ def view_papers():
         pagination=pagination,
         total_papers=total_papers
     )
-
 
 @app.route('/view_paper/<paper_id>')
 def view_paper(paper_id):

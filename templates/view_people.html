@@ -18,7 +18,6 @@
                 <br>
                 <input type="text" id="search-input" class="input-field" placeholder="Search members" onkeyup="searchMembers()">
                 <div class="member-section">
-                   <div class="member-section">
                 <h2>Lecturers</h2>
                 {% if lecturers %}
                 <table class="w-full">
@@ -64,8 +63,10 @@
                     <p>No students found.</p>
                 {% endif %}
             </div>
-                <div class="viewPeople-button">
-                    <a href="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}">Back</a>
+                <div class="btn-container">
+                <form action="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}" method="POST">
+                    <input type="submit" class="viewPeople-button" value="Back">
+                </form>
                 </div>
                 <script>
                     function searchMembers() {
