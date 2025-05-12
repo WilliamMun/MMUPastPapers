@@ -16,6 +16,7 @@
                 <h1>Class Members</h1>
                 <p>Total Members: {{ total_members }}</p>
                 <br>
+              
                 <form method="GET" action="{{ url_for('view_people', class_id=class_data.CLASS_ID) }}">
                     <input type="text" 
                         name="search" 

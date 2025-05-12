@@ -3,6 +3,8 @@ from flask import send_file, abort
 from flask import request
 from math import ceil
 from sqlalchemy import or_
+from sqlalchemy import and_
+from sqlalchemy import func
 import os
 from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
@@ -481,25 +483,42 @@ def editProfile():
        
   return render_template("editProfile.html")
 
+from sqlalchemy import and_
+
 @app.route('/view_papers')
 def view_papers():
-    search_query = request.args.get('search', '').strip()
+    # Get search filter inputs
+    term = request.args.get('term', '').strip()
+    subject = request.args.get('subject', '').strip()
+    filename = request.args.get('filename', '').strip()
+    description = request.args.get('description', '').strip()
+
     page = request.args.get('page', 1, type=int)
     per_page = 5
 
+    # Base query
     query = PASTPAPERS_INFO.query
 
-    if search_query:
-        search_term = f"%{search_query}%"
-        query = query.filter(
-            db.or_(
-                PASTPAPERS_INFO.PAPER_ID.ilike(search_term),
-                PASTPAPERS_INFO.TERM_ID.ilike(search_term),
-                PASTPAPERS_INFO.FILENAME.ilike(search_term),
-                PASTPAPERS_INFO.PAPER_DESC.ilike(search_term)
-            )
-        )
+    # Apply filters only if they are provided
+    filters = []
+    
+    if term:
+        filters.append(func.lower(PASTPAPERS_INFO.TERM_ID) == term.lower())
+    if subject:
+        filters.append(func.lower(PASTPAPERS_INFO.SUBJECT_ID) == subject.lower())
+    if filename:
+        filters.append(PASTPAPERS_INFO.FILENAME.ilike(f"%{filename}%"))
+    if description:
+        filters.append(PASTPAPERS_INFO.PAPER_DESC.ilike(f"%{description}%"))
 
+    # Apply all filters with 'and_' to combine them
+    if filters:
+        query = query.filter(and_(*filters))
+
+    # Debugging: Print the query to check the applied filters
+    print(str(query))
+
+    # Pagination and count
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     total_papers = query.count()
 
@@ -509,7 +528,6 @@ def view_papers():
         pagination=pagination,
         total_papers=total_papers
     )
-
 
 @app.route('/view_paper/<paper_id>')
 def view_paper(paper_id):
