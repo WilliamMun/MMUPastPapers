@@ -883,7 +883,7 @@ def view_people(class_id):
     if not class_data:
         abort(404, description="Class not found")
 
-    query = USER_INFO.query.join(USER_CLASS).filter(
+    query = db.session.query(USER_INFO).join(USER_CLASS).filter(
         USER_CLASS.CLASS_ID == class_id
     )
 
@@ -902,16 +902,6 @@ def view_people(class_id):
         error_out=False
     )
 
-    lecturers = USER_INFO.query.join(USER_CLASS).filter(
-        USER_CLASS.CLASS_ID == class_id,
-        USER_INFO.ROLES == 2
-    ).all()
-
-    students = USER_INFO.query.join(USER_CLASS).filter(
-        USER_CLASS.CLASS_ID == class_id,
-        USER_INFO.ROLES == 1
-    ).all()
-
     return render_template(
         "view_people.html",
         class_data=class_data,
@@ -919,8 +909,6 @@ def view_people(class_id):
         pagination=pagination,
         selected_role=role_filter,
         search_query=search_query,
-        lecturers=lecturers,
-        students=students,
         total_members=query.count()
     )
 
@@ -1105,7 +1093,7 @@ def class_info(class_id):
     if not newClassName:
        flash("Please enter a new class name!",'error')
        print("Class name empty. ")
-       return redirect(f'/class_info/{session.get('current_class_id')}')
+       return redirect(f'/class_info/{session.get("current_class_id")}')
     
     record = CLASS.query.filter_by(CLASS_ID=session.get('current_class_id')).first()
 
@@ -1121,7 +1109,7 @@ def class_info(class_id):
     except Exception as e:
        flash("Error occurs while editing class info. Please try again later.",'error')
        print("Internal server error.", e)
-       return redirect(f'/class_info/{session.get('current_class_id')}')
+       return redirect(f'/class_info/{session.get("current_class_id")}')
 
   return render_template("class_info.html", class_record=class_record, classCode = session.get('current_class_id'))
 

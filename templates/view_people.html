@@ -40,11 +40,9 @@
                     </form>
                 </div>
 
-
-
                 <div class="member-section">
                     <h2>All members</h2>
-                    {% if students %}
+                    {% if pagination.items %}
                     <table class="w-full">
                         <thead>
                             <tr>
@@ -53,18 +51,18 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for student in pagination.items %}
+                            {% for member in pagination.items %}
                             <tr class="member-row">
-                                <td class="member-name">{{ student.NAME }}</td>
+                                <td class="member-name">{{ member.NAME }}</td>
                                 <td class="member-role">
-                                    {% if student.ROLES == 1 %}Student{% elif student.ROLES == 2 %}Lecturer{% endif %}
+                                    {% if member.ROLES == 1 %}Student{% else %}Lecturer{% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                     {% else %}
-                        <p>No students found.</p>
+                        <p>No members found.</p>
                     {% endif %} 
                 </div>
 
