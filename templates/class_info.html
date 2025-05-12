@@ -18,7 +18,7 @@
             <div class="main-container">
                 <div class="class-title-box">
                     <img src="{{ url_for('static', filename='images/ppcover.png')}}">
-                    <h1>class_data.CLASS_NAME</h1>
+                    <h1>{{ class_record.className }}</h1>
                     <br>
                 </div>
 
@@ -26,7 +26,7 @@
                     <h1>Class Code:</h1>
                     <p>You can share your class code with your students or share the link and send it to your students!</p>
                     <div class="show-class-code">
-                        <h1>class code sini</h1>
+                        <h1>{{ class_record.classCode }}</h1>
                     </div>
                     <p>or</p>
                     <input type="text" readonly value="{{ url_for('join_class_link', class_id=class_id, _external=True) }}">
@@ -37,11 +37,11 @@
                     <p>You may edit your class info here.</p>
                     <form action="class_info" method="POST">
                         <label for="class_name">Class Name:</label>
-                        <input type="text" name="class_name" id="class_name" value="Class Name Later put sini">
+                        <input type="text" name="class_name" id="class_name" value="{{ class_record.className }}">
                         <label for="subject">Subject: </label>
-                        <input type="text" name="subject" id="subject" readonly value="subject letak sini" disabled>
+                        <input type="text" name="subject" id="subject" readonly value="{{ class_record.subject }}" disabled>
                         <label for="term">Term: </label>
-                        <input type="text" name="term" id="term" readonly value="term letak sini" disabled>
+                        <input type="text" name="term" id="term" readonly value="{{ class_record.term }}" disabled>
                         <input type="submit" name="editClass" id="editClass" value="Edit">
                     </form>
                 </div>
@@ -50,4 +50,31 @@
 
         {% include 'footer.html' %}
     </body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            var classCode = {{ classCode | tojson }};
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "/open_class/" + classCode;
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
 </html>
