@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
+        <script src="{{ url_for('static', filename='script.js' )}}"></script>
+        <title>Class Info | MMUPastPapers</title>
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+
+        <main class="main-content">
+            {% include 'class_bar.html' %}
+
+            <div class="main-container">
+                <div class="class-title-box">
+                    <img src="{{ url_for('static', filename='images/ppcover.png')}}">
+                    <h1>class_data.CLASS_NAME</h1>
+                    <br>
+                </div>
+
+                <div class="class-code-box">
+                    <h1>Class Code:</h1>
+                    <p>You can share your class code with your students or share the link and send it to your students!</p>
+                    <div class="show-class-code">
+                        <h1>class code sini</h1>
+                    </div>
+                    <p>or</p>
+                    <input type="text" readonly value="{{ url_for('join_class_link', class_id=class_id, _external=True) }}">
+                </div>
+
+                <div class="edit-box">
+                    <h1>Class Info:</h1>
+                    <p>You may edit your class info here.</p>
+                    <form action="class_info" method="POST">
+                        <label for="class_name">Class Name:</label>
+                        <input type="text" name="class_name" id="class_name" value="Class Name Later put sini">
+                        <label for="subject">Subject: </label>
+                        <input type="text" name="subject" id="subject" readonly value="subject letak sini" disabled>
+                        <label for="term">Term: </label>
+                        <input type="text" name="term" id="term" readonly value="term letak sini" disabled>
+                        <input type="submit" name="editClass" id="editClass" value="Edit">
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

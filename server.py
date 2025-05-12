@@ -1062,5 +1062,14 @@ def setup_answer_field(class_id, answer_board_id):
 def open_answer_board(class_id, answer_board_id):
    return render_template("view_answer_board.html")
 
+@app.route('/class_info/<class_id>', methods=['POST','GET'])
+def class_info(class_id):
+  
+  return render_template("class_info.html")
+
+@app.route('/join_class_link/<class_id>', methods=['GET','POST'])
+def join_class_link(class_id):
+  
+  return render_template("class_info.html")
 if __name__ == "__main__":
     app.run(debug=True)

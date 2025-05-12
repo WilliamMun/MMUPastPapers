@@ -12,7 +12,7 @@
         <div class="sidebar">
             <a href="{{ url_for('open_class', class_id=class_id) }}" class="dashboard">Dashboard</a>
             <a href="{{ url_for('view_people', class_id=class_id) }}" class="people">People</a>
-            <a href="###" class="class-info">Class Info</a>
+            <a href="{{ url_for('class_info', class_id=class_id) }}" class="class-info">Class Info</a>
         </div>
     </body>
 </html>
