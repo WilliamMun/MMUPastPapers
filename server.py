@@ -894,38 +894,40 @@ def joinClass():
 def view_people(class_id):
     page = request.args.get('page', 1, type=int)
     per_page = 10
+    search_query = request.args.get('search', '').strip()
+    role_filter = request.args.get('role', 'all')
 
-    # Get class info
     class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
     if not class_data:
         abort(404, description="Class not found")
 
-    # Query members for the class
-    members_query = db.session.query(
-        USER_INFO.USER_ID,
-        USER_INFO.NAME,
-        USER_INFO.ROLES
-    ).join(
-        USER_CLASS, USER_CLASS.USER_ID == USER_INFO.USER_ID
-    ).filter(
+    query = db.session.query(USER_INFO).join(USER_CLASS).filter(
         USER_CLASS.CLASS_ID == class_id
     )
 
-    pagination = members_query.paginate(page=page, per_page=per_page, error_out=False)
-    members = pagination.items
+    if role_filter == 'students':
+        query = query.filter(USER_INFO.ROLES == 1)
+    elif role_filter == 'lecturers':
+        query = query.filter(USER_INFO.ROLES == 2)
 
-    # Split into roles
-    lecturers = [m for m in members if m.ROLES == 2]
-    students = [m for m in members if m.ROLES == 1]
+    if search_query:
+        search_term = f"%{search_query}%"
+        query = query.filter(USER_INFO.NAME.ilike(search_term))
+
+    pagination = query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
 
     return render_template(
         "view_people.html",
         class_data=class_data,
         class_id=class_id,
-        lecturers=lecturers,
-        students=students,
-        total_members=pagination.total,
-        pagination=pagination
+        pagination=pagination,
+        selected_role=role_filter,
+        search_query=search_query,
+        total_members=query.count()
     )
 
 @app.route('/create_answer_board/<class_id>', methods=['GET','POST'])
@@ -1078,7 +1080,7 @@ def setup_answer_field(class_id, answer_board_id):
     except Exception as e:
       flash("Error occurs while setup answer field. Please try again.",'error')
       print("Error occurs while setup answer field.",e)
-      return redirect(f'/setup_answer_field/{session.get('current_class_id')}/{answer_board_id}')
+      return redirect(f'/setup_answer_field/{session.get("current_class_id")}/{answer_board_id}')
     
   return render_template("setup_answer_field.html",paperPath=paper_path, classCode=session.get('current_class_id'))
 
@@ -1109,7 +1111,7 @@ def class_info(class_id):
     if not newClassName:
        flash("Please enter a new class name!",'error')
        print("Class name empty. ")
-       return redirect(f'/class_info/{session.get('current_class_id')}')
+       return redirect(f'/class_info/{session.get("current_class_id")}')
     
     record = CLASS.query.filter_by(CLASS_ID=session.get('current_class_id')).first()
 
@@ -1125,7 +1127,7 @@ def class_info(class_id):
     except Exception as e:
        flash("Error occurs while editing class info. Please try again later.",'error')
        print("Internal server error.", e)
-       return redirect(f'/class_info/{session.get('current_class_id')}')
+       return redirect(f'/class_info/{session.get("current_class_id")}')
 
   return render_template("class_info.html", class_record=class_record, classCode = session.get('current_class_id'))
 

@@ -16,72 +16,80 @@
                 <h1>Class Members</h1>
                 <p>Total Members: {{ total_members }}</p>
                 <br>
-                <input type="text" id="search-input" class="input-field" placeholder="Search members" onkeyup="searchMembers()">
-                <div class="member-section">
-                <h2>Lecturers</h2>
-                {% if lecturers %}
-                <table class="w-full">
-                    <thead>
-                        <tr>
-                            <th>Lecturer</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lecturer in lecturers %}
-                        <tr class="member-row">
-                            <td class="member-name">{{ lecturer.NAME }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                    <p>No lecturers found.</p>
-                {% endif %}
-            </div>
-
-            <hr class="my-4">
-
-            <!-- Students -->
-            <div class="member-section">
-                <h2>Students</h2>
-                {% if students %}
-                <table class="w-full">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for student in students %}
-                        <tr class="member-row">
-                            <td class="member-name">{{ student.NAME }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                    <p>No students found.</p>
-                {% endif %}
-            </div>
-                <div class="btn-container">
-                <form action="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}" method="POST">
-                    <input type="submit" class="viewPeople-button" value="Back">
+              
+                <form method="GET" action="{{ url_for('view_people', class_id=class_data.CLASS_ID) }}">
+                    <input type="text" 
+                        name="search" 
+                        class="input-field" 
+                        placeholder="Search members"
+                        value="{{ search_query }}">
+                    <button type="submit">Search</button>
                 </form>
+
+                <div class="filter-section mb-4">
+                    <form method="GET" class="flex gap-4 items-center">
+                        <input type="hidden" name="search" value="{{ search_query }}">
+        
+                        <div class="filter-group">
+                            <label for="role" class="block mb-2">Filter by Role:</label>
+                            <select name="role" id="role" class="p-2 border rounded" onchange="this.form.submit()">
+                                <option value="all" {% if selected_role == 'all' %}selected{% endif %}>All Roles</option>
+                                <option value="students" {% if selected_role == 'students' %}selected{% endif %}>Student</option>
+                                <option value="lecturers" {% if selected_role == 'lecturers' %}selected{% endif %}>Lecturer</option>
+                            </select>
+                        </div>
+                    </form>
                 </div>
-                <script>
-                    function searchMembers() {
-                        const input = document.getElementById('search-input');
-                        const filter = input.value.toUpperCase();
-                        const rows = document.querySelectorAll('.member-row');
-                
-                        rows.forEach(row => {
-                            const nameCell = row.querySelector('.member-name');
-                            const name = nameCell.textContent.toUpperCase();
-                            row.style.display = name.includes(filter) ? '' : 'none';
-                        });
-                    }
-                </script>
-                
+
+                <div class="member-section">
+                    <h2>All members</h2>
+                    {% if pagination.items %}
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in pagination.items %}
+                            <tr class="member-row">
+                                <td class="member-name">{{ member.NAME }}</td>
+                                <td class="member-role">
+                                    {% if member.ROLES == 1 %}Student{% else %}Lecturer{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                        <p>No members found.</p>
+                    {% endif %} 
+                </div>
+
+                <div class="pagination">
+                    {% if pagination.pages > 1 %}
+                        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=3) %}
+                            {% if page_num %}
+                                <a href="{{ url_for('view_people', 
+                                    class_id=class_id,
+                                    page=page_num,
+                                    role=selected_role,
+                                    search=search_query) }}"
+                                    class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                                    {{ page_num }}
+                                </a>
+                            {% else %}
+                                <span class="page-ellipsis">...</span>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="viewPeople-button">
+                    <a href="{{ url_for('view_class', class_id=class_data.CLASS_ID) }}">Back</a>
+                </div>
+            </div>
         </main>
         <footer>
             {% include 'footer.html' %}
