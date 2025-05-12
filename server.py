@@ -223,7 +223,13 @@ def login():
           session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
-          return render_template('login.html',registerStatus=registerStatus)
+          pending_class = session.pop('pending_class', None)
+          if pending_class:
+            print("Join class logic.")
+            return redirect(url_for('join_class_link', class_id=pending_class))
+          else:
+            print("Normal login logic.")
+            return render_template('login.html',registerStatus=registerStatus)
         
     return render_template("login.html")
 
@@ -1107,7 +1113,26 @@ def class_info(class_id):
 
 @app.route('/join_class_link/<class_id>', methods=['GET','POST'])
 def join_class_link(class_id):
-  
-  return render_template("class_info.html")
+  session_user = session.get('user_id')
+  if not session_user:
+     flash("Please login before join a class!",'error')
+     print("Not logged in yet.")
+     session['pending_class'] = class_id
+     return redirect(url_for('login'))
+
+  already_joined = USER_CLASS.query.filter_by(CLASS_ID=class_id, USER_ID=session_user).first()
+  print("User already joined:",already_joined) #For debugging purposes
+  if already_joined:
+      flash('You joined this class!','error')
+      print("User joined this class!") #For debugging purposes 
+      return redirect(url_for('view_class'))
+  else:
+      new_record = USER_CLASS(USER_ID=session_user, CLASS_ID=class_id, JOINED_AT=datetime.now())
+      db.session.add(new_record)
+      db.session.commit()
+      flash('Join class successfully!','success')
+      print("Join class action success.") #For debugging purposes 
+      return redirect(url_for('open_class', class_id=class_id, showAlert=False))
+      
 if __name__ == "__main__":
     app.run(debug=True)
