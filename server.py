@@ -3,6 +3,8 @@ from flask import send_file, abort
 from flask import request
 from math import ceil
 from sqlalchemy import or_
+from sqlalchemy import and_
+from sqlalchemy import func
 import os
 from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
@@ -481,9 +483,11 @@ def editProfile():
        
   return render_template("editProfile.html")
 
+from sqlalchemy import and_
+
 @app.route('/view_papers')
 def view_papers():
-    # Get search filter inputs individually
+    # Get search filter inputs
     term = request.args.get('term', '').strip()
     subject = request.args.get('subject', '').strip()
     filename = request.args.get('filename', '').strip()
@@ -495,17 +499,26 @@ def view_papers():
     # Base query
     query = PASTPAPERS_INFO.query
 
-    # Apply filters conditionally
+    # Apply filters only if they are provided
+    filters = []
+    
     if term:
-        query = query.filter(PASTPAPERS_INFO.TERM_ID.ilike(f"%{term}%"))
+        filters.append(func.lower(PASTPAPERS_INFO.TERM_ID) == term.lower())
     if subject:
-        query = query.filter(PASTPAPERS_INFO.SUBJECT_ID.ilike(f"%{subject}%"))
+        filters.append(func.lower(PASTPAPERS_INFO.SUBJECT_ID) == subject.lower())
     if filename:
-        query = query.filter(PASTPAPERS_INFO.FILENAME.ilike(f"%{filename}%"))
+        filters.append(PASTPAPERS_INFO.FILENAME.ilike(f"%{filename}%"))
     if description:
-        query = query.filter(PASTPAPERS_INFO.PAPER_DESC.ilike(f"%{description}%"))
+        filters.append(PASTPAPERS_INFO.PAPER_DESC.ilike(f"%{description}%"))
 
-    # Pagination and total count
+    # Apply all filters with 'and_' to combine them
+    if filters:
+        query = query.filter(and_(*filters))
+
+    # Debugging: Print the query to check the applied filters
+    print(str(query))
+
+    # Pagination and count
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     total_papers = query.count()
 
