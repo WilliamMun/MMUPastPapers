@@ -1,0 +1,88 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
+        <script src="{{ url_for('static', filename='script.js' )}}"></script>
+        <title>Class Info | MMUPastPapers</title>
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+
+        <main class="main-content">
+            {% include 'class_bar.html' %}
+
+            <div class="main-container">
+                <div class="class-title-box">
+                    <img src="{{ url_for('static', filename='images/ppcover.png')}}">
+                    <h1>{{ class_record.className }}</h1>
+                    <br>
+                </div>
+
+                <div class="class-code-box">
+                    <h1>Class Code:</h1>
+                    <p>You can share your class code with your students or share the link and send it to your students!</p>
+                    <div class="show-class-code">
+                        <h1 id="classCode">{{ class_record.classCode }}</h1>
+                        <div class="copy-container" id="codeTooltip">
+                            <img src="{{ url_for('static', filename='images/copy.jpg') }}" alt="Copy Class Code" onclick="copyClassCode()" style="cursor: pointer;">
+                            <span class="tooltip">Copied!</span>
+                        </div>
+                    </div>
+                    <p>or</p>
+                    <input type="text" id="joinLink" readonly value="{{ url_for('join_class_link', class_id=class_id, _external=True) }}">
+                    <div class="copy-container2" id="linkCopyContainer">
+                        <img src="{{ url_for('static', filename='images/copy.jpg') }}" alt="Copy Class Link" onclick="copyClassLink()" style="cursor: pointer;">
+                        <span class="tooltip2">Copied!</span>
+                    </div>
+                </div>
+
+                <div class="edit-box">
+                    <h1>Class Info:</h1>
+                    <p>You may edit your class info here.</p>
+                    <form action="class_info" method="POST">
+                        <label for="class_name">Class Name:</label>
+                        <input type="text" name="class_name" id="class_name" value="{{ class_record.className }}">
+                        <label for="subject">Subject: </label>
+                        <input type="text" name="subject" id="subject" readonly value="{{ class_record.subject }}" disabled>
+                        <label for="term">Term: </label>
+                        <input type="text" name="term" id="term" readonly value="{{ class_record.term }}" disabled>
+                        <input type="submit" name="editClass" id="editClass" value="Edit">
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        {% include 'footer.html' %}
+    </body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            var classCode = {{ classCode | tojson }};
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "/open_class/" + classCode;
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
+</html>

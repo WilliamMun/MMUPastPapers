@@ -119,3 +119,27 @@ function handleAnswerFieldType(select) {
         mcqSetup.querySelector('.mcq-option').innerHTML = '';
     }
 }
+
+function showTooltip(containerId) {
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.classList.add('show-tooltip');
+        setTimeout(() => {
+            container.classList.remove('show-tooltip');
+        }, 1500);
+    }
+}
+
+function copyClassCode() {
+    const text = document.getElementById('classCode').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        showTooltip('codeTooltip');
+    });
+}
+
+function copyClassLink() {
+    const input = document.getElementById('joinLink');
+    navigator.clipboard.writeText(input.value).then(() => {
+        showTooltip('linkCopyContainer');
+    });
+}

@@ -1155,3 +1155,71 @@ hr{
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 /** The End of Setup Answer Field Page Settings **/
+
+/** Class Info Page **/
+.copy-container {
+    position: relative;
+    display: inline-block;
+}
+
+.copy-container img {
+    cursor: pointer;
+    width: 24px;
+    margin-left: 10px;
+}
+
+.copy-container .tooltip {
+    visibility: hidden;
+    background-color: #4CAF50;
+    color: #fff;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 5px;
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    font-size: 0.8rem;
+}
+
+.copy-container.show-tooltip .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.copy-container2 {
+    position: relative;
+    display: inline-block;
+}
+
+.copy-container2 img {
+    cursor: pointer;
+    width: 24px;
+    margin-left: 10px;
+}
+
+.copy-container2 .tooltip2 {
+    visibility: hidden;
+    background-color: #4CAF50;
+    color: #fff;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 5px;
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    font-size: 0.8rem;
+}
+
+.copy-container2.show-tooltip .tooltip2 {
+    visibility: visible;
+    opacity: 1;
+}
+/** The End of Class Info Page Settings **/
