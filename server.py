@@ -1154,5 +1154,106 @@ def join_class_link(class_id):
       print("Join class action success.") #For debugging purposes 
       return redirect(url_for('open_class', class_id=class_id, showAlert=False))
       
+@app.route('/view_subjects')
+def view_subjects():
+    # Query with explicit joins
+    subjects = db.session.query(
+        SUBJECT_INFO,
+        STUDY_LVL_INFO.STUDY_LVL_DESC,
+        FACULTY_INFO.FACULTY_DESC
+    ).join(
+        STUDY_LVL_INFO, 
+        SUBJECT_INFO.STUDY_LVL_ID == STUDY_LVL_INFO.STUDY_LVL_ID
+    ).join(
+        FACULTY_INFO,
+        SUBJECT_INFO.FACULTY_ID == FACULTY_INFO.FACULTY_ID
+    ).all()
+    
+    return render_template('view_subjects.html', subjects=subjects)
+
+@app.route('/edit_subject/<subject_id>', methods=['GET', 'POST'])
+def edit_subject(subject_id):
+    subject = SUBJECT_INFO.query.get_or_404(subject_id)
+    study_levels = STUDY_LVL_INFO.query.all()
+    faculties = FACULTY_INFO.query.all()
+
+    if request.method == 'POST':
+        try:
+            # Update subject information
+            subject.SUBJECT_ID = request.form['subject_id']
+            subject.SUBJECT_DESC = request.form['subject_desc']
+            subject.STUDY_LVL_ID = request.form['study_lvl']
+            subject.FACULTY_ID = request.form['faculty']
+            
+            db.session.commit()
+            flash('Subject updated successfully!', 'success')
+            return redirect(url_for('view_subjects'))
+        except IntegrityError:
+            db.session.rollback()
+            flash('Subject ID already exists!', 'error')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating subject: {str(e)}', 'error')
+
+    return render_template('edit_subject.html', 
+                         subject=subject,
+                         study_levels=study_levels,
+                         faculties=faculties)
+
+@app.route('/delete_subject/<subject_id>', methods=['POST'])
+def delete_subject(subject_id):
+    subject = SUBJECT_INFO.query.get_or_404(subject_id)
+    try:
+        db.session.delete(subject)
+        db.session.commit()
+        flash('Subject deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting subject: {str(e)}', 'error')
+    return redirect(url_for('view_subjects'))
+
+@app.route('/add_subject', methods=['GET', 'POST'])
+def add_subject():
+    study_levels = STUDY_LVL_INFO.query.all()
+    faculties = FACULTY_INFO.query.all()
+
+    if request.method == 'POST':
+        try:
+            # Validate required fields
+            if not all([request.form['subject_id'], 
+                       request.form['subject_desc'],
+                       request.form['study_lvl'],
+                       request.form['faculty']]):
+                flash('All fields are required!', 'error')
+                return redirect(url_for('add_subject'))
+
+            # Check for existing subject ID
+            if SUBJECT_INFO.query.get(request.form['subject_id']):
+                flash('Subject ID already exists!', 'error')
+                return redirect(url_for('add_subject'))
+
+            new_subject = SUBJECT_INFO(
+                SUBJECT_ID=request.form['subject_id'],
+                SUBJECT_DESC=request.form['subject_desc'],
+                STUDY_LVL_ID=request.form['study_lvl'],
+                FACULTY_ID=request.form['faculty']
+            )
+
+            db.session.add(new_subject)
+            db.session.commit()
+            flash('Subject added successfully!', 'success')
+            return redirect(url_for('view_subjects'))
+
+        except IntegrityError as e:
+            db.session.rollback()
+            flash('Invalid study level or faculty selected!', 'error')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error adding subject: {str(e)}', 'error')
+
+    return render_template('add_subject.html',
+                         study_levels=study_levels,
+                         faculties=faculties)
+
 if __name__ == "__main__":
     app.run(debug=True)
