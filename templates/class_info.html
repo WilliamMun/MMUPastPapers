@@ -22,6 +22,7 @@
                     <br>
                 </div>
 
+                {% if session.get('roles') == 2 %}
                 <div class="class-code-box">
                     <h1>Class Code:</h1>
                     <p>You can share your class code with your students or share the link and send it to your students!</p>
@@ -53,6 +54,20 @@
                         <input type="submit" name="editClass" id="editClass" value="Edit">
                     </form>
                 </div>
+
+                {% elif session.get('roles') == 1 %}
+                <div class="edit-box">
+                    <h1>Class Info:</h1>
+                    <form action="class_info" method="POST">
+                        <label for="class_name">Class Name:</label>
+                        <input type="text" name="class_name" id="class_name" readonly value="{{ class_record.className }}" disabled>
+                        <label for="subject">Subject: </label>
+                        <input type="text" name="subject" id="subject" readonly value="{{ class_record.subject }}" disabled>
+                        <label for="term">Term: </label>
+                        <input type="text" name="term" id="term" readonly value="{{ class_record.term }}" disabled>
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </main>
 
