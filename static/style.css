@@ -397,6 +397,11 @@ button:hover {
   transition: 0.3s ease;
 }
 
+.btn:hover {
+  background-color: #BCCCDC;
+  color: black;
+}
+
 .search-button{
   width: 20%;
   padding: 8px;
@@ -1601,3 +1606,111 @@ hr{
   color: black;
 }
 /** The End of Class Info Page Settings **/
+
+/** View Subject Page **/
+
+/* Container for subject information */
+.subjectinfo-box {
+  background: white;
+  padding: 40px;
+  width: 1000px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Page heading */
+.subjectinfo-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+
+/* Centering the table container */
+.table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* Table styles */
+table {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: whitesmoke;
+  border-radius: 15px;
+}
+
+/* Optional caption style */
+caption {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+  padding: 10px;
+}
+
+/* Table header */
+th {
+  background-color: lightgrey;
+  color: black;
+  padding: 10px;
+  font-size: 15px;
+  border: 2px solid black;
+  text-align: center;
+}
+
+/* Table data */
+td {
+  font-size: 14px;
+  color: #444;
+  padding: 10px;
+  border: 2px solid black;
+  text-align: center;
+}
+
+/* Alternate row background */
+tr:nth-child(even) {
+  background-color: white;
+}
+
+tr:nth-child(odd) {
+  background-color: white;
+}
+
+/* Hover effect */
+tr:hover {
+  background-color: #f0e9e2;
+  cursor: pointer;
+}
+
+/* Flash message style */
+.flash-message {
+  padding: 10px 15px;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 800px;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.flash-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.flash-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
