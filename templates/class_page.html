@@ -24,7 +24,7 @@
       {% if answer_board_info %}
         {% for answer_board in answer_board_info %}
           <div class="answer-board-box">
-            <a href="{{ url_for('open_answer_board', class_id='class_id', answer_board_id=answer_board.answer_board_id) }}">
+            <a href="{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=answer_board.answer_board_id) }}">
               <p><b>{{ answer_board.creator }}</b> created an answer board: <b>{{ answer_board.answer_board_name }}</b></p>
             </a>
           </div>

@@ -1146,7 +1146,7 @@ def join_class_link(class_id):
   if already_joined:
       flash('You joined this class!','error')
       print("User joined this class!") #For debugging purposes 
-      return redirect(url_for('view_class'))
+      return render_template("view_class.html")
   else:
       new_record = USER_CLASS(USER_ID=session_user, CLASS_ID=class_id, JOINED_AT=datetime.now())
       db.session.add(new_record)
