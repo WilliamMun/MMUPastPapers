@@ -15,11 +15,27 @@
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash-message {{ category }}">
-                    <p>{{ message }}</p>
-                </div>
-            {% endfor %}
+            <script>
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops! An error occurred.',
+                            text: "{{ message }}"
+                        });
+                    {% elif category == 'success' %}
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Yay! Success.',
+                            text: "{{ message }}"
+                        }).then(() => {
+                            setTimeout(function() {
+                                window.location.href = "{{ url_for('view_subjects') }}";
+                            }, 1000);
+                        });
+                    {% endif %}
+                {% endfor %}
+            </script>
         {% endif %}
     {% endwith %}
 
