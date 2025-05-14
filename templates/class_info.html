@@ -69,12 +69,18 @@
                 <div class="edit-box">
                     <h1>Class Info:</h1>
                     <form action="class_info" method="POST">
-                        <label for="class_name">Class Name:</label>
-                        <input type="text" name="class_name" id="class_name" readonly value="{{ class_record.className }}" disabled>
-                        <label for="subject">Subject: </label>
-                        <input type="text" name="subject" id="subject" readonly value="{{ class_record.subject }}" disabled>
-                        <label for="term">Term: </label>
-                        <input type="text" name="term" id="term" readonly value="{{ class_record.term }}" disabled>
+                        <div class="class-name-box">
+                            <label for="class_name">Class Name:</label>
+                            <input type="text" name="class_name" id="class_name" readonly value="{{ class_record.className }}" disabled>
+                        </div>
+                        <div class="subject-box">
+                            <label for="subject">Subject: </label>
+                            <input type="text" name="subject" id="subject" readonly value="{{ class_record.subject }}" disabled>
+                        </div>
+                        <div class="term-box">
+                            <label for="term">Term: </label>
+                            <input type="text" name="term" id="term" readonly value="{{ class_record.term }}" disabled>
+                        </div>
                     </form>
                 </div>
                 {% endif %}

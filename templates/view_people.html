@@ -16,20 +16,8 @@
                 <h1>Class Members</h1>
                 <p>Total Members: {{ total_members }}</p>
                 <br>
-              
-                <form method="GET" action="{{ url_for('view_people', class_id=class_data.CLASS_ID) }}">
-                    <input type="text" 
-                        name="search" 
-                        class="input-field" 
-                        placeholder="Search members"
-                        value="{{ search_query }}">
-                    <button type="submit">Search</button>
-                </form>
-
-                <div class="filter-section mb-4">
-                    <form method="GET" class="flex gap-4 items-center">
-                        <input type="hidden" name="search" value="{{ search_query }}">
-        
+                <div class="search-box">
+                    <form method="GET" action="{{ url_for('view_people', class_id=class_data.CLASS_ID) }}">
                         <div class="filter-group">
                             <label for="role" class="block mb-2">Filter by Role:</label>
                             <select name="role" id="role" class="p-2 border rounded" onchange="this.form.submit()">
@@ -38,6 +26,16 @@
                                 <option value="lecturers" {% if selected_role == 'lecturers' %}selected{% endif %}>Lecturer</option>
                             </select>
                         </div>
+
+                        <input type="text" 
+                            name="search" 
+                            class="input-field" 
+                            placeholder="Search members"
+                            value="{{ search_query }}">
+                        
+                        <br>
+
+                        <button type="submit" class="view-ppl-submit">Search</button>
                     </form>
                 </div>
 

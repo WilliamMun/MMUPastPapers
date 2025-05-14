@@ -1125,6 +1125,53 @@ hr{
   color: black;
 }
 
+.search-box form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-box form .input-field {
+  width: 700px;
+  height: 40px;
+  margin-top: 23px;
+}
+
+.filter-group label {
+  white-space: nowrap;
+  margin-top: 5px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif
+}
+
+.filter-group select {
+  width: 200px;
+}
+.view-ppl-submit {
+  width: 100px;
+  padding: 8px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 5px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.view-ppl-submit:hover {
+  background-color: #BCCCDC;
+  color: black;
+}
+
 /** Class Page Settings **/
 .class-title-box { /**Size of Register Box**/
   background: white;
@@ -1232,13 +1279,121 @@ hr{
 .setup-box{
   background: white;
   padding: 40px;
-  width: 90%;
+  width: auto;
   height: auto;
   max-width: 90%;
   margin: 40px auto;
   border-radius: 20px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
+
+.setup-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+  text-align: left;
+}
+
+.setup-box h2 {
+  margin-bottom: 30px;
+  color: #003366;
+}
+
+.setup-box p {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.setup-box label {
+  font-family: "Georgia";
+  margin-bottom: 20px;
+  text-align: left;
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+.setup-delete-btn { 
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: transparent;
+  color: #000000;               
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+  width: 1%;
+}
+
+.setup-delete-btn:hover {
+  background-color: transparent; 
+  color: #000000;         
+}
+
+/* Input placeholder */
+.answer-fields {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  text-align: left;
+}
+
+.answer-fields input{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: 25%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.mcq-setup {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: auto;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.mcq-option {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mcq-option .option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.mcq-option input[type="radio"] {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.mcq-option input[type="text"] {
+  flex-grow: 1;
+  min-width: 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /** The End of Setup Answer Field Page Settings **/
 
 /** Class Info Page **/
