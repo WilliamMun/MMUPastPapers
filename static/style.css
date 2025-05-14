@@ -1714,3 +1714,46 @@ tr:hover {
   border: 1px solid #f5c6cb;
 }
 
+/**Edit Subject Page**/
+.editSubject-box {
+  background: white;
+  padding: 40px;
+  width: 750px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Page heading */
+.editSubject-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+
+/**New Subject Page**/
+.newSubject-box {
+  background: white;
+  padding: 40px;
+  width: 750px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Page heading */
+.newSubject-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
