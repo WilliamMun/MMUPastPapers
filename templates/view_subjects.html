@@ -52,9 +52,9 @@
 
                             </td>
                             <td>
-                            <form action="/delete_subject/{{ subject.SUBJECT_INFO.SUBJECT_ID }}" method="POST" style="display:inline;" id="deleteForm">
-                                <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete" title="Delete" style="cursor:pointer;" onclick="confirmDelete()">
-                            </form>
+                                <form action="/delete_subject/{{ subject.SUBJECT_INFO.SUBJECT_ID }}" method="POST" style="display:inline;" class="delete-form">
+                                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete" title="Delete" style="cursor:pointer;" onclick="confirmDelete(event)">
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -73,9 +73,12 @@
     </main>
 
     <script>
-    function confirmDelete() {
+    function confirmDelete(event) {
         if (confirm('Are you sure you want to delete this subject?')) {
-            document.getElementById('deleteForm').submit();
+            // Get the form that's associated with the clicked image
+            event.target.closest('form').submit();
+        } else {
+            event.preventDefault(); // Prevent form submission if canceled
         }
     }
     </script>
