@@ -3,65 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
+  <script src="{{ url_for('static', filename='sweetalert.js') }}"></script>
+
   <title>Edit Subject | MMUPastPapers</title>
 </head>
 
 <body>
-<!-- Header Bar -->
-{% include 'header.html' %}
+
+  <!-- Header Bar -->
+  {% include 'header.html' %}
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="ques-box">
+    <div class="editSubject-box">
       <h1>Edit Subject</h1>
+      
       <form method="POST">
+
+        <!-- Subject ID -->
         <div class="ques-box-input">
           <label for="subject_id">Subject ID:</label>
-          <input type="text" name="subject_id" id="subject_id" 
-                 class="subject-id" value="{{ subject.SUBJECT_ID }}">
+          <input type="text" name="subject_id" id="subject_id" value="{{ subject.SUBJECT_ID }}" placeholder="Enter Subject ID">
         </div>
 
+        <!-- Subject Description -->
         <div class="ques-box-input">
           <label for="subject_desc">Subject Description:</label>
-          <input type="text" name="subject_desc" id="subject_desc" 
-                 class="subject-desc" value="{{ subject.SUBJECT_DESC }}">
+          <input type="text" name="subject_desc" id="subject_desc" value="{{ subject.SUBJECT_DESC }}" placeholder="Enter Subject Description">
         </div>
 
-        <div class="ques-box-input">
+        <!-- Study Level -->
+        <div class="select-field">
           <label for="study_lvl">Study Level:</label>
-          <select id="study_lvl" name="study_lvl" class="study-lvl">
+          <select id="study_lvl" name="study_lvl">
             {% for level in study_levels %}
-            <option value="{{ level.STUDY_LVL_ID }}" 
-                    {% if level.STUDY_LVL_ID == subject.STUDY_LVL_ID %}selected{% endif %}>
-              {{ level.STUDY_LVL_DESC }}
-            </option>
+              <option 
+                value="{{ level.STUDY_LVL_ID }}" 
+                {% if level.STUDY_LVL_ID == subject.STUDY_LVL_ID %}selected{% endif %}>
+                {{ level.STUDY_LVL_DESC }}
+              </option>
             {% endfor %}
           </select>
         </div>
 
-        <div class="ques-box-input">
+        <!-- Faculty -->
+        <div class="select-field">
           <label for="faculty">Faculty:</label>
-          <select id="faculty" name="faculty" class="faculty">
+          <select id="faculty" name="faculty">
             {% for faculty in faculties %}
-            <option value="{{ faculty.FACULTY_ID }}"
-                    {% if faculty.FACULTY_ID == subject.FACULTY_ID %}selected{% endif %}>
-              {{ faculty.FACULTY_DESC }}
-            </option>
+              <option 
+                value="{{ faculty.FACULTY_ID }}" 
+                {% if faculty.FACULTY_ID == subject.FACULTY_ID %}selected{% endif %}>
+                {{ faculty.FACULTY_DESC }}
+              </option>
             {% endfor %}
           </select>
         </div>
 
-        <div class="button-container">
-          <a href="{{ url_for('view_subjects') }}" class="btn">Cancel</a>
-          <button type="submit" class="btn">Save Changes</button>
+        <!-- Buttons -->
+        <div class="btn-container">
+          <button><a href="{{ url_for('view_subjects') }}">Cancel</a></button>
+          <button type="submit">Save Changes</button>
         </div>
+
       </form>
     </div>
   </main>
 
+  <!-- Footer -->
   {% include 'footer.html' %}
+
 </body>
 
 {% with messages = get_flashed_messages(with_categories=true) %}

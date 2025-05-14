@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
   <title>Add New Subject | MMUPastPapers</title>
@@ -14,25 +15,22 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="ques-box">
+    <div class="newSubject-box">
       <h1>Add New Subject</h1>
       <form method="POST">
         <div class="ques-box-input">
           <label for="subject_id">Subject ID:</label>
-          <input type="text" name="subject_id" id="subject_id" class="subject-id" 
-                 placeholder="Enter Subject ID" required
-                 pattern="[A-Za-z0-9]{5,10}">
+          <input type="text" name="subject_id" id="subject_id" placeholder="Enter Subject ID" pattern="[A-Za-z0-9]{5,10}">
         </div>
 
         <div class="ques-box-input">
           <label for="subject_desc">Subject Description:</label>
-          <input type="text" name="subject_desc" id="subject-desc" 
-                 class="subject-desc" placeholder="Enter Subject Description" required>
+          <input type="text" name="subject_desc" id="subject-desc" placeholder="Enter Subject Description">
         </div>
 
-        <div class="ques-box-input">
+        <div class="select-field">
           <label for="study_lvl">Study Level:</label>
-          <select id="study_lvl" name="study_lvl" class="study-lvl" required>
+          <select id="study_lvl" name="study_lvl">
             <option value="" disabled selected>Select Study Level</option>
             {% for level in study_levels %}
             <option value="{{ level.STUDY_LVL_ID }}">{{ level.STUDY_LVL_DESC }}</option>
@@ -42,7 +40,7 @@
 
         <div class="ques-box-input">
           <label for="faculty">Faculty:</label>
-          <select id="faculty" name="faculty" class="faculty" required>
+          <select id="faculty" name="faculty">
             <option value="" disabled selected>Select Faculty</option>
             {% for faculty in faculties %}
             <option value="{{ faculty.FACULTY_ID }}">{{ faculty.FACULTY_DESC }}</option>
@@ -50,9 +48,9 @@
           </select>
         </div>
 
-        <div class="button-container">
-          <a href="{{ url_for('view_subjects') }}" class="btn">Cancel</a>
-          <button type="submit" class="btn">Create Subject</button>
+        <div class="btn-container">
+          <button class="btn"><a href="{{ url_for('view_subjects') }}">Cancel</a></button>
+          <button type="submit" class="btn">Add Subject</button>
         </div>
       </form>
     </div>
