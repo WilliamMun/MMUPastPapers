@@ -32,6 +32,7 @@ function addAnswerField(button) {
     newField.innerHTML = `
         <br>
         <input type="text" name="question${answerFieldCount}" id="question${answerFieldCount}" placeholder="Enter Question Number/Question ${answerFieldCount}">
+        <button class="setup-delete-btn" onclick="deleteAnswerField(this)">✖</button>
         <label for="type-ans${answerFieldCount}">Type of Answer Field: </label>
         <select class="type-ans${answerFieldCount}" name="type-ans${answerFieldCount}" id="type-ans${answerFieldCount}" onchange="handleAnswerFieldType(this)">
             <option value="text">Text</option>
@@ -47,10 +48,10 @@ function addAnswerField(button) {
                         placeholder="Enter your answer question ${answerFieldCount} option 1.">
                 </div>
             </div>
-            <button type="button" onclick="addMcqOptions(this)">Add Answer Option</button>
+            <button type="button" onclick="addMcqOptions(this)" class="btn">Add Answer Option</button>
         </div>
-
-        <button onclick="deleteAnswerField(this)">Delete</button>
+        <br>
+        <hr>
     `;
 
     container.appendChild(newField);
@@ -86,7 +87,7 @@ function addMcqOptions(button) {
         <br>
         <input type="radio" name="mcqQuestion${questionNumber}Answer${optionCount}" value="question${questionNumber}${optionId}">
         <input type="text" name="question${questionNumber}-option${optionCount}-text" placeholder="Enter your answer question${questionNumber} ${optionId}.">
-        <button onclick="deleteOption(this)">Delete Option</button>
+        <button class="setup-delete-btn" onclick="deleteOption(this)">✖</button>
     `;
 
     mcqSetup.querySelector('.mcq-option').appendChild(newField);

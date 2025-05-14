@@ -21,7 +21,8 @@
             <hr>
             <p>Papers you selected:</p>
             <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px"
-                height="1000px"></iframe>
+                height="1000px">
+            </iframe>
             <br>
             <form
                 action="{{ url_for('setup_answer_field', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id'))}}"
@@ -36,20 +37,21 @@
                             <option value="file">File</option>
                         </select>
 
-                        <div class="mcq-setup" id="mcq-setup" style="display: none;" data-option-count="2">
-                            <div class="mcq-option" id="mcq-option">
-                                <div class="option" id="option">
-                                    <input type="radio" name="mcqAnswer" id="mcqAnswer" class="mcqAnswer" value="option1">
-                                    <input type="text" name="question1-option1-text" id="question1-option1-text" class="question1-option-text"
-                                        placeholder="Enter your answer question 1 option 1.">
+                        <div class="mcq-setup" style="display: none;" data-option-count="2">
+                            <div class="mcq-option">
+                                <div class="option">
+                                <input type="radio" name="mcqAnswer" value="option1" class="mcq-option">
+                                <input type="text" name="question1-option1-text" placeholder="Enter your answer question 1 option 1.">
                                 </div>
                             </div>
-                            <button type="button" onclick="addMcqOptions(this)">Add Answer Option</button>
+                            <button type="button" onclick="addMcqOptions(this)" class="btn">Add Answer Option</button>
                         </div>
+                        <br>
+                        <hr>
                     </div>
                 </div>
-                <button type="button" onclick="addAnswerField(this)">Add Answer Field</button>
-                <input type="submit" name="submit-answer-field" id="submit-answer-field" value="Create Answer Field">
+                <button type="button" onclick="addAnswerField(this)" class="btn">Add Answer Field</button>
+                <button type="submit" name="submit-answer-field" id="submit-answer-field" class="btn">Create Answer Field</button>
             </form>
         </div>
 

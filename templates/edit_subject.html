@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <title>Edit Subject</title>
+</head>
+<body class="bg-gray-100">
+    {% include 'header.html' %}
+
+    <main class="main-content">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-6">Edit Subject</h2>
+            
+            <form method="POST">
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Subject ID -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Subject ID</label>
+                        <input type="text" name="subject_id" value="{{ subject.SUBJECT_ID }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Subject Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Subject Description</label>
+                        <input type="text" name="subject_desc" value="{{ subject.SUBJECT_DESC }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Study Level -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Study Level</label>
+                        <select name="study_lvl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            {% for level in study_levels %}
+                            <option value="{{ level.STUDY_LVL_ID }}" 
+                                {% if level.STUDY_LVL_ID == subject.STUDY_LVL_ID %}selected{% endif %}>
+                                {{ level.STUDY_LVL_DESC }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Faculty -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Faculty</label>
+                        <select name="faculty" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            {% for faculty in faculties %}
+                            <option value="{{ faculty.FACULTY_ID }}"
+                                {% if faculty.FACULTY_ID == subject.FACULTY_ID %}selected{% endif %}>
+                                {{ faculty.FACULTY_DESC }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <a href="{{ url_for('view_subjects') }}" 
+                       class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+</body>
+</html>
