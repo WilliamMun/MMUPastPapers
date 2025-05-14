@@ -1188,13 +1188,20 @@ def edit_subject(subject_id):
             
             db.session.commit()
             flash('Subject updated successfully!', 'success')
-            return redirect(url_for('view_subjects'))
+            print("Subject updates successfully!")
+            return render_template("edit_subject.html", subject=subject,
+                         study_levels=study_levels,
+                         faculties=faculties)
         except IntegrityError:
             db.session.rollback()
             flash('Subject ID already exists!', 'error')
+            print("Subject ID exists!")
+            return redirect(url_for('edit_subject'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error updating subject: {str(e)}', 'error')
+            print("Internal server error",e)
+            return redirect(url_for('edit_subject'))
 
     return render_template('edit_subject.html', 
                          subject=subject,

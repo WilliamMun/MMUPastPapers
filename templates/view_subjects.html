@@ -15,11 +15,27 @@
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash-message {{ category }}">
-                    <p>{{ message }}</p>
-                </div>
-            {% endfor %}
+            <script>
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops! An error occurred.',
+                            text: "{{ message }}"
+                        });
+                    {% elif category == 'success' %}
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Yay! Success.',
+                            text: "{{ message }}"
+                        }).then(() => {
+                            setTimeout(function() {
+                                window.location.href = "{{ url_for('view_subjects') }}";
+                            }, 1000);
+                        });
+                    {% endif %}
+                {% endfor %}
+            </script>
         {% endif %}
     {% endwith %}
 
@@ -52,8 +68,25 @@
 
                             </td>
                             <td>
-                                <form action="/delete_subject/{{ subject.SUBJECT_INFO.SUBJECT_ID }}" method="POST" style="display:inline;" class="delete-form">
-                                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete" title="Delete" style="cursor:pointer;" onclick="confirmDelete(event)">
+                                <form id="deleteForm-{{ subject.SUBJECT_INFO.SUBJECT_ID }}" action="/delete_subject/{{ subject.SUBJECT_INFO.SUBJECT_ID }}" method="POST" style="display:inline;" class="delete-form">
+                                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete" title="Delete" style="cursor:pointer;" onclick="confirmDelete('{{ subject.SUBJECT_INFO.SUBJECT_ID }}')">
+                                    <script>
+                                        function confirmDelete(subjectId) {
+                                            Swal.fire({
+                                                title: 'Are you sure?',
+                                                text: "You won't be able to revert this!",
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#3085d6',
+                                                cancelButtonColor: '#d33',
+                                                confirmButtonText: 'Yes, delete it!'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    document.getElementById('deleteForm-' + subjectId).submit();
+                                                }
+                                            });
+                                        }
+                                    </script>
                                 </form>
                             </td>
                         </tr>
@@ -71,17 +104,6 @@
             </div>
         </div>
     </main>
-
-    <script>
-    function confirmDelete(event) {
-        if (confirm('Are you sure you want to delete this subject?')) {
-            // Get the form that's associated with the clicked image
-            event.target.closest('form').submit();
-        } else {
-            event.preventDefault(); // Prevent form submission if canceled
-        }
-    }
-    </script>
 
     {% include 'footer.html' %}
 </body>
