@@ -493,6 +493,7 @@ def view_papers():
     filename = request.args.get('filename', '').strip()
     description = request.args.get('description', '').strip()
 
+    print(f"Term: {term}, Subject: {subject}, Filename: {filename}, Desc: {description}")
     page = request.args.get('page', 1, type=int)
     per_page = 5
 

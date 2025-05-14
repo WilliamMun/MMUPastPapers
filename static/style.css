@@ -1125,6 +1125,53 @@ hr{
   color: black;
 }
 
+.search-box form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-box form .input-field {
+  width: 700px;
+  height: 40px;
+  margin-top: 23px;
+}
+
+.filter-group label {
+  white-space: nowrap;
+  margin-top: 5px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif
+}
+
+.filter-group select {
+  width: 200px;
+}
+.view-ppl-submit {
+  width: 100px;
+  padding: 8px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 5px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.view-ppl-submit:hover {
+  background-color: #BCCCDC;
+  color: black;
+}
+
 /** Class Page Settings **/
 .class-title-box { /**Size of Register Box**/
   background: white;
