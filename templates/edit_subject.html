@@ -64,8 +64,8 @@
 
         <!-- Buttons -->
         <div class="btn-container">
-          <button><a href="{{ url_for('view_subjects') }}">Cancel</a></button>
-          <button type="submit">Save Changes</button>
+          <button type="button" class="btn" onclick="window.location.href='{{ url_for('view_subjects') }}'">Cancel</button>
+          <button type="submit" class="btn">Save Changes</button>
         </div>
 
       </form>
