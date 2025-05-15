@@ -696,14 +696,14 @@ tr:hover {
   font-size: 16px;
   cursor: pointer;
   transition: 0.3s ease;
-  display: flexbox;
+  display: right;
   justify-content: center;
 }
 
-.add-filter-container {
+.filter-container {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .add-filter-btn:hover {

@@ -22,15 +22,13 @@
         <form method="GET" action="{{ url_for('view_papers') }}" class="search-form">
           <div id="filter-container"></div>
 
-          <div class="add-filter-container">
+          <div class="btn-container">
             <button type="button" id="add-filter" class="add-filter-btn">+ Add Filter</button>
+            <button type="submit" class="search-button">Search</button>
             <div id="search-wrapper" class="search-wrapper">
-              <button type="submit" class="search-button">Search</button>
             </div>
           </div>
         </form>
-
-        <br>
 
         <!-- Papers Table -->
         <table>
