@@ -1146,7 +1146,26 @@ def join_class_link(class_id):
   if already_joined:
       flash('You joined this class!','error')
       print("User joined this class!") #For debugging purposes 
-      return render_template("view_class.html")
+
+      records = USER_CLASS.query.filter_by(USER_ID=session.get('user_id')).all()
+      print("User class:", records)
+      classIds = [record.CLASS_ID for record in records]
+      print(f"Class ID under user {session.get('user_id')} : {classIds}")
+
+      classes = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds)).all()
+
+      class_records = []
+      for cls in classes:
+        lecturer = USER_INFO.query.filter_by(USER_ID=cls.CREATED_BY).first()
+        class_records.append({
+            'classID': cls.CLASS_ID,
+            'className': cls.CLASS_NAME,
+            'termID': cls.TERM_ID,
+            'lecturerName': lecturer.NAME if lecturer else 'Unknown'
+        })
+
+      print("Final record:", class_records)
+      return render_template("view_class.html",records=class_records)
   else:
       new_record = USER_CLASS(USER_ID=session_user, CLASS_ID=class_id, JOINED_AT=datetime.now())
       db.session.add(new_record)
