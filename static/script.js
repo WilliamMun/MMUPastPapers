@@ -22,6 +22,14 @@ function showClassCodeInput() {
     classCodeBox.classList.toggle("openClassCodeBox");
 }
 
+let defaultMcqOption = null;
+
+function handleMcqDefaultSelect(selectElement) {
+    if (defaultMcqOption === null) {
+        defaultMcqOption = selectElement.value;
+    }
+}
+
 function addAnswerField(button) {
     const container = document.getElementById('answer-fields');
 
@@ -29,6 +37,11 @@ function addAnswerField(button) {
 
     const newField = document.createElement('div');
     newField.className = 'answer-field';
+
+    let mcqOptionsHtml = `
+        <option value="4" ${defaultMcqOption === '4' ? 'selected' : ''}>Four Answer Options</option>
+        <option value="5" ${defaultMcqOption === '5' ? 'selected' : ''}>Five Answer Options</option>
+    `;
     newField.innerHTML = `
         <br>
         <input type="text" name="question${answerFieldCount}" id="question${answerFieldCount}" placeholder="Enter Question Number/Question ${answerFieldCount}">
@@ -42,8 +55,7 @@ function addAnswerField(button) {
         
         <div class="mcq-setup" style="display: none;" data-option-count="2">
             <select class="type-ans" name="type-mcq${answerFieldCount}" id="type-mcq${answerFieldCount}">
-                <option value="4">Four Answer Options</option>
-                <option value="5">Five Answer Options</option>
+                ${mcqOptionsHtml}
             </select>
         </div>
         <br>
@@ -65,42 +77,6 @@ function deleteAnswerField(button) {
             answerField.setAttribute('data-answer-count', remaining + 1);
         }
   }
-}
-
-function addMcqOptions(button) {
-    const answerField = button.closest('.answer-field');
-    const questionInput = answerField.querySelector('input[type="text"][name^="question"]');
-    const match = questionInput.name.match(/^question(\d+)$/);
-    const questionNumber = match ? match[1] : '0';  // default to '0' if not matched
-
-    const mcqSetup = button.closest('.mcq-setup');
-    let optionCount = parseInt(mcqSetup.getAttribute('data-option-count'));
-
-    const newField = document.createElement('div');
-    newField.className = 'option';
-    const optionId = `option ${optionCount}`;
-    newField.innerHTML = `
-        <br>
-        <input type="radio" name="mcqQuestion${questionNumber}Answer${optionCount}" value="question${questionNumber}${optionId}">
-        <input type="text" name="question${questionNumber}-option${optionCount}-text" placeholder="Enter your answer question${questionNumber} ${optionId}.">
-        <button class="setup-delete-btn" onclick="deleteOption(this)">✖</button>
-    `;
-
-    mcqSetup.querySelector('.mcq-option').appendChild(newField);
-    mcqSetup.setAttribute('data-option-count', optionCount + 1);
-}
-
-function deleteOption(button) {
-    const field = button.closest('.option');
-    if (field) {
-        const mcqSetup = button.closest('.mcq-setup');
-        field.remove();
-
-        if(mcqSetup) {
-            const remaining = mcqSetup.querySelectorAll('.option').length;
-            mcqSetup.setAttribute('data-option-count', remaining + 1);
-        }
-    }
 }
 
 function handleAnswerFieldType(select) {
