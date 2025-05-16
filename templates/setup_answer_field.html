@@ -29,22 +29,19 @@
                 method="POST">
                 <div class="answer-fields" id="answer-fields" data-answer-count="2">
                     <div class="answer-field">
-                        <input type="text" name="question" id="question1" placeholder="Enter Question Number/Question">
+                        <input type="text" name="question1" id="question1" placeholder="Enter Question Number/Question">
                         <label for="type-ans">Type of Answer Field: </label>
-                        <select class="type-ans" name="type-ans" id="type-ans1" onchange="handleAnswerFieldType(this)">
+                        <select class="type-ans" name="type-ans1" id="type-ans1" onchange="handleAnswerFieldType(this)">
                             <option value="text">Text</option>
                             <option value="mcq">MCQ</option>
                             <option value="file">File</option>
                         </select>
 
                         <div class="mcq-setup" style="display: none;" data-option-count="2">
-                            <div class="mcq-option">
-                                <div class="option">
-                                <input type="radio" name="mcqAnswer" value="option1" class="mcq-option">
-                                <input type="text" name="question1-option1-text" placeholder="Enter your answer question 1 option 1.">
-                                </div>
-                            </div>
-                            <button type="button" onclick="addMcqOptions(this)" class="btn">Add Answer Option</button>
+                                <select class="type-ans" name="type-mcq1" id="type-mcq1" onchange="handleMcqDefaultSelect(this)">
+                                    <option value="4">Four Answer Options</option>
+                                    <option value="5">Five Answer Options</option>
+                                </select>
                         </div>
                         <br>
                         <hr>
