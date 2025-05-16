@@ -1,23 +1,39 @@
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="{{ url_for('static', filename='script.js' )}}"></script>
-        <title>Answer Board | MMUPastPapers</title>
-    </head>
 
-    <body>
-        {% include 'header.html' %}
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <title>Answer Board | MMUPastPapers</title>
+</head>
 
-        <main class="main-content">
-            {% include 'class_bar.html' %}
+<body>
+    {% include 'header.html' %}
 
-            
-        </main>
+    <main class="main-content">
+        {% include 'class_bar.html' %}
 
-        {% include 'footer.html' %}
-    </body>
+
+        <div class="view-answer-board-box">
+            <div class="btn-container">
+            <h1>Answer Board</h1>
+            <hr>
+            <button class="editAnswerBoard-btn">Edit Answer Board</button>
+            <p>Answer the question based on the paper.</p>
+            {% if paperPath %}
+                <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px">
+                </iframe>
+            {% else %}
+                <p>No paper available for this answer board.</p>
+            {% endif %}
+        </div>
+        
+    </main>
+
+    {% include 'footer.html' %}
+</body>
+
 </html>
