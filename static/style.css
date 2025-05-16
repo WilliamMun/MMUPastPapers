@@ -957,6 +957,60 @@ tr:hover {
   font-size: 16px;
   font-weight: bold;
 }
+
+.filter-class-section {
+  background: whitesmoke;
+  padding: 40px;
+  padding-left: 20px;
+  width: 60%;
+  height: auto;
+  min-width: 60%;
+  max-width: 95%;
+  margin: 40px auto;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-class-section p{
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-class-section form {
+  display: flex;
+  gap: 20px;
+}
+
+.entry-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.entry-box p {
+  white-space: nowrap;
+}
+
+.class-term-box {
+  width: 310px;
+  height: 50px;
+}
+
+.entry {
+  width: 100px;
+  height: 50px;
+}
+
+.submit-filter-btn {
+  margin-top: 0px;
+}
 /**The End of View Class Page Settings**/
 
 /** Upload Paper Page Settings **/

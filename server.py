@@ -736,12 +736,35 @@ def delete_paper(paper_id):
 
 @app.route('/view_class', methods=['GET', 'POST'])
 def view_class():
+    #Show Term Info in Filter Section 
+    term_info = TERM_INFO.query.all()
+    terms = []
+    for term in term_info:
+       term_dict = {
+          'term_id': term.TERM_ID,
+          'term_name': term.TERM_DESC
+       }
+       terms.append(term_dict)
+
+    #Get pagination parameters
+    term_filter = request.form.get('term') if request.method == 'POST' else request.args.get('term', 'all')
+    page = int(request.args.get('page', 1)) if request.method == 'POST' else int(request.args.get('page', 1))
+    entry = request.form.get('entry', 12) if request.method == 'POST' else request.args.get('entry', 12)
+    per_page = int(entry)
+    print(f"Term: {term_filter}, Page={page}, Entry: {entry} / {type(entry)}, Per_Page: {per_page} / {type(per_page)}")
+
+    #Show Class Record 
     records = USER_CLASS.query.filter_by(USER_ID=session.get('user_id')).all()
     print("User class:", records)
     classIds = [record.CLASS_ID for record in records]
     print(f"Class ID under user {session.get('user_id')} : {classIds}")
 
-    classes = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds)).all()
+    query = CLASS.query.filter(CLASS.CLASS_ID.in_(classIds))
+    if term_filter and term_filter != 'all':
+       query = query.filter(CLASS.TERM_ID == term_filter)
+    
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    classes = pagination.items
 
     class_records = []
     for cls in classes:
@@ -754,7 +777,7 @@ def view_class():
         })
 
     print("Final record:", class_records)
-    return render_template("view_class.html", records=class_records)
+    return render_template("view_class.html", terms=terms, records=class_records, pagination=pagination, selected_term=term_filter, selected_entry=int(per_page))
 
 @app.route('/open_class/<class_id>', methods=['GET','POST'])
 def open_class(class_id):
