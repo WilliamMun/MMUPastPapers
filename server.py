@@ -129,6 +129,7 @@ class ANSWER_FIELD(db.Model):
   ANSWER_FIELD_DESC = db.Column(db.Text, nullable=True) 
   ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload file 
   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+  MCQ_TYPE = db.Column(db.Integer) #4: 4 answer options, 5: 5 answer options 
 
 #ENTITY: ANSWER  
 class ANSWER(db.Model): 
@@ -1020,16 +1021,6 @@ def setup_answer_field(class_id, answer_board_id):
     print(f"Inputs received: {form_data}")
     question_data = []
 
-    options_by_question = defaultdict(list)
-
-    for key in form_data:
-      match = re.match(r'question(\d+)-option\d+-text', key)
-      if match:
-        question_id = match.group(1)
-        option_text = form_data[key]
-        if option_text.strip():  # Avoid empty options
-            options_by_question[question_id].append(option_text)
-
     for key in form_data:
       if key.startswith('question') and '-' not in key:  # only top-level question fields
         question_id = key.replace('question', '') 
@@ -1037,15 +1028,13 @@ def setup_answer_field(class_id, answer_board_id):
            question_id = 1
         question_text = form_data[key]
         answer_type = form_data.get(f'type-ans{question_id}', 'text')
+        mcq_type = form_data.get(f'type-mcq{question_id}',None) if answer_type == 'mcq' else None
 
         question_entry = {
             'question': question_text,
             'type': answer_type,
-            'options': []
+            'mcq_type': int(mcq_type) if mcq_type else None
         }
-
-        if answer_type == 'mcq':
-            question_entry['options'] = options_by_question.get(question_id, [])
 
         print(f"Question {question_id} record: {question_entry}")
         question_data.append(question_entry)
@@ -1055,27 +1044,20 @@ def setup_answer_field(class_id, answer_board_id):
       for question in question_data:
         question_desc = question['question']
         question_type = question['type']
+        
+
         if question_type == "text":
             question_type_no = 1
         elif question_type == "mcq":
             question_type_no = 2
         elif question_type == "file":
             question_type_no = 3
-        options = question['options']
+
         ans_field_id = uuid.uuid4().hex[:10]
-        new_record1 = ANSWER_FIELD(ANSWER_FIELD_ID=ans_field_id, ANSWER_FIELD_DESC=question_desc, ANSWER_FIELD_TYPE=question_type_no, ANSWER_BOARD_ID=answer_board_id)
+        new_record1 = ANSWER_FIELD(ANSWER_FIELD_ID=ans_field_id, ANSWER_FIELD_DESC=question_desc, ANSWER_FIELD_TYPE=question_type_no, ANSWER_BOARD_ID=answer_board_id, MCQ_TYPE=question['mcq_type'])
         print(f"Record will insert into ANSWER_FIELD: {new_record1}")
         db.session.add(new_record1)
-
-        #Handle MCQ options if exists
-        if options:
-            for option in options:
-              optionId = uuid.uuid4().hex[:10]
-              new_record2 = MCQ_OPTION(MCQ_OPTION_ID=optionId, MCQ_OPTION_DESC=option, ANSWER_FIELD_ID=ans_field_id)
-              print(f"Record will insert into MCQ_OPTION: {new_record2}")
-              db.session.add(new_record2)
       db.session.commit()
-
       flash("Answer field setup successfully!",'success')
       return render_template("setup_answer_field.html",paperPath=paper_path,classCode=session.get('current_class_id'))
     except Exception as e:

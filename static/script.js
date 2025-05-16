@@ -40,15 +40,11 @@ function addAnswerField(button) {
             <option value="file">File</option>
         </select>
         
-        <div class="mcq-setup" id="mcq-setup" style="display: none;" data-option-count="2">
-            <div class="mcq-option" id="mcq-option">
-                <div class="option" id="option">
-                    <input type="radio" name="mcqAnswer" id="mcqAnswer" class="mcqAnswer" value="option1">
-                    <input type="text" name="question${answerFieldCount}-option1-text" id="question${answerFieldCount}-option1-text" class="question${answerFieldCount}-option1-text"
-                        placeholder="Enter your answer question ${answerFieldCount} option 1.">
-                </div>
-            </div>
-            <button type="button" onclick="addMcqOptions(this)" class="btn">Add Answer Option</button>
+        <div class="mcq-setup" style="display: none;" data-option-count="2">
+            <select class="type-ans" name="type-mcq${answerFieldCount}" id="type-mcq${answerFieldCount}">
+                <option value="4">Four Answer Options</option>
+                <option value="5">Five Answer Options</option>
+            </select>
         </div>
         <br>
         <hr>
