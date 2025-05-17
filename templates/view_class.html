@@ -38,15 +38,16 @@
       {% endif %}
 
       <div class="filter-class-section">
-        <br>
-        <p>Show:</p>
         <form action="{{ url_for('view_class') }}" method="POST">
+          <p>Show:</p>
+          
           <select class="class-term-box" id="class-box" name="term">
             <option value="all" selected>All Term</option>
             {% for term in terms %}
               <option value="{{ term.term_id }}">{{ term.term_id}} - {{ term.term_name }}</option>
             {% endfor %}
           </select>
+
           <div class="entry-box">
             <select class="entry" id="entry" name="entry">
               <option value="">-- Select a Value --</option>
@@ -56,9 +57,12 @@
             </select>
             <p>entry per page</p>
           </div>
+
           <button class="submit-filter-btn">Filter</button>
         </form>
       </div>
+
+
       <div class="content-section">
         {% if records %}
           {% for record in records %}

@@ -1013,13 +1013,13 @@ def upload_answer_board(class_id):
 
    return render_template("upload_answer_board.html", classCode=session.get('current_class_id'), answerBoardId=session.get('current_answer_board_id'))
 
-@app.route('/get_pdf/<filepath>')
+@app.route('/get_pdf/<path:filepath>')
 def get_pdf(filepath):
-   print('Final file path:',filepath)
-   directory = os.path.dirname(filepath)  
-   file = os.path.basename(filepath)
-   print(f"Directory: {directory}, file: {file}")
-   return send_from_directory(directory, file)
+    print('Final file path:',filepath)
+    directory = os.path.dirname(filepath)  
+    file = os.path.basename(filepath)
+    print(f"Directory: {directory}, file: {file}")
+    return send_from_directory(directory, file, mimetype='application/pdf')
 
 @app.route('/setup_answer_field/<class_id>/<answer_board_id>', methods=['GET','POST'])
 def setup_answer_field(class_id, answer_board_id):
@@ -1092,7 +1092,14 @@ def setup_answer_field(class_id, answer_board_id):
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
 def open_answer_board(class_id, answer_board_id):
-   return render_template("view_answer_board.html")
+    ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+    if ans_board:
+        paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
+        paper_path = paper.FILEPATH if paper else None  # Get the filepath
+        return render_template("view_answer_board.html", paperPath=paper_path)
+    else:
+        flash("Answer board not found.", "error")
+        return redirect(url_for('view_class'))  # Or wherever you want to redirect
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
 def class_info(class_id):
