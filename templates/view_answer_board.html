@@ -18,10 +18,11 @@
 
 
         <div class="view-answer-board-box">
-            <div class="btn-container">
             <h1>Answer Board</h1>
             <hr>
-            <button class="editAnswerBoard-btn">Edit Answer Board</button>
+            <div class="btn-container">
+                <button class="editAnswerBoard-btn">Edit Answer Board</button>
+            </div>
             <p>Answer the question based on the paper.</p>
             {% if paperPath %}
                 <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px">
