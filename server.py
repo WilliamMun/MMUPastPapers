@@ -1090,16 +1090,23 @@ def setup_answer_field(class_id, answer_board_id):
     
   return render_template("setup_answer_field.html",paperPath=paper_path, classCode=session.get('current_class_id'))
 
-@app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
+@app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET', 'POST'])
 def open_answer_board(class_id, answer_board_id):
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+    
     if ans_board:
         paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
-        paper_path = paper.FILEPATH if paper else None  # Get the filepath
-        return render_template("view_answer_board.html", paperPath=paper_path)
+        paper_path = paper.FILEPATH if paper else None
+        answer_board_name = ans_board.ANSWER_BOARD_NAME  # Correct: comes from ANSWER_BOARD
+        
+        return render_template(
+            "view_answer_board.html", 
+            paperPath=paper_path, 
+            answer_board_name=answer_board_name
+        )
     else:
         flash("Answer board not found.", "error")
-        return redirect(url_for('view_class'))  # Or wherever you want to redirect
+        return redirect(url_for('view_class'))
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
 def class_info(class_id):
