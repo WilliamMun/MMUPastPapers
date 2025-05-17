@@ -930,6 +930,11 @@ tr:hover {
 /**The End of Security Question Page Settings**/
 
 /** View Class Page Settings **/
+.viewclass {
+  width: 2000px;
+  height: 1050px auto;
+}
+
 .hiddenClassCodeBox {
   max-height: 0; 
   overflow: hidden;
