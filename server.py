@@ -1096,7 +1096,7 @@ def open_answer_board(class_id, answer_board_id):
     if ans_board:
         paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
         paper_path = paper.FILEPATH if paper else None  # Get the filepath
-        return render_template("view_answer_board.html", paperPath=paper_path)
+        return render_template("view_answer_board.html", paperPath=paper_path, answer_board_id=ans_board.ANSWER_BOARD_ID)
     else:
         flash("Answer board not found.", "error")
         return redirect(url_for('view_class'))  # Or wherever you want to redirect
@@ -1293,6 +1293,40 @@ def add_subject():
     return render_template('add_subject.html',
                          study_levels=study_levels,
                          faculties=faculties)
+
+@app.route('/edit_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
+def edit_answer_board(class_id, answer_board_id):
+  ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+  print(f"Answer board: {ans_board}")
+  paper_id = ans_board.PAPER_ID
+  print(f"Paper ID: {paper_id}")
+  if paper_id:
+    paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=paper_id).first()
+    print(f"Paper Info: {paper_info}")
+    paper_path = paper_info.FILEPATH
+    print(f"Paper path: {paper_path}")
+  else:
+    flash("Unexpected error.",'error')
+    print("No paper id found!")
+    return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
+  
+  ans_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+  print(f"Ans field from db: {ans_fields}")
+
+  ans_field_datas = []
+
+  for ans_field in ans_fields:
+    ans_field_dict = {
+       'question_name': ans_field.ANSWER_FIELD_DESC,
+       'question_type': ans_field.ANSWER_FIELD_TYPE,
+       'mcq_type': ans_field.MCQ_TYPE
+    }
+
+    ans_field_datas.append(ans_field_dict)
+  
+  print(f"Final answer field record: {ans_field_datas}.")
+
+  return render_template("edit_answer_board.html", paperPath=paper_path, ans_field_datas=ans_field_datas)
 
 if __name__ == "__main__":
     app.run(debug=True)

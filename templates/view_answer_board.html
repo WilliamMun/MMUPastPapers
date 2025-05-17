@@ -20,9 +20,13 @@
         <div class="view-answer-board-box">
             <h1>Answer Board</h1>
             <hr>
+            {% if session.get('roles') == 2 %}
+            <form action="{{ url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="POST">
             <div class="btn-container">
                 <button class="editAnswerBoard-btn">Edit Answer Board</button>
             </div>
+            </form>
+            {% endif %}
             <p>Answer the question based on the paper.</p>
             {% if paperPath %}
                 <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px">
