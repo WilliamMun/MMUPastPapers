@@ -17,12 +17,15 @@
         {% include 'class_bar.html' %}
 
 
-        <div class="view-answer-board-box">
-            <h1>Answer Board</h1>
+            <div class="view-answer-board-box">
+            <h1>{{ answer_board_name }}</h1>
+
             <hr>
-            <div class="btn-container">
-                <button class="editAnswerBoard-btn">Edit Answer Board</button>
-            </div>
+            {% if session.get('roles') == 2 %}
+                <div class="btn-container">
+                    <button class="editAnswerBoard-btn">Edit Answer Board</button>
+                </div>
+            {% endif %}
             <p>Answer the question based on the paper.</p>
             {% if paperPath %}
                 <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px">
