@@ -1094,19 +1094,23 @@ def setup_answer_field(class_id, answer_board_id):
 def open_answer_board(class_id, answer_board_id):
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
     
-    if ans_board:
-        paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
-        paper_path = paper.FILEPATH if paper else None
-        answer_board_name = ans_board.ANSWER_BOARD_NAME  # Correct: comes from ANSWER_BOARD
-        
-        return render_template(
-            "view_answer_board.html", 
-            paperPath=paper_path, 
-            answer_board_name=answer_board_name
-        )
-    else:
+    if not ans_board:
         flash("Answer board not found.", "error")
         return redirect(url_for('view_class'))
+
+    paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
+    paper_path = paper.FILEPATH if paper else None
+    answer_board_name = ans_board.ANSWER_BOARD_NAME
+
+    # NEW: Get answer fields
+    answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+
+    return render_template(
+        "view_answer_board.html", 
+        paperPath=paper_path, 
+        answer_board_name=answer_board_name,
+        answer_fields=answer_fields  # NEW
+    )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
 def class_info(class_id):
@@ -1300,6 +1304,64 @@ def add_subject():
     return render_template('add_subject.html',
                          study_levels=study_levels,
                          faculties=faculties)
+
+@app.route('/submit_answers/<class_id>/<answer_board_id>', methods=['POST'])
+def submit_answers(class_id, answer_board_id):
+    user_id = session.get('user_id')  # Replace with correct key for your student ID
+    if not user_id:
+        flash("You must be logged in to submit answers.", "error")
+        return redirect(url_for('login'))
+
+    answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+
+    try:
+        for i, field in enumerate(answer_fields, start=1):
+            answer_field_id = field.ANSWER_FIELD_ID
+            answer_type = field.ANSWER_FIELD_TYPE
+
+            student_answer_id = uuid.uuid4().hex[:10]
+            answer_text = None
+            answer_choice = None
+            answer_filepath = None
+
+            if answer_type == 1:
+                # Text answer
+                answer_text = request.form.get(f'answer{i}')
+            elif answer_type == 2:
+                # MCQ answer
+                answer_choice = request.form.get(f'answer{i}')
+            elif answer_type == 3:
+                # File upload
+                file = request.files.get(f'answer{i}')
+                if file:
+                    filename = secure_filename(file.filename)
+                    upload_dir = os.path.join('static', 'uploads', 'student_answers')
+                    os.makedirs(upload_dir, exist_ok=True)
+                    filepath = os.path.join(upload_dir, filename)
+                    file.save(filepath)
+                    answer_filepath = filepath
+
+            student_answer = STUDENT_ANSWER(
+                STUDENT_ANSWER_ID=student_answer_id,
+                STUDENT_ID=user_id,
+                ANSWER_BOARD_ID=answer_board_id,
+                ANSWER_FIELD_ID=answer_field_id,
+                ANSWER_TEXT=answer_text,
+                ANSWER_CHOICE=answer_choice,
+                ANSWER_FILEPATH=answer_filepath
+            )
+
+            db.session.add(student_answer)
+
+        db.session.commit()
+        flash("Answers submitted successfully!", "success")
+        return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
+
+    except Exception as e:
+        print("Error submitting answers:", e)
+        db.session.rollback()
+        flash("An error occurred while submitting answers. Please try again.", "error")
+        return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
 
 if __name__ == "__main__":
     app.run(debug=True)
