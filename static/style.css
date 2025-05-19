@@ -495,7 +495,57 @@ button:hover {
 
 /* Radio buttons center below the grid */
 .radio-group {
-  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white; /* slightly brighter than #f9f9f9 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* soft shadow for depth */
+}
+
+.radio-group label {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  font-size: 0.5rem;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  margin: 0.1rem 0.1rem 0.1rem 0.1rem;
+}
+
+.radio-group input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #bbb;
+  border-radius: 50%;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+  margin: 0.1rem 0.1rem 0.1rem 0.1rem;
+}
+
+.radio-group input[type="radio"]:checked::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #007bff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0.1rem 0.1rem 0.1rem 0.1rem;
+}
+
+.radio-group input[type="radio"]:hover {
+  border-color: #007bff;
 }
 
 /* Links */
@@ -1080,6 +1130,7 @@ tr:hover {
 .no-class {
   font-family: Georgia, 'Times New Roman', Times, serif;
   background-color: white;
+  width: 25%;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -1180,7 +1231,8 @@ hr{
   border: none;
   height: 0.1px;
   background-color: #333;
-  margin: 20px 0;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .viewPapers-button {
@@ -1312,6 +1364,14 @@ hr{
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
+.answer-field hr{
+  border: none;
+  height: 0.1px;
+  background-color: #333;
+  margin-top: 1.5rem;
+  margin-bottom: 0.1rem;
+}
+
 .no-answer-board{
   background: white;
   padding: 20px;
@@ -1328,6 +1388,24 @@ hr{
   font-family: 20px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
+
+.no-questions-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2.5rem;
+}
+
+.no-questions {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  background-color: whitesmoke;
+  width: 40%;
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid whitesmoke;
+  text-align: center;
+}
+
 
 .btn-container{
   display: block;
@@ -1891,13 +1969,13 @@ tr:hover {
 
 .view-answer-board-box label {
   font-family: Georgia, 'Times New Roman', Times, serif;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   text-align: left;
   display: block;
   font-weight: bold;
   color: #333;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
+  margin-top: 0;
+  padding-top:
 }
 
 .editAnswerBoard-btn {
@@ -1921,3 +1999,24 @@ tr:hover {
   background-color: #BCCCDC;
   color: black;
 }
+
+.textarea-answer {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serifs;
+  width: 100%; /* Makes the textarea take up the full width of its container */
+  padding: 10px; /* Adds some space inside the textarea */
+  border: 1px solid #ccc; /* Adds a light gray border */
+  border-radius: 4px; /* Slightly rounded corners */
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+  font-size: 14px; /* Sets a readable font size */
+  line-height: 1.5; /* Improves text readability */
+}
+
+.answerboard-file {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+  justify-content: flex-start;
+}
+/** The End of View Answer Board Page **/
