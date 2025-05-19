@@ -1,5 +1,4 @@
 <html>
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,46 +24,55 @@
                     <button class="editAnswerBoard-btn">Edit Answer Board</button>
                 </div>
             {% endif %}
-            <p>Answer the question based on the paper.</p>
+
+            <p>Answer the questions based on the paper.</p>
+
             {% if paperPath %}
                 <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px">
                 </iframe>
             {% else %}
                 <p>No paper available for this answer board.</p>
             {% endif %}
-            <form action="{{ url_for('submit_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="POST" enctype="multipart/form-data" class="answer-form">
-    {% for field in answer_fields %}
+            
+            {% if answer_fields and answer_fields|length > 0 %}
+                <form action="{{ url_for('submit_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="POST" enctype="multipart/form-data" class="answer-form">
+                    {% for field in answer_fields %}
+                    <br>
+                    <div class="answer-field">
+                        <label>{{ loop.index }}. {{ field.ANSWER_FIELD_DESC }}</label>
 
-    <br>
-    
-        <div class="answer-field">
-            <label><strong>{{ loop.index }}. {{ field.ANSWER_FIELD_DESC }}</strong></label>
+                        {% if field.ANSWER_FIELD_TYPE == 1 %}
+                            <!-- Text Input -->
+                            <textarea name="answer{{ loop.index }}" rows="4" cols="50" class="textarea-answer" placeholder="Enter your answer"></textarea>
 
-            {% if field.ANSWER_FIELD_TYPE == 1 %}
-                <!-- Text Input -->
-                <textarea name="answer{{ loop.index }}" rows="4" cols="50" class="textarea-answer" placeholder="Enter your answer"></textarea>
+                        {% elif field.ANSWER_FIELD_TYPE == 2 %}
+                            <!-- MCQ Input -->
+                            {% set options = ['A', 'B', 'C', 'D'] if field.MCQ_TYPE == 4 else ['A', 'B', 'C', 'D', 'E'] %}
+                            {% for opt in options %}
+                                <label>
+                                    <input type="radio" name="answer{{ loop.index }}" value="{{ opt }}" class="radio-group"> {{ opt }}
+                                </label>
+                            {% endfor %}
 
-            {% elif field.ANSWER_FIELD_TYPE == 2 %}
-                <!-- MCQ Input -->
-                {% set options = ['A', 'B', 'C', 'D'] if field.MCQ_TYPE == 4 else ['A', 'B', 'C', 'D', 'E'] %}
-                {% for opt in options %}
-                    <label>
-                        <input type="radio" name="answer{{ loop.index }}" value="{{ opt }}" class="radio-group"> {{ opt }}
-                    </label>
-                {% endfor %}
-
-            {% elif field.ANSWER_FIELD_TYPE == 3 %}
-                <!-- File Upload -->
-                <input type="file" class="answerboard-file" name="answer{{ loop.index }}">
+                        {% elif field.ANSWER_FIELD_TYPE == 3 %}
+                            <!-- File Upload -->
+                            <input type="file" class="answerboard-file" name="answer{{ loop.index }}">
+                        {% endif %}
+                        <hr>
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn">Submit Answers</button>
+                </form>
+                {% else %}
+                <div class="no-questions-container">
+                    <div class="no-questions">
+                        <em>There's no questions need to be answered</em>
+                    </div>
+                </div>
             {% endif %}
-            <hr>
-        </div>
-    {% endfor %}
 
-    <button type="submit" class="btn">Submit Answers</button>
-</form>
 
-        </div>
+         </div>
         
     </main>
 

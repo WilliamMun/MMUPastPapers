@@ -1389,6 +1389,24 @@ hr{
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
+.no-questions-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2.5rem;
+}
+
+.no-questions {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  background-color: whitesmoke;
+  width: 40%;
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid whitesmoke;
+  text-align: center;
+}
+
+
 .btn-container{
   display: block;
 }
@@ -2001,3 +2019,4 @@ tr:hover {
   margin-left: 10px;
   justify-content: flex-start;
 }
+/** The End of View Answer Board Page **/

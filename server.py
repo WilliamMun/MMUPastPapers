@@ -1102,14 +1102,15 @@ def open_answer_board(class_id, answer_board_id):
     paper_path = paper.FILEPATH if paper else None
     answer_board_name = ans_board.ANSWER_BOARD_NAME
 
-    # NEW: Get answer fields
     answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
 
     return render_template(
         "view_answer_board.html", 
         paperPath=paper_path, 
         answer_board_name=answer_board_name,
-        answer_fields=answer_fields  # NEW
+        answer_fields=answer_fields,
+        class_id=class_id,               # <-- add this
+        answer_board_id=answer_board_id  # <-- add this
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
@@ -1307,61 +1308,54 @@ def add_subject():
 
 @app.route('/submit_answers/<class_id>/<answer_board_id>', methods=['POST'])
 def submit_answers(class_id, answer_board_id):
-    user_id = session.get('user_id')  # Replace with correct key for your student ID
-    if not user_id:
-        flash("You must be logged in to submit answers.", "error")
-        return redirect(url_for('login'))
 
+
+    student_id = session.get('user_id')  # or session['id'] depending on your session keys
+    submitted_data = request.form
+    uploaded_files = request.files
+
+    # Retrieve related answer fields
     answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
 
     try:
-        for i, field in enumerate(answer_fields, start=1):
+        for index, field in enumerate(answer_fields, start=1):
+            answer_id = uuid.uuid4().hex[:10]
             answer_field_id = field.ANSWER_FIELD_ID
+            answer_by = student_id
+            answer_on = datetime.now()
+
+            form_key = f'answer{index}'
             answer_type = field.ANSWER_FIELD_TYPE
 
-            student_answer_id = uuid.uuid4().hex[:10]
-            answer_text = None
-            answer_choice = None
-            answer_filepath = None
-
-            if answer_type == 1:
-                # Text answer
-                answer_text = request.form.get(f'answer{i}')
-            elif answer_type == 2:
-                # MCQ answer
-                answer_choice = request.form.get(f'answer{i}')
-            elif answer_type == 3:
-                # File upload
-                file = request.files.get(f'answer{i}')
+            if answer_type == 3:  # File upload
+                file = uploaded_files.get(form_key)
                 if file:
-                    filename = secure_filename(file.filename)
-                    upload_dir = os.path.join('static', 'uploads', 'student_answers')
-                    os.makedirs(upload_dir, exist_ok=True)
-                    filepath = os.path.join(upload_dir, filename)
-                    file.save(filepath)
-                    answer_filepath = filepath
+                    filename = f"{uuid.uuid4().hex}_{file.filename}"
+                    file_path = os.path.join('static', 'student_uploads', filename)
+                    file.save(file_path)
+                    answer_content = file_path
+                else:
+                    answer_content = None
+            else:
+                answer_content = submitted_data.get(form_key)
 
-            student_answer = STUDENT_ANSWER(
-                STUDENT_ANSWER_ID=student_answer_id,
-                STUDENT_ID=user_id,
-                ANSWER_BOARD_ID=answer_board_id,
+            new_answer = ANSWER(
+                ANSWER_ID=answer_id,
                 ANSWER_FIELD_ID=answer_field_id,
-                ANSWER_TEXT=answer_text,
-                ANSWER_CHOICE=answer_choice,
-                ANSWER_FILEPATH=answer_filepath
+                ANSWER_BY=answer_by,
+                ANSWER_ON=answer_on,
+                ANSWER_CONTENT=answer_content
             )
-
-            db.session.add(student_answer)
+            db.session.add(new_answer)
 
         db.session.commit()
         flash("Answers submitted successfully!", "success")
-        return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
-
     except Exception as e:
-        print("Error submitting answers:", e)
         db.session.rollback()
-        flash("An error occurred while submitting answers. Please try again.", "error")
-        return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
+        print("Error saving answers:", e)
+        flash("Failed to submit answers. Please try again.", "error")
+
+    return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
 
 if __name__ == "__main__":
     app.run(debug=True)
