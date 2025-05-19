@@ -22,13 +22,14 @@
                 <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px"></iframe>
                 <br>
 
-                <form action="{{ url_for('setup_answer_field', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id'))}}" method="POST">
-                    <div class="answer-fields" id="answer-fields" data-answer-count="2">
+                <form action="{{ url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id'))}}" method="POST">
+                    <div class="answer-fields" id="answer-fields" data-answer-count="{{ ans_field_datas|length + 1 }}">
                         {% for answer_field_data in ans_field_datas %}
                             <div class="answer-field">
                                 <input type="text" name="question1" id="question1" placeholder="Enter Question Number/Question" value="{{ answer_field_data.question_name }}">
+                                <button class="setup-delete-btn" onclick="deleteAnswerField(this)">✖</button>
                                 <label for="type-ans">Type of Answer Field: </label>
-                                <select class="type-ans" name="type-ans1" id="type-ans1" onchange="handleAnswerFieldType(this)">
+                                <select class="type-ans" name="type-ans1" id="type-ans1" onchange="handleAnswerFieldTypeEdit(this)">
                                     <option value="text" {% if answer_field_data.question_type == 1 %}selected{% endif %}>Text</option>
                                     <option value="mcq" {% if answer_field_data.question_type == 2 %}selected{% endif %}>MCQ</option>
                                     <option value="file" {% if answer_field_data.question_type == 3 %}selected{% endif %}>File</option>
@@ -40,14 +41,17 @@
                                         <option value="4" {% if answer_field_data.mcq_type == 4 %}selected{% endif %}>Four Answer Options</option>
                                         <option value="5" {% if answer_field_data.mcq_type == 4 %}selected{% endif %}>Five Answer Options</option>
                                     </select>
+                                </div>
                                 {% endif %}
                             </div>
-                        {% endfor %}
                         <br>
                         <hr>
+                        {% endfor %}
+                        <div class="field-buttons" id="field-buttons">
+                            <button type="button" onclick="addAnswerFieldEdit(this)" class="btn">Add Answer Field</button>
+                            <button type="submit" name="submit-answer-field" id="submit-answer-field" class="btn">Edit Answer Field</button>
+                        </div>
                     </div>
-                    <button type="button" onclick="addAnswerField(this)" class="btn">Add Answer Field</button>
-                    <button type="submit" name="submit-answer-field" id="submit-answer-field" class="btn">Edit Answer Field</button>
                 </form>
             </div>
         </main>

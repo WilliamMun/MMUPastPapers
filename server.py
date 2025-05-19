@@ -1092,6 +1092,7 @@ def setup_answer_field(class_id, answer_board_id):
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
 def open_answer_board(class_id, answer_board_id):
+    session['current_answer_board_id'] = answer_board_id
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
     if ans_board:
         paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
@@ -1325,6 +1326,30 @@ def edit_answer_board(class_id, answer_board_id):
     ans_field_datas.append(ans_field_dict)
   
   print(f"Final answer field record: {ans_field_datas}.")
+
+  if request.method == 'POST':
+    #Get user input from form 
+    form_data = request.form
+    print(f"Inputs received: {form_data}")
+    question_data = []
+
+    for key in form_data:
+      if key.startswith('question') and '-' not in key:  # only top-level question fields
+        question_id = key.replace('question', '') 
+        if not question_id:
+           question_id = 1
+        question_text = form_data[key]
+        answer_type = form_data.get(f'type-ans{question_id}', 'text')
+        mcq_type = form_data.get(f'type-mcq{question_id}',None) if answer_type == 'mcq' else None
+
+        question_entry = {
+            'question': question_text,
+            'type': answer_type,
+            'mcq_type': int(mcq_type) if mcq_type else None
+        }
+
+        print(f"Question {question_id} record: {question_entry}")
+        question_data.append(question_entry)
 
   return render_template("edit_answer_board.html", paperPath=paper_path, ans_field_datas=ans_field_datas)
 
