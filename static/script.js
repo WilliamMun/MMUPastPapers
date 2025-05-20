@@ -116,3 +116,71 @@ function copyClassLink() {
         showTooltip('linkCopyContainer');
     });
 }
+
+function handleAnswerFieldTypeEdit(selectElem) {
+    const answerFieldDiv = selectElem.closest('.answer-field');
+    const selectedValue = selectElem.value;
+
+    // Check if mcq-setup already exists
+    let mcqSetup = answerFieldDiv.querySelector('.mcq-setup');
+
+    if (selectedValue === 'mcq') {
+        if (!mcqSetup) {
+            // Create and append the mcq-setup dynamically
+            mcqSetup = document.createElement('div');
+            mcqSetup.className = 'mcq-setup';
+            mcqSetup.innerHTML = `
+                <label for="type-mcq">Answer Options:</label>
+                <select class="type-ans" name="type-mcq1" id="type-mcq1" onchange="handleMcqDefaultSelect(this)">
+                    <option value="4">Four Answer Options</option>
+                    <option value="5">Five Answer Options</option>
+                </select>
+            `;
+            answerFieldDiv.appendChild(mcqSetup);
+        } else {
+            mcqSetup.style.display = 'block';
+        }
+    } else {
+        // Hide mcq-setup if it exists
+        if (mcqSetup) {
+            mcqSetup.style.display = 'none';
+        }
+    }
+}
+
+function addAnswerFieldEdit(button) {
+    const container = document.getElementById('answer-fields');
+    const buttonContainer = container.querySelector('.field-buttons'); 
+
+    let answerFieldCount = parseInt(container.getAttribute('data-answer-count'));
+
+    const newField = document.createElement('div');
+    newField.className = 'answer-field';
+
+    let mcqOptionsHtml = `
+        <option value="4" ${defaultMcqOption === '4' ? 'selected' : ''}>Four Answer Options</option>
+        <option value="5" ${defaultMcqOption === '5' ? 'selected' : ''}>Five Answer Options</option>
+    `;
+    newField.innerHTML = `
+        <br>
+        <input type="text" name="question${answerFieldCount}" id="question${answerFieldCount}" placeholder="Enter Question Number/Question ${answerFieldCount}">
+        <button class="setup-delete-btn" onclick="deleteAnswerField(this)">✖</button>
+        <label for="type-ans${answerFieldCount}">Type of Answer Field: </label>
+        <select class="type-ans${answerFieldCount}" name="type-ans${answerFieldCount}" id="type-ans${answerFieldCount}" onchange="handleAnswerFieldType(this)">
+            <option value="text">Text</option>
+            <option value="mcq">MCQ</option>
+            <option value="file">File</option>
+        </select>
+        
+        <div class="mcq-setup" style="display: none;" data-option-count="2">
+            <select class="type-ans" name="type-mcq${answerFieldCount}" id="type-mcq${answerFieldCount}">
+                ${mcqOptionsHtml}
+            </select>
+        </div>
+        <br>
+        <hr>
+    `;
+
+    container.insertBefore(newField, buttonContainer);
+    container.setAttribute("data-answer-count", answerFieldCount + 1)
+}

@@ -1092,9 +1092,14 @@ def setup_answer_field(class_id, answer_board_id):
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET', 'POST'])
 def open_answer_board(class_id, answer_board_id):
+    session['current_answer_board_id'] = answer_board_id
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
     
-    if not ans_board:
+    if ans_board:
+        paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
+        paper_path = paper.FILEPATH if paper else None  # Get the filepath
+        return render_template("view_answer_board.html", paperPath=paper_path, answer_board_id=ans_board.ANSWER_BOARD_ID)
+    else:
         flash("Answer board not found.", "error")
         return redirect(url_for('view_class'))
 
