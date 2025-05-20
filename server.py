@@ -1358,6 +1358,14 @@ def edit_answer_board(class_id, answer_board_id):
           question_text = form_data[key]
           answer_type = form_data.get(f'type-ans{question_id}', 'text')
           mcq_type = form_data.get(f'type-mcq{question_id}',None) if answer_type == 'mcq' else None
+          deleted_ids_str = request.form.get('deleted_questions', '')
+          deleted_ids = [id.strip() for id in deleted_ids_str.split(',') if id.strip()]
+
+          for del_id in deleted_ids: 
+            field_to_delete = ANSWER_FIELD.query.filter_by(ANSWER_FIELD_ID=del_id).first()
+            print(f"Field to be deleted:{field_to_delete}")
+            if field_to_delete:
+              db.session.delete(field_to_delete)
 
           if answer_type == 'text':
             answer_type_no = 1

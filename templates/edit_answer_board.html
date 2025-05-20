@@ -23,13 +23,14 @@
                 <br>
 
                 <form action="{{ url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id'))}}" method="POST">
+                    <input type="hidden" name="deleted_questions" id="deleted_questions" value="">
                     <div class="answer-fields" id="answer-fields" data-answer-count="{{ ans_field_datas|length + 1 }}">
                         {% for answer_field_data in ans_field_datas %}
                         {% set i = loop.index %}
                             <div class="answer-field">
                                 <input type="hidden" name="ques_id{{i}}" id="ques_id{{i}}" value="{{ answer_field_data.question_id }}">
                                 <input type="text" name="question{{i}}" id="question{{i}}" placeholder="Enter Question Number/Question" value="{{ answer_field_data.question_name }}">
-                                <button class="setup-delete-btn" onclick="deleteAnswerField(this)">✖</button>
+                                <button type="button" class="setup-delete-btn" onclick="deleteAnswerFieldEdit(this)">✖</button>
                                 <label for="type-ans">Type of Answer Field: </label>
                                 <select class="type-ans" name="type-ans{{i}}" id="type-ans{{i}}" onchange="handleAnswerFieldTypeEdit(this)">
                                     <option value="text" {% if answer_field_data.question_type == 1 %}selected{% endif %}>Text</option>
