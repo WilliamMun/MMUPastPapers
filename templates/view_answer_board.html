@@ -61,7 +61,12 @@
                         <hr>
                     </div>
                     {% endfor %}
+                    {% if session.get('roles') == 1 %}
                     <button type="submit" class="btn">Submit Answers</button>
+                    {% endif %}
+                    {% if session.get('roles') == 2 %}
+                    <button type="button" class="btn">Review Student Answers</button>
+                    {% endif %}
                 </form>
                 {% else %}
                 <div class="no-questions-container">
