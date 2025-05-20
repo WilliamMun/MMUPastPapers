@@ -20,7 +20,7 @@
 
             <hr>
             {% if session.get('roles') == 2 %}
-            <form action="{{ url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="POST">
+            <form action="{{ url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="GET">
             <div class="btn-container">
                 <button class="editAnswerBoard-btn">Edit Answer Board</button>
             </div>

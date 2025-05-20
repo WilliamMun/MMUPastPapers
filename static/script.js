@@ -120,6 +120,7 @@ function copyClassLink() {
 function handleAnswerFieldTypeEdit(selectElem) {
     const answerFieldDiv = selectElem.closest('.answer-field');
     const selectedValue = selectElem.value;
+    const index = Array.from(document.querySelectorAll('.answer-field')).indexOf(answerFieldDiv) + 1;
 
     // Check if mcq-setup already exists
     let mcqSetup = answerFieldDiv.querySelector('.mcq-setup');
@@ -130,8 +131,8 @@ function handleAnswerFieldTypeEdit(selectElem) {
             mcqSetup = document.createElement('div');
             mcqSetup.className = 'mcq-setup';
             mcqSetup.innerHTML = `
-                <label for="type-mcq">Answer Options:</label>
-                <select class="type-ans" name="type-mcq1" id="type-mcq1" onchange="handleMcqDefaultSelect(this)">
+                <label for="type-mcq${index}">Answer Options:</label>
+                <select class="type-ans" name="type-mcq${index}" id="type-mcq${index}" onchange="handleMcqDefaultSelect(this)">
                     <option value="4">Four Answer Options</option>
                     <option value="5">Five Answer Options</option>
                 </select>
@@ -163,17 +164,18 @@ function addAnswerFieldEdit(button) {
     `;
     newField.innerHTML = `
         <br>
+        <input type="hidden" name="ques_id${answerFieldCount}" id="ques_id${answerFieldCount}" value="">
         <input type="text" name="question${answerFieldCount}" id="question${answerFieldCount}" placeholder="Enter Question Number/Question ${answerFieldCount}">
         <button class="setup-delete-btn" onclick="deleteAnswerField(this)">✖</button>
         <label for="type-ans${answerFieldCount}">Type of Answer Field: </label>
-        <select class="type-ans${answerFieldCount}" name="type-ans${answerFieldCount}" id="type-ans${answerFieldCount}" onchange="handleAnswerFieldType(this)">
+        <select class="type-ans${answerFieldCount}" name="type-ans${answerFieldCount}" id="type-ans${answerFieldCount}" onchange="handleAnswerFieldTypeEdit(this)">
             <option value="text">Text</option>
             <option value="mcq">MCQ</option>
             <option value="file">File</option>
         </select>
         
         <div class="mcq-setup" style="display: none;" data-option-count="2">
-            <select class="type-ans" name="type-mcq${answerFieldCount}" id="type-mcq${answerFieldCount}">
+            <select class="type-ans" name="type-mcq${answerFieldCount}" id="type-mcq${answerFieldCount}" onchange="handleMcqDefaultSelect(this)">
                 ${mcqOptionsHtml}
             </select>
         </div>
