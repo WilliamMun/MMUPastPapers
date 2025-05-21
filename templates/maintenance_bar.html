@@ -5,13 +5,18 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <script src="{{ url_for('static', filename='script.js' ) }}"></script>
         <script src="{{ url_for('static', filename='sweetalert.js') }}"></script>
+         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
 
     <!-- Maintenance Page Sidebar -->
     <body>
-        <div class="sidebar">
-            <a href="{{ url_for('view_subjects') }}" class="subject">Subject</a>
-            <a href="{{ url_for('view_terms') }}" class="term">Term</a>
-        </div>
+        <nav class="maintenance-nav">
+            <a href="{{ url_for('view_subjects') }}">
+                <i class="fa-solid fa-chalkboard"></i><span class="label-text">Subject</span>
+            </a>
+            <a href="{{ url_for('view_terms') }}">
+                <i class="fa-solid fa-calendar-days"></i><span class="label-text">Term</span>
+            </a>
+        </nav>
     </body>
 </html>

@@ -1188,8 +1188,69 @@ tr:hover {
 .class-nav a:hover .label-text {
   opacity: 1;
 }
-
 /**The End of Class Bar Page Settings**/
+
+/** Maintenance Bar Settings **/
+.maintenance-nav {
+  position: fixed;
+  top: 8rem;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 20;
+}
+
+.maintenance-nav a {
+  position: relative;
+  display: fixed;
+  align-items: center;
+  color: rgb(12, 12, 12);
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 0 5px 5px 0;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 18px;
+  white-space: nowrap;
+  transition: width 0.3s ease, background-color 0.3s;
+  overflow: hidden;
+  width: 50px;
+  background-color: whitesmoke;
+  clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.maintenance-nav a:hover {
+  width: 160px; /* Expand size */
+  background-color: #e0e0e0;
+  z-index: 25;
+}
+
+.maintenance-nav a i {
+  margin-right: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.maintenance-nav .label-text {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.maintenance-nav a:hover .label-text {
+  opacity: 1;
+}
+
+.sidebar .subject {
+  top: 20px;
+  background-color: whitesmoke;
+}
+
+.sidebar .term {
+  top: 100px;
+  background-color: whitesmoke;
+}
+/**The End of Maintenance  Bar Page Settings**/
 
 /** View People Page (view_people.pages) **/
 .viewPeople-box {
@@ -1806,7 +1867,7 @@ hr{
 .terminfo-box {
   background: white;
   padding: 40px;
-  width: 1000px;
+  width: 800px;
   height: auto;
   max-width: 95%;
   margin: 40px auto;
@@ -1823,6 +1884,19 @@ hr{
   margin-bottom: 15px;
   color: black;
 }
+
+.terminfo-box th, .terminfo-box td {
+  padding: 8px;
+  vertical-align: middle;
+}
+
+/* Ensure images like edit/delete icons stay aligned */
+.terminfo-box td img {
+  height: 17px;
+  align-items: center;
+  display: inline-block;
+}
+/**The End of View Term Page
 
 /* Centering the table container */
 .table-container {
@@ -1930,6 +2004,7 @@ tr:hover {
 .subjectinfo-box .btn-container {
   margin-top: 25px;
 }
+
 /**Edit Subject Page**/
 .editSubject-box {
   background: white;
@@ -2182,54 +2257,3 @@ tr:hover {
   line-height: 1.5;
 }
 /** The End of Edit Answer Field Page **/
-
-/* Clickable Static Sidebar */
-.sidebar {
-  position: relative;
-  width: 240px;
-  margin: 2rem;
-  padding: 1.5rem 0;
-  background: #f8fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  z-index: 100;
-}
-
-.sidebar a {
-  display: block;
-  padding: 12px 24px;
-  color: #64748b;
-  text-decoration: none;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-/* Interactive Hover State */
-.sidebar a:hover {
-  background-color: rgba(99, 102, 241, 0.05);
-  color: #4f46e5;
-}
-
-.sidebar a::before {
-  content: "•";
-  margin-right: 12px;
-  color: #94a3b8;
-  transition: color 0.2s ease;
-}
-
-.sidebar a:hover::before {
-  color: #4f46e5;
-}
-
-/* Remove disabled styles */
-.sidebar {
-  opacity: 1;
-  filter: none;
-}
-
-.sidebar::before {
-  display: none; /* Remove disabled banner */
-}
