@@ -12,12 +12,10 @@
     <body>
         {% include 'header.html' %}
         <main class="main-content">
-        {% include 'maintenance_bar.html' %}
-        <div class="table-container">
-            <div class="terminfo-box">
-                <h1>Edit Terms Info</h1>
-    
-                <div class="table-container">
+            {% include 'maintenance_bar.html' %}
+            <div class="table-container">
+                <div class="terminfo-box">
+                    <h1>Edit Terms Info</h1>
                     <table>
                         <thead>
                             <tr>
@@ -33,16 +31,13 @@
                             <td>{{ term.TERM_DESC }}</td>
                             <td>
                                 <a href="/edit_term/{{ term.TERM_ID }}">
-                                    <img src="{{ url_for('static', filename='images/edit.png') }}" alt="edit">
+                                    <img src="{{ url_for('static', filename='images/edit.png') }}" alt="Edit Term">
                                 </a>
-                            </td>
                         </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                </div>
-
-                <div class="pagination mt-4 flex justify-center items-center gap-2">
+                    <div class="pagination mt-4 flex justify-center items-center gap-2">
                 {% if pagination.has_prev %}
                     <a href="{{ url_for('view_terms', page=pagination.prev_num) }}" 
                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -68,12 +63,14 @@
                     </a>
                 {% endif %}
                 </div>
-
-                <div class="button">
-                    <a href="{{ url_for('add_term') }}" class="btn">Add New Term</a>
+                    <br>
+                    <div class="btn-container">
+                        <a href="{{ url_for('add_term') }}" class="btn">Add New Term</a>
+                    </div>
                 </div>
             </div>
         </main>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <script>
@@ -83,24 +80,23 @@
                                 icon: 'error',
                                 title: 'Oops! An error occurred.',
                                 text: "{{ message }}"
-                        });
-        
+                            });
                         {% elif category == 'success' %}
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Yay! Success.',
                                 text: "{{ message }}"
-                        }).then(() => {
-                            setTimeout(function() {
-                            window.location.href = "{{ url_for('login') }}";
-                            }, 1000);
-                        });
+                            }).then(() => {
+                                setTimeout(function() {
+                                    window.location.href = "{{ url_for('login') }}";
+                                }, 1000);
+                            });
                         {% endif %}
                     {% endfor %}
                 </script>
             {% endif %}
         {% endwith %}
-    
+
         {% include 'footer.html' %}
-    </head>
+    </body>
 </html>
