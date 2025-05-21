@@ -33,20 +33,10 @@
                                 <a href="/edit_term/{{ term.TERM_ID }}">
                                     <img src="{{ url_for('static', filename='images/edit.png') }}" alt="Edit Term">
                                 </a>
-<<<<<<< HEAD
-=======
-                            </td>
-                            <td>
-                                <form method="POST" action="{{ url_for('delete_term', term_id=term.TERM_ID) }}" id="delete-form-{{ term.TERM_ID }}">
-                                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete Term" title="Delete" onclick="confirmDelete('{{ term.TERM_ID }}')">
-                                </form>
-                            </td>
->>>>>>> 82cda53b5638f43e4121ac277ac345667db71ff4
                         </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-<<<<<<< HEAD
                     <div class="pagination mt-4 flex justify-center items-center gap-2">
                 {% if pagination.has_prev %}
                     <a href="{{ url_for('view_terms', page=pagination.prev_num) }}" 
@@ -73,8 +63,6 @@
                     </a>
                 {% endif %}
                 </div>
-=======
->>>>>>> 82cda53b5638f43e4121ac277ac345667db71ff4
                     <br>
                     <div class="btn-container">
                         <a href="{{ url_for('add_term') }}" class="btn">Add New Term</a>
@@ -109,30 +97,6 @@
             {% endif %}
         {% endwith %}
 
-<<<<<<< HEAD
         {% include 'footer.html' %}
     </body>
 </html>
-=======
-        <script>
-            function confirmDelete(subjectId) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById('delete-form-' + subjectId).submit();
-                    }
-                });
-            }
-        </script>
-
-        {% include 'footer.html' %}
-    </body>
-</html>
->>>>>>> 82cda53b5638f43e4121ac277ac345667db71ff4
