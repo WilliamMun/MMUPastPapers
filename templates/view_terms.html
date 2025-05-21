@@ -12,12 +12,10 @@
     <body>
         {% include 'header.html' %}
         <main class="main-content">
-        {% include 'maintenance_bar.html' %}
-        <div class="table-container">
-            <div class="terminfo-box">
-                <h1>Edit Terms Info</h1>
-    
-                <div class="table-container">
+            {% include 'maintenance_bar.html' %}
+            <div class="table-container">
+                <div class="terminfo-box">
+                    <h1>Edit Terms Info</h1>
                     <table>
                         <thead>
                             <tr>
@@ -33,42 +31,26 @@
                             <td>{{ term.TERM_DESC }}</td>
                             <td>
                                 <a href="/edit_term/{{ term.TERM_ID }}">
-                                    <img src="{{ url_for('static', filename='images/edit.png') }}" alt="edit">
+                                    <img src="{{ url_for('static', filename='images/edit.png') }}" alt="Edit Term">
                                 </a>
                             </td>
                             <td>
-                                <form method="POST" action="{{ url_for('delete_term', term_id=term.TERM_ID) }}" style="display: inline;" class="delete-form" id="delete-form-{{ term.TERM_ID }}">
-                                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete" title="Delete" style="cursor:pointer;" onclick="confirmDelete('{{ term.TERM_ID }}')">
-                                    <script>
-                                        function confirmDelete(subjectId) {
-                                            Swal.fire({
-                                                title: 'Are you sure?',
-                                                text: "You won't be able to revert this!",
-                                                icon: 'warning',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#3085d6',
-                                                cancelButtonColor: '#d33',
-                                                confirmButtonText: 'Yes, delete it!'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    document.getElementById('deleteForm-' + subjectId).submit();
-                                                }
-                                            });
-                                        }
-                                    </script>
+                                <form method="POST" action="{{ url_for('delete_term', term_id=term.TERM_ID) }}" id="delete-form-{{ term.TERM_ID }}">
+                                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete Term" title="Delete" onclick="confirmDelete('{{ term.TERM_ID }}')">
                                 </form>
                             </td>
                         </tr>
                         {% endfor %}
                         </tbody>
                     </table>
-                </div>
-
-                <div class="button">
-                    <a href="{{ url_for('add_term') }}" class="btn">Add New Term</a>
+                    <br>
+                    <div class="btn-container">
+                        <a href="{{ url_for('add_term') }}" class="btn">Add New Term</a>
+                    </div>
                 </div>
             </div>
         </main>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <script>
@@ -78,24 +60,41 @@
                                 icon: 'error',
                                 title: 'Oops! An error occurred.',
                                 text: "{{ message }}"
-                        });
-        
+                            });
                         {% elif category == 'success' %}
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Yay! Success.',
                                 text: "{{ message }}"
-                        }).then(() => {
-                            setTimeout(function() {
-                            window.location.href = "{{ url_for('login') }}";
-                            }, 1000);
-                        });
+                            }).then(() => {
+                                setTimeout(function() {
+                                    window.location.href = "{{ url_for('login') }}";
+                                }, 1000);
+                            });
                         {% endif %}
                     {% endfor %}
                 </script>
             {% endif %}
         {% endwith %}
-    
+
+        <script>
+            function confirmDelete(subjectId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('delete-form-' + subjectId).submit();
+                    }
+                });
+            }
+        </script>
+
         {% include 'footer.html' %}
-    </head>
+    </body>
 </html>
