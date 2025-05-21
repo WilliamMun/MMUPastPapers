@@ -1,5 +1,4 @@
 <html>
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,15 +15,16 @@
     <main class="main-content">
         {% include 'class_bar.html' %}
 
-
-            <div class="view-answer-board-box">
+        <div class="view-answer-board-box">
             <h1>{{ answer_board_name }}</h1>
 
             <hr>
             {% if session.get('roles') == 2 %}
-                <div class="btn-container">
-                    <button class="editAnswerBoard-btn">Edit Answer Board</button>
-                </div>
+            <form action="{{ url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="GET">
+            <div class="btn-container">
+                <button class="editAnswerBoard-btn">Edit Answer Board</button>
+            </div>
+            </form>
             {% endif %}
             <p>Answer the question based on the paper.</p>
             {% if paperPath %}
@@ -33,7 +33,51 @@
             {% else %}
                 <p>No paper available for this answer board.</p>
             {% endif %}
-        </div>
+            
+            {% if answer_fields and answer_fields|length > 0 %}
+                <form action="{{ url_for('submit_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="POST" enctype="multipart/form-data" class="answer-form">
+                    {% for field in answer_fields %}
+                    <br>
+                    <div class="answer-field">
+                        <label>{{ loop.index }}. {{ field.ANSWER_FIELD_DESC }}</label>
+
+                        {% if field.ANSWER_FIELD_TYPE == 1 %}
+                            <!-- Text Input -->
+                            <textarea name="answer{{ loop.index }}" rows="4" cols="50" class="textarea-answer" placeholder="Enter your answer"></textarea>
+
+                        {% elif field.ANSWER_FIELD_TYPE == 2 %}
+                            <!-- MCQ Input -->
+                            {% set options = ['A', 'B', 'C', 'D'] if field.MCQ_TYPE == 4 else ['A', 'B', 'C', 'D', 'E'] %}
+                            {% for opt in options %}
+                                <label>
+                                    <input type="radio" name="answer{{ loop.index }}" value="{{ opt }}" class="radio-group"> {{ opt }}
+                                </label>
+                            {% endfor %}
+
+                        {% elif field.ANSWER_FIELD_TYPE == 3 %}
+                            <!-- File Upload -->
+                            <input type="file" class="answerboard-file" name="answer{{ loop.index }}">
+                        {% endif %}
+                        <hr>
+                    </div>
+                    {% endfor %}
+                    {% if session.get('roles') == 1 %}
+                    <button type="submit" class="btn">Submit Answers</button>
+                    {% endif %}
+                    {% if session.get('roles') == 2 %}
+                    <button type="button" class="btn">Review Student Answers</button>
+                    {% endif %}
+                </form>
+                {% else %}
+                <div class="no-questions-container">
+                    <div class="no-questions">
+                        <em>There's no questions need to be answered</em>
+                    </div>
+                </div>
+            {% endif %}
+
+
+         </div>
         
     </main>
 

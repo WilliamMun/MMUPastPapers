@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <title>Edit Answer Field | MMUPastPapers</title>
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+
+        <main class="main-content">
+            {% include 'class_bar.html' %}
+
+            <div class="edit-answer-field-box">
+                <h1>Edit Answer Field</h1>
+                <hr>
+                <p>Papers you selected:</p>
+                <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px"></iframe>
+                <br>
+
+                <form action="{{ url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id'))}}" method="POST">
+                    <input type="hidden" name="deleted_questions" id="deleted_questions" value="">
+                    <div class="answer-fields" id="answer-fields" data-answer-count="{{ ans_field_datas|length + 1 }}">
+                        {% for answer_field_data in ans_field_datas %}
+                        {% set i = loop.index %}
+                            <div class="answer-field">
+                                <input type="hidden" name="ques_id{{i}}" id="ques_id{{i}}" value="{{ answer_field_data.question_id }}">
+                                <input type="text" name="question{{i}}" id="question{{i}}" placeholder="Enter Question Number/Question" value="{{ answer_field_data.question_name }}">
+                                <button type="button" class="setup-delete-btn" onclick="deleteAnswerFieldEdit(this)">✖</button>
+                                <label for="type-ans">Type of Answer Field: </label>
+                                <select class="type-ans" name="type-ans{{i}}" id="type-ans{{i}}" onchange="handleAnswerFieldTypeEdit(this)">
+                                    <option value="text" {% if answer_field_data.question_type == 1 %}selected{% endif %}>Text</option>
+                                    <option value="mcq" {% if answer_field_data.question_type == 2 %}selected{% endif %}>MCQ</option>
+                                    <option value="file" {% if answer_field_data.question_type == 3 %}selected{% endif %}>File</option>
+                                </select>
+                                
+                                {% if answer_field_data.question_type == 2 %}
+                                <div class="mcq-setup" data-option-count="2">
+                                    <select class="type-ans" name="type-mcq{{i}}" id="type-mcq{{i}}" onchange="handleMcqDefaultSelect(this)">
+                                        <option value="4" {% if answer_field_data.mcq_type == 4 %}selected{% endif %}>Four Answer Options</option>
+                                        <option value="5" {% if answer_field_data.mcq_type == 5 %}selected{% endif %}>Five Answer Options</option>
+                                    </select>
+                                </div>
+                                {% endif %}
+                            </div>
+                        <br>
+                        <hr>
+                        {% endfor %}
+                        <div class="field-buttons" id="field-buttons">
+                            <button type="button" onclick="addAnswerFieldEdit(this)" class="btn">Add Answer Field</button>
+                            <button type="submit" name="submit-answer-field" id="submit-answer-field" class="btn">Edit Answer Field</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        {% include 'footer.html' %}
+    </body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
+
+</html>

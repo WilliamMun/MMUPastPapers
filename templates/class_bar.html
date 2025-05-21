@@ -1,18 +1,26 @@
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <script src="{{ url_for('static', filename='script.js' ) }}"></script>
-        <script src="{{ url_for('static', filename='sweetalert.js') }}"></script>
-    </head>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js' ) }}"></script>
+    <script src="{{ url_for('static', filename='sweetalert.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
 
-    <!-- Class Page Sidebar -->
-    <body>
-        <div class="sidebar">
-            <a href="{{ url_for('open_class', class_id=class_id) }}" class="dashboard">Dashboard</a>
-            <a href="{{ url_for('view_people', class_id=class_id) }}" class="people">People</a>
-            <a href="{{ url_for('class_info', class_id=class_id) }}" class="class-info">Class Info</a>
-        </div>
-    </body>
+<header class="topbar">
+</header>
+
+
+<nav class="class-nav">
+  <a href="{{ url_for('open_class', class_id=class_id) }}" class="dashboard">
+    <i class="fa-solid fa-chalkboard"></i><span class="label-text">Dashboard</span>
+  </a>
+  <a href="{{ url_for('view_people', class_id=class_id) }}" class="people">
+    <i class="fa-solid fa-user-group"></i><span class="label-text">People</span>
+  </a>
+  <a href="{{ url_for('class_info', class_id=class_id) }}" class="class-info">
+    <i class="fas fa-info-circle"></i><span class="label-text">Class Info</span>
+  </a>
+</nav>
 </html>

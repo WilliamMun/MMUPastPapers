@@ -1101,21 +1101,30 @@ def setup_answer_field(class_id, answer_board_id):
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET', 'POST'])
 def open_answer_board(class_id, answer_board_id):
+    session['current_answer_board_id'] = answer_board_id
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
-    
+
     if ans_board:
-        paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
-        paper_path = paper.FILEPATH if paper else None
-        answer_board_name = ans_board.ANSWER_BOARD_NAME  # Correct: comes from ANSWER_BOARD
-        
-        return render_template(
-            "view_answer_board.html", 
-            paperPath=paper_path, 
-            answer_board_name=answer_board_name
-        )
+      paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
+      paper_path = paper.FILEPATH if paper else None  # Get the filepath
     else:
-        flash("Answer board not found.", "error")
-        return redirect(url_for('view_class'))
+      flash("Answer board not found.", "error")
+      return redirect(url_for('view_class'))
+
+    paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
+    paper_path = paper.FILEPATH if paper else None
+    answer_board_name = ans_board.ANSWER_BOARD_NAME
+
+    answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+
+    return render_template(
+        "view_answer_board.html", 
+        paperPath=paper_path, 
+        answer_board_name=answer_board_name,
+        answer_fields=answer_fields,
+        class_id=class_id,               # <-- add this
+        answer_board_id=answer_board_id  # <-- add this
+    )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
 def class_info(class_id):
@@ -1309,6 +1318,156 @@ def add_subject():
     return render_template('add_subject.html',
                          study_levels=study_levels,
                          faculties=faculties)
+
+@app.route('/edit_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
+def edit_answer_board(class_id, answer_board_id):
+  ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+  print(f"Answer board: {ans_board}")
+  paper_id = ans_board.PAPER_ID
+  print(f"Paper ID: {paper_id}")
+  if paper_id:
+    paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=paper_id).first()
+    print(f"Paper Info: {paper_info}")
+    paper_path = paper_info.FILEPATH
+    print(f"Paper path: {paper_path}")
+  else:
+    flash("Unexpected error.",'error')
+    print("No paper id found!")
+    return redirect(f"/upload_answer_board/{session.get('current_class_id')}")
+
+  ans_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+  print(f"Ans field from db: {ans_fields}")
+
+  ans_field_datas = []
+
+  for ans_field in ans_fields:
+    ans_field_dict = {
+       'question_id': ans_field.ANSWER_FIELD_ID,
+       'question_name': ans_field.ANSWER_FIELD_DESC,
+       'question_type': ans_field.ANSWER_FIELD_TYPE,
+       'mcq_type': ans_field.MCQ_TYPE
+    }
+
+    ans_field_datas.append(ans_field_dict)
+
+  print(f"Final answer field record: {ans_field_datas}.")
+
+  if request.method == 'POST':
+    #Get user input from form 
+    form_data = request.form
+    print(f"Inputs received: {form_data}")
+    question_data = []
+    try:
+      for key in form_data:
+        if key.startswith('question') and '-' not in key:  # only top-level question fields
+          question_id = key.replace('question', '') 
+          if not question_id:
+            question_id = 1
+          ques_id = form_data.get(f'ques_id{question_id}', '')
+          question_text = form_data[key]
+          answer_type = form_data.get(f'type-ans{question_id}', 'text')
+          mcq_type = form_data.get(f'type-mcq{question_id}',None) if answer_type == 'mcq' else None
+          deleted_ids_str = request.form.get('deleted_questions', '')
+          deleted_ids = [id.strip() for id in deleted_ids_str.split(',') if id.strip()]
+
+          for del_id in deleted_ids: 
+            field_to_delete = ANSWER_FIELD.query.filter_by(ANSWER_FIELD_ID=del_id).first()
+            print(f"Field to be deleted:{field_to_delete}")
+            if field_to_delete:
+              db.session.delete(field_to_delete)
+
+          if answer_type == 'text':
+            answer_type_no = 1
+            mcq_type = None
+          elif answer_type == 'mcq':
+            answer_type_no = 2
+          elif answer_type == 'file':
+            answer_type_no = 3
+            mcq_type = None
+          else:
+            answer_type_no = 1
+            mcq_type = None
+          
+          question_entry = {
+            'ques_id': ques_id,
+            'question': question_text,
+            'type': answer_type_no,
+            'mcq_type': int(mcq_type) if mcq_type else None
+          }
+
+          print(f"Question {question_id} record: {question_entry}")
+          question_data.append(question_entry)
+
+          if ques_id:
+            answer_field = ANSWER_FIELD.query.filter_by(ANSWER_FIELD_ID=ques_id).first()
+            answer_field.ANSWER_FIELD_DESC = question_text
+            answer_field.ANSWER_FIELD_TYPE = answer_type_no
+            answer_field.MCQ_TYPE = int(mcq_type) if mcq_type else None 
+          else:
+            new_record = ANSWER_FIELD(ANSWER_FIELD_ID=uuid.uuid4().hex[:10], ANSWER_FIELD_DESC=question_text, ANSWER_FIELD_TYPE=answer_type_no, ANSWER_BOARD_ID=session.get('current_answer_board_id'), MCQ_TYPE=mcq_type)
+            print(f"Record going to be inserted: {new_record}")
+            db.session.add(new_record)
+      db.session.commit()
+      flash("Edit answer field successfully!",'success')
+      print("Successfully edit answer field!")
+      return render_template("edit_answer_board.html", paperPath=paper_path, ans_field_datas=ans_field_datas)
+    except Exception as e:
+      db.session.rollback()
+      flash("Error occurs while editing answer field. Try again later.",'error')
+      print("Internal server error",e)
+      return redirect(url_for('edit_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')))
+    
+  return render_template("edit_answer_board.html", paperPath=paper_path, ans_field_datas=ans_field_datas)
+
+@app.route('/submit_answers/<class_id>/<answer_board_id>', methods=['POST'])
+def submit_answers(class_id, answer_board_id):
+    
+    student_id = session.get('user_id')  
+    submitted_data = request.form
+    uploaded_files = request.files
+
+    # Retrieve related answer fields
+    answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+
+    try:
+        for index, field in enumerate(answer_fields, start=1):
+            answer_id = uuid.uuid4().hex[:10]
+            answer_field_id = field.ANSWER_FIELD_ID
+            answer_by = student_id
+            answer_on = datetime.now()
+
+            form_key = f'answer{index}'
+            answer_type = field.ANSWER_FIELD_TYPE
+
+            if answer_type == 3:  # File upload
+                file = uploaded_files.get(form_key)
+                if file:
+                    filename = f"{uuid.uuid4().hex}_{file.filename}"
+                    file_path = os.path.join('static', 'student_uploads', filename)
+                    file.save(file_path)
+                    answer_content = file_path
+                else:
+                    answer_content = None
+            else:
+                answer_content = submitted_data.get(form_key)
+
+            new_answer = ANSWER(
+                ANSWER_ID=answer_id,
+                ANSWER_FIELD_ID=answer_field_id,
+                ANSWER_BY=answer_by,
+                ANSWER_ON=answer_on,
+                ANSWER_CONTENT=answer_content
+            )
+            db.session.add(new_answer)
+
+        db.session.commit()
+        flash("Answers submitted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        print("Error saving answers:", e)
+        flash("Failed to submit answers. Please try again.", "error")
+
+    return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
 
 @app.route('/terms')
 def view_terms():

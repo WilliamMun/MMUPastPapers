@@ -495,7 +495,58 @@ button:hover {
 
 /* Radio buttons center below the grid */
 .radio-group {
-  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white; /* slightly brighter than #f9f9f9 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* soft shadow for depth */
+}
+
+.radio-group label {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-style: italic;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  margin: 0.1rem 0.1rem 0.1rem 0.1rem;
+}
+
+.radio-group input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #bbb;
+  border-radius: 50%;
+  background-color: #fff;
+  cursor: pointer;
+  position: relative;
+  margin: 0.1rem 0.1rem 0.1rem 0.1rem;
+}
+
+.radio-group input[type="radio"]:checked::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #007bff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0.1rem 0.1rem 0.1rem 0.1rem;
+}
+
+.radio-group input[type="radio"]:hover {
+  border-color: #007bff;
 }
 
 /* Links */
@@ -1080,6 +1131,7 @@ tr:hover {
 .no-class {
   font-family: Georgia, 'Times New Roman', Times, serif;
   background-color: white;
+  width: 25%;
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -1087,36 +1139,54 @@ tr:hover {
 /**The End of View Class Page Settings**/
 
 /** Class Bar Settings **/
-.sidebar a {
-  position: absolute; 
-  left: -80px; 
-  transition: 0.3s; 
-  padding: 15px; 
-  width: 150px; 
-  text-decoration: none; 
-  font-size: 18px; 
-  color: rgb(12, 12, 12); 
-  border-radius: 0 5px 5px 0; 
+.class-nav {
+  position: fixed;
+  top: 8rem;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 20;
+}
+
+.class-nav a {
+  position: relative;
+  display: fixed;
+  align-items: center;
+  color: rgb(12, 12, 12);
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 0 5px 5px 0;
   font-family: Georgia, 'Times New Roman', Times, serif;
-}
-
-.sidebar a:hover {
-  left: 0px;
-}
-
-.sidebar .dashboard {
-  top: 20px;
-  background-color: whitesmoke; 
-}
-
-.sidebar .people {
-  top: 100px;
+  font-size: 18px;
+  white-space: nowrap;
+  transition: width 0.3s ease, background-color 0.3s;
+  overflow: hidden;
+  width: 50px;
   background-color: whitesmoke;
+  clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar .class-info {
-  top: 180px;
-  background-color: whitesmoke;
+.class-nav a:hover {
+  width: 160px; /* Expand size */
+  background-color: #e0e0e0;
+  z-index: 25;
+}
+
+.class-nav a i {
+  margin-right: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.class-nav .label-text {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.class-nav a:hover .label-text {
+  opacity: 1;
 }
 
 .sidebar .subject {
@@ -1190,7 +1260,8 @@ hr{
   border: none;
   height: 0.1px;
   background-color: #333;
-  margin: 20px 0;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .viewPapers-button {
@@ -1322,6 +1393,14 @@ hr{
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
+.answer-field hr{
+  border: none;
+  height: 0.1px;
+  background-color: #333;
+  margin-top: 1.5rem;
+  margin-bottom: 0.1rem;
+}
+
 .no-answer-board{
   background: white;
   padding: 20px;
@@ -1338,6 +1417,24 @@ hr{
   font-family: 20px;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
+
+.no-questions-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2.5rem;
+}
+
+.no-questions {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  background-color: whitesmoke;
+  width: 40%;
+  padding: 20px;
+  border-radius: 15px;
+  border: 2px solid whitesmoke;
+  text-align: center;
+}
+
 
 .btn-container{
   display: block;
@@ -1968,13 +2065,13 @@ tr:hover {
 
 .view-answer-board-box label {
   font-family: Georgia, 'Times New Roman', Times, serif;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   text-align: left;
   display: block;
   font-weight: bold;
   color: #333;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
+  margin-top: 0;
+  padding-top:
 }
 
 .editAnswerBoard-btn {
@@ -1998,3 +2095,99 @@ tr:hover {
   background-color: #BCCCDC;
   color: black;
 }
+
+.textarea-answer {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serifs;
+  width: 100%; /* Makes the textarea take up the full width of its container */
+  padding: 10px; /* Adds some space inside the textarea */
+  border: 1px solid #ccc; /* Adds a light gray border */
+  border-radius: 4px; /* Slightly rounded corners */
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+  font-size: 14px; /* Sets a readable font size */
+  line-height: 1.5; /* Improves text readability */
+}
+
+.answerboard-file {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+  justify-content: flex-start;
+}
+/** The End of View Answer Board Page **/
+
+
+/** Edit Answer Field Page **/
+.edit-answer-field-box{
+  background: white;
+  padding: 40px;
+  width: auto;
+  height: auto;
+  max-width: 90%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.edit-answer-field-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+  text-align: left;
+}
+
+.edit-answer-field-box h2 {
+  margin-bottom: 30px;
+  color: #003366;
+}
+
+.edit-answer-field-box p {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.edit-answer-field-box label {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  margin-bottom: 1rem;
+  text-align: left;
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-top: 0;
+  padding-top:
+}
+
+.field-buttons {
+  width: 100%;
+  padding: 8px;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin: 1rem auto;
+  cursor: pointer;
+  transition: 0.3s ease;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.textarea-answer {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serifs;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 1.5;
+}
+/** The End of Edit Answer Field Page **/
