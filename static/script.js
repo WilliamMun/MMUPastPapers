@@ -186,3 +186,52 @@ function addAnswerFieldEdit(button) {
     container.insertBefore(newField, buttonContainer);
     container.setAttribute("data-answer-count", answerFieldCount + 1)
 }
+
+let deletedIDs = [] 
+function deleteAnswerFieldEdit(button) {
+    const field = button.closest('.answer-field');
+    const hiddenInput = field.querySelector('input[type="hidden"]');
+  
+    if (hiddenInput && hiddenInput.value) {
+        deletedIDs.push(hiddenInput.value);
+    }
+
+    if (field) {
+        const answerField = button.closest('.answer-fields');
+        field.remove();
+        document.getElementById("deleted_questions").value = deletedIDs.join(',');
+        renumberQuestions();
+    
+        if(answerField) {
+            const remaining = answerField.querySelectorAll('.answer-field').length;
+            answerField.setAttribute('data-answer-count', remaining + 1);
+        }
+    }
+}
+
+function renumberQuestions() {
+    const fields = document.querySelectorAll('.answer-field');
+    fields.forEach((field, index) => {
+        const label = field.querySelector('label');
+        label.textContent = `Question ${index + 1}`;
+
+        field.querySelectorAll('input, select').forEach(input => {
+            if (input.name.includes('question')) {
+                input.name = `question${index + 1}`;
+                input.id = `question${index + 1}`;
+            } else if (input.name.includes('type-ans')) {
+                input.name = `type-ans${index + 1}`;
+                input.id = `type-ans${index + 1}`;
+            } else if (input.name.includes('type-mcq')) {
+                input.name = `type-mcq${index + 1}`;
+                input.id = `type-mcq${index + 1}`;
+            } else if (input.name.includes('ques_id')) {
+                input.name = `ques_id${index + 1}`;
+                input.id = `ques_id${index + 1}`;
+            }
+        });
+    });
+
+  document.getElementById('answer-fields').setAttribute('data-answer-count', fields.length + 1);
+
+}
