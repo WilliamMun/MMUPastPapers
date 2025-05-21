@@ -1189,15 +1189,6 @@ tr:hover {
   opacity: 1;
 }
 
-.sidebar .subject {
-  top: 20px;
-  background-color: whitesmoke;
-}
-
-.sidebar .term {
-  top: 100px;
-  background-color: whitesmoke;
-}
 /**The End of Class Bar Page Settings**/
 
 /** View People Page (view_people.pages) **/
@@ -2191,3 +2182,54 @@ tr:hover {
   line-height: 1.5;
 }
 /** The End of Edit Answer Field Page **/
+
+/* Clickable Static Sidebar */
+.sidebar {
+  position: relative;
+  width: 240px;
+  margin: 2rem;
+  padding: 1.5rem 0;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px 24px;
+  color: #64748b;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* Interactive Hover State */
+.sidebar a:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+  color: #4f46e5;
+}
+
+.sidebar a::before {
+  content: "•";
+  margin-right: 12px;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+
+.sidebar a:hover::before {
+  color: #4f46e5;
+}
+
+/* Remove disabled styles */
+.sidebar {
+  opacity: 1;
+  filter: none;
+}
+
+.sidebar::before {
+  display: none; /* Remove disabled banner */
+}

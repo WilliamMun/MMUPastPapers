@@ -1471,8 +1471,15 @@ def submit_answers(class_id, answer_board_id):
 
 @app.route('/terms')
 def view_terms():
-    terms = TERM_INFO.query.all()
-    return render_template('view_terms.html', terms=terms)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    pagination = TERM_INFO.query.order_by(TERM_INFO.TERM_ID).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+    return render_template('view_terms.html', terms=pagination.items, pagination=pagination)
 
 @app.route('/add_term', methods=['GET', 'POST'])
 def add_term():
