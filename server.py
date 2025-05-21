@@ -41,6 +41,7 @@ class USER_INFO(db.Model):
   NAME = db.Column(db.String(200), nullable=False) 
   PASSWORD = db.Column(db.String(255), nullable=False) 
   ROLES = db.Column(db.Integer, nullable=False) #1 indicates student; 2 indicates lecturer  
+  FACULTY_ID = db.column(db.String(3), db.ForeignKey('FACULTY_INFO.FACULTY_ID'))
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
@@ -238,11 +239,15 @@ def login():
 
 @app.route('/register' ,methods=['GET','POST'])
 def register():
+    faculties = FACULTY_INFO.query.all()
+    if request.method == 'GET':
+       return render_template("register.html", faculties=faculties)
     print("Executing register action")
     if request.method == 'POST':
         #Retrive user input 
         email = request.form['email'].strip()
         name = request.form['name']
+        faculty_id = request.form.get['faculty']
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         roles = request.form.get('user_type')
@@ -258,6 +263,10 @@ def register():
         print(f"New registration info: {email},{name},{password},{roles},{rolesNum}.") #For debugging purposes 
 
         #Input verification 
+        if not FACULTY_INFO.query.get(faculty_id):
+           flash('Invalid faculty selected', 'error')
+           return redirect('/register')
+
         if password != confirm_password:
            flash('Passwords do not match.', 'error')
            print(f"Passwords do not match. New password:{password} vs Confirm password:{confirm_password}.") #For debugging purposes 
@@ -297,7 +306,7 @@ def register():
         print(userId) #For debugging purposes
 
         try:
-           new_user = USER_INFO(USER_ID=userId, USER_EMAIL=email, NAME=name, PASSWORD=generate_password_hash(password), ROLES=rolesNum)
+           new_user = USER_INFO(USER_ID=userId, USER_EMAIL=email, NAME=name, PASSWORD=generate_password_hash(password), ROLES=rolesNum, FACULTY_ID=faculty_id)
            db.session.add(new_user)
            db.session.commit()
            flash('User registered successfully!', 'success')
@@ -1208,7 +1217,7 @@ def view_subjects():
         SUBJECT_INFO.FACULTY_ID == FACULTY_INFO.FACULTY_ID
     ).all()
     
-    return render_template('view_subjects.html', subjects=subjects)
+    return render_template('view_subjects.html', subjects=subjects, class_id='none')
 
 @app.route('/edit_subject/<subject_id>', methods=['GET', 'POST'])
 def edit_subject(subject_id):
@@ -1300,6 +1309,62 @@ def add_subject():
     return render_template('add_subject.html',
                          study_levels=study_levels,
                          faculties=faculties)
+
+@app.route('/terms')
+def view_terms():
+    terms = TERM_INFO.query.all()
+    return render_template('view_terms.html', terms=terms)
+
+@app.route('/add_term', methods=['GET', 'POST'])
+def add_term():
+    if request.method == 'POST':
+        try:
+            term_desc = request.form['term_desc']
+            if not term_desc:
+                flash('Term description is required!', 'error')
+                return redirect(url_for('add_term'))
+
+            new_term = TERM_INFO(TERM_DESC=term_desc)
+            db.session.add(new_term)
+            db.session.commit()
+            flash('Term added successfully!', 'success')
+            return redirect(url_for('view_terms'))
+
+        except IntegrityError:
+            db.session.rollback()
+            flash('Term already exists!', 'error')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error adding term: {str(e)}', 'error')
+
+    return render_template('add_term.html')
+
+@app.route('/edit_term/<term_id>', methods=['GET', 'POST'])
+def edit_term(term_id):
+    term = TERM_INFO.query.get_or_404(term_id)
+    if request.method == 'POST':
+        try:
+            term.TERM_DESC = request.form['term_desc']
+            db.session.commit()
+            flash('Term updated successfully!', 'success')
+            return redirect(url_for('view_terms'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating term: {str(e)}', 'error') 
+            return redirect(url_for('edit_term', term_id=term_id))
+    return render_template('edit_term.html', term=term)
+
+
+@app.route('/delete_term/<term_id>', methods=['POST'])
+def delete_term(term_id):
+    term = TERM_INFO.query.get_or_404(term_id)
+    try:
+        db.session.delete(term)
+        db.session.commit()
+        flash('Term deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -11,7 +11,7 @@
 </head>
 <body>
     {% include 'header.html' %}
-
+    
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -41,6 +41,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        {% include 'maintenance_bar.html' %}
         <div class="table-container">
             <div class="subjectinfo-box">
                 <h1>Edit Subject Info</h1>

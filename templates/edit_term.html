@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Term | MMUPastPapers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+
+    {% include 'header.html' %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="editTerm-box">
+            <h1>Edit Term</h1>
+            <form method="POST">
+                <div class="ques-box-input">
+                    <label for="term_id">Term ID:</label>
+                    <input type="text" name="term_id" id="term_id" value="{{ term.TERM_ID }}" placeholder="Enter Term ID">
+                </div>
+
+                <div class="ques-box-input">
+                    <label for="term_desc">Term Description:</label>
+                    <input type="text" name="term_desc" id="term_desc" value="{{ term.TERM_DESC }}" placeholder="Enter Term Description">
+                </div>
+
+                <div class="btn-container">
+                    <button type="button" class="btn" onclick="window.location.href='{{ url_for('view_terms') }}'">Cancel</button>
+                    <button type="submit" class="btn">Update Term</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops! An error occurred.',
+                            text: "{{ message }}"
+                    });
+        
+                    {% elif category == 'success' %}
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Yay! Success.',
+                            text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                        window.location.href = "{{ url_for('login') }}";
+                        }, 1000);
+                    });
+                    {% endif %}
+                {% endfor %}
+            </script>
+        {% endif %}
+    {% endwith %}
+    
+    {% include 'footer.html' %}
+
+</body>
+</html>

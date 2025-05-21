@@ -15,42 +15,22 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="newSubject-box">
-      <h1>Add New Subject</h1>
+    <div class="newTerm-box">
+      <h1>Add New Term</h1>
       <form method="POST">
         <div class="ques-box-input">
-          <label for="subject_id">Subject ID:</label>
-          <input type="text" name="subject_id" id="subject_id" placeholder="Enter Subject ID" pattern="[A-Za-z0-9]{5,10}" title="Term ID must be 5-10 characters long and contain only letters and numbers.">
+          <label for="term_id">Term ID</label>
+          <input type="text" name="term_id" id="term_id" placeholder="Enter Term ID" pattern="^\d{4}$" title="Term ID must be exactly 4 digits long.">
         </div>
 
         <div class="ques-box-input">
-          <label for="subject_desc">Subject Description:</label>
-          <input type="text" name="subject_desc" id="subject-desc" placeholder="Enter Subject Description">
-        </div>
-
-        <div class="select-field">
-          <label for="study_lvl">Study Level:</label>
-          <select id="study_lvl" name="study_lvl">
-            <option value="" disabled selected>Select Study Level</option>
-            {% for level in study_levels %}
-            <option value="{{ level.STUDY_LVL_ID }}">{{ level.STUDY_LVL_DESC }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <div class="ques-box-input">
-          <label for="faculty">Faculty:</label>
-          <select id="faculty" name="faculty">
-            <option value="" disabled selected>Select Faculty</option>
-            {% for faculty in faculties %}
-            <option value="{{ faculty.FACULTY_ID }}">{{ faculty.FACULTY_DESC }}</option>
-            {% endfor %}
-          </select>
+          <label for="term_desc">Term Description:</label>
+          <input type="text" name="term_desc" id="term-desc" placeholder="Enter Term Description">
         </div>
 
         <div class="btn-container">
-          <button type="button" class="btn" onclick="window.location.href='{{ url_for('view_subjects') }}'">Cancel</button>
-          <button type="submit" class="btn">Add Subject</button>
+          <button type="button" class="btn" onclick="window.location.href='{{ url_for('view_terms') }}'">Cancel</button>
+          <button type="submit" class="btn">Add Term</button>
         </div>
       </form>
     </div>

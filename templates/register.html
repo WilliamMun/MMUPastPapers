@@ -68,6 +68,14 @@
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" placeholder="Enter name" />
                   </div> 
+                  <div class="facultyBox">
+                    <label for="faculty">Faculty</label>
+                    <select id="faculty" name="faculty" required>
+                      {% for faculty in faculties %}
+                        <option value="{{ faculty.FACULTY_ID }}">{{ faculty.FACULTY_DESC }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
                   <div class="passwordBox">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Enter password" />

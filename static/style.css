@@ -1118,6 +1118,16 @@ tr:hover {
   top: 180px;
   background-color: whitesmoke;
 }
+
+.sidebar .subject {
+  top: 20px;
+  background-color: whitesmoke;
+}
+
+.sidebar .term {
+  top: 100px;
+  background-color: whitesmoke;
+}
 /**The End of Class Bar Page Settings**/
 
 /** View People Page (view_people.pages) **/
@@ -1704,6 +1714,28 @@ hr{
   color: black;
 }
 
+/* Container for term information */
+.terminfo-box {
+  background: white;
+  padding: 40px;
+  width: 1000px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Page heading */
+.terminfo-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+
 /* Centering the table container */
 .table-container {
   display: flex;
@@ -1833,6 +1865,29 @@ tr:hover {
 }
 /**The End of Edit Subject Page**/
 
+/**Edit Term Page**/
+.editTerm-box {
+  background: white;
+  padding: 40px;
+  width: 750px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Page heading */
+.editTerm-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+/**The End of Edit Term Page**/
+
 /**New Subject Page**/
 .newSubject-box {
   background: white;
@@ -1854,6 +1909,28 @@ tr:hover {
   color: black;
 }
 /**The End of Add SUbject Page**/
+
+/**New Term Page**/
+.newTerm-box {
+  background: white;
+  padding: 40px;
+  width: 750px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.newTerm-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+/**The End of Add Term Page**/
 
 /** View Answer Board Page **/
 .view-answer-board-box{
