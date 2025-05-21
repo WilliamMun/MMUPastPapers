@@ -36,28 +36,6 @@
                                     <img src="{{ url_for('static', filename='images/edit.png') }}" alt="edit">
                                 </a>
                             </td>
-                            <td>
-                                <form method="POST" action="{{ url_for('delete_term', term_id=term.TERM_ID) }}" style="display: inline;" class="delete-form" id="delete-form-{{ term.TERM_ID }}">
-                                    <img src="{{ url_for('static', filename='images/delete.png') }}" alt="Delete" title="Delete" style="cursor:pointer;" onclick="confirmDelete('{{ term.TERM_ID }}')">
-                                    <script>
-                                        function confirmDelete(subjectId) {
-                                            Swal.fire({
-                                                title: 'Are you sure?',
-                                                text: "You won't be able to revert this!",
-                                                icon: 'warning',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#3085d6',
-                                                cancelButtonColor: '#d33',
-                                                confirmButtonText: 'Yes, delete it!'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    document.getElementById('deleteForm-' + subjectId).submit();
-                                                }
-                                            });
-                                        }
-                                    </script>
-                                </form>
-                            </td>
                         </tr>
                         {% endfor %}
                         </tbody>
