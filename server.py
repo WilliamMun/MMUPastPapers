@@ -1485,12 +1485,13 @@ def view_terms():
 def add_term():
     if request.method == 'POST':
         try:
+            term_id = request.form['term_id']
             term_desc = request.form['term_desc']
-            if not term_desc:
-                flash('Term description is required!', 'error')
+            if not term_desc or not term_id:
+                flash('All fields are required!', 'error')
                 return redirect(url_for('add_term'))
 
-            new_term = TERM_INFO(TERM_DESC=term_desc)
+            new_term = TERM_INFO(TERM_ID=term_id, TERM_DESC=term_desc)
             db.session.add(new_term)
             db.session.commit()
             flash('Term added successfully!', 'success')
