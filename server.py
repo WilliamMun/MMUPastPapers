@@ -239,15 +239,11 @@ def login():
 
 @app.route('/register' ,methods=['GET','POST'])
 def register():
-    faculties = FACULTY_INFO.query.all()
-    if request.method == 'GET':
-       return render_template("register.html", faculties=faculties)
     print("Executing register action")
     if request.method == 'POST':
         #Retrive user input 
         email = request.form['email'].strip()
         name = request.form['name']
-        faculty_id = request.form.get['faculty']
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         roles = request.form.get('user_type')
@@ -263,10 +259,6 @@ def register():
         print(f"New registration info: {email},{name},{password},{roles},{rolesNum}.") #For debugging purposes 
 
         #Input verification 
-        if not FACULTY_INFO.query.get(faculty_id):
-           flash('Invalid faculty selected', 'error')
-           return redirect('/register')
-
         if password != confirm_password:
            flash('Passwords do not match.', 'error')
            print(f"Passwords do not match. New password:{password} vs Confirm password:{confirm_password}.") #For debugging purposes 
@@ -306,7 +298,7 @@ def register():
         print(userId) #For debugging purposes
 
         try:
-           new_user = USER_INFO(USER_ID=userId, USER_EMAIL=email, NAME=name, PASSWORD=generate_password_hash(password), ROLES=rolesNum, FACULTY_ID=faculty_id)
+           new_user = USER_INFO(USER_ID=userId, USER_EMAIL=email, NAME=name, PASSWORD=generate_password_hash(password), ROLES=rolesNum)
            db.session.add(new_user)
            db.session.commit()
            flash('User registered successfully!', 'success')
