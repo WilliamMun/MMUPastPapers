@@ -34,6 +34,11 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create upload folder if
 
 #-----------------------------------------------------------------------------------------------------------
 #Create database tables  
+#ENTITY: FACULTY_INFO  
+class FACULTY_INFO(db.Model): 
+  FACULTY_ID = db.Column(db.String(3), primary_key=True) 
+  FACULTY_DESC = db.Column(db.Text, nullable=False) 
+
 #ENTITY: USER_INFO 
 class USER_INFO(db.Model):  
   USER_ID = db.Column(db.String(50), primary_key=True, unique=True) 
@@ -41,10 +46,10 @@ class USER_INFO(db.Model):
   NAME = db.Column(db.String(200), nullable=False) 
   PASSWORD = db.Column(db.String(255), nullable=False) 
   ROLES = db.Column(db.Integer, nullable=False) #1 indicates student; 2 indicates lecturer  
-  FACULTY_ID = db.column(db.String(3), db.ForeignKey('FACULTY_INFO.FACULTY_ID'))
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
+  FACULTY_ID = db.Column(db.String(3), db.ForeignKey(FACULTY_INFO.FACULTY_ID))
  
 #ENTITY: SECURITY_QUES 
 class SECURITY_QUES(db.Model): 
@@ -66,11 +71,6 @@ class SECURITY_QUES_ANS(db.Model):
 class STUDY_LVL_INFO(db.Model): 
   STUDY_LVL_ID = db.Column(db.String(4), primary_key=True) 
   STUDY_LVL_DESC = db.Column(db.Text, nullable=False) 
-
-#ENTITY: FACULTY_INFO  
-class FACULTY_INFO(db.Model): 
-  FACULTY_ID = db.Column(db.String(3), primary_key=True) 
-  FACULTY_DESC = db.Column(db.Text, nullable=False) 
 
 #ENTITY: SUBJECT_INFO  
 class SUBJECT_INFO(db.Model): 
@@ -154,6 +154,16 @@ class MCQ_OPTION(db.Model):
    MCQ_OPTION_DESC = db.Column(db.Text)
    MCQ_OPTION_FLAG = db.Column(db.Integer, nullable=True)
    ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
+
+#ENTITY: CHAT_MESSAGE
+class CHAT_MESSAGE(db.Model):
+  CHAT_ID = db.Column(db.String(100), primary_key=True, default=uuid.uuid4().hex[:20])
+  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+  SENT_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID))
+  MESSAGE_CONTENT = db.Column(db.Text, nullable=True)
+  IMAGE_URL = db.Column(db.String(200), nullable=True)
+  TIMESTAMP = db.Column(db.DateTime, default=datetime.now)
+
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
 
