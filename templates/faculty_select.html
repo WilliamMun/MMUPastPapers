@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <title>Select Faculty | MMUPastPapers</title>
+    </head>
+    
+    <body>
+        <!-- Header -->
+        {% include 'header.html' %}
+
+        <!-- Main content -->
+        <main class="main-content">
+            <div class="container">
+                <h2>Select Your Faculty{% if session.roles == 1 %} and Study Level{% endif %}</h2>
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="faculty">Faculty:</label>
+                        <select class="form-control" name="faculty" id="faculty" required>
+                            <option value="">Select Faculty</option>
+                            {% for faculty in faculties %}
+                                <option value="{{ faculty.FACULTY_ID }}">{{ faculty.FACULTY_DESC }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </main>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <script>
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops! An error occurred.',
+                                text: "{{ message }}"
+                            });
+                        {% elif category == 'success' %}
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Yay! Success.',
+                                text: "{{ message }}"
+                            }).then(() => {
+                                setTimeout(function() {
+                                    {% if registerStatus == 1 %}
+                                    window.location.href = "{{ url_for('view_papers') }}";
+                                    {% elif registerStatus == 2 %}
+                                    window.location.href = "{{ url_for('logout') }}";
+                                    {% endif %}
+                                }, 1000);
+                            });
+                        {% endif %}
+                    {% endfor %}
+                </script>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Footer Bar -->
+        {% include 'footer.html' %}
+    </body>
+</html>

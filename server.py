@@ -31,6 +31,8 @@ app.config.update({
 db = SQLAlchemy(app)
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create upload folder if it doesn't exist
+os.makedirs('static/uploads', exist_ok=True) #Create static upload folder if it doesn't exist
+os.makedirs('static/student_uploads', exist_ok=True) #Create static student upload folder if it doesn't exist
 
 #-----------------------------------------------------------------------------------------------------------
 #Create database tables  
@@ -41,7 +43,7 @@ class USER_INFO(db.Model):
   NAME = db.Column(db.String(200), nullable=False) 
   PASSWORD = db.Column(db.String(255), nullable=False) 
   ROLES = db.Column(db.Integer, nullable=False) #1 indicates student; 2 indicates lecturer  
-  FACULTY_ID = db.column(db.String(3), db.ForeignKey('FACULTY_INFO.FACULTY_ID'))
+  FACULTY_ID = db.Column(db.String(3), db.ForeignKey('FACULTY_INFO.FACULTY_ID'))
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
@@ -227,6 +229,10 @@ def login():
           session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
+          if not user.FACULTY_ID:
+            print("User has not selected faculty. Redirecting to faculty selection page.")
+            return redirect(url_for('faculty_select'))
+          
           pending_class = session.pop('pending_class', None)
           if pending_class:
             print("Join class logic.")
@@ -279,6 +285,11 @@ def register():
           print("Email does not met requirement.")
           return redirect('/register')
         
+        if rolesNum == None:
+           flash('Invalid user type selected.', 'error')
+           print(f"Invalid roles: {rolesNum}")
+           return redirect('/register')
+        
         #Retrive data from database 
         user_db = USER_INFO.query.filter_by(USER_EMAIL=email).first()
         print(f"Email: {user_db}") #For debugging purposes
@@ -303,10 +314,14 @@ def register():
            db.session.commit()
            flash('User registered successfully!', 'success')
            print(f"User {email} succesfully registered")
+           session['email'] = email
+           session['name'] = name
+           session['roles'] = rolesNum
+           session['user_id'] = userId
            session['newRegistered'] = True
            print(f"New registered: {session.get('newRegistered')}")
            print(f"Variable type: {type(session.get('newRegistered'))}")
-           return render_template("register.html")
+           return redirect(url_for('faculty_select'))
         except IntegrityError:
            db.session.rollback()
            flash('Email already exists.', 'error')
@@ -315,6 +330,7 @@ def register():
         except Exception as e:
            db.session.rollback()
            flash('Error occurred while registering user. Please try again later', 'error')
+           app.logger.error(f"Registration error: {str(e)}", exc_info=True)
            print(f"Internal server error: {e}")
            return redirect('/register')
     return render_template("register.html")
@@ -555,6 +571,35 @@ def download_paper(paper_id):
         )
     else:
         abort(404, description="Paper not found or file missing.")
+
+@app.route('/faculty_select', methods=['GET', 'POST'])
+def faculty_select():
+   if 'user_id' not in session:
+      flash('Please log in to access this page.', 'error')
+      return redirect('/login')
+   
+   user_id = session['user_id']
+   user = USER_INFO.query.get(user_id)
+
+   if request.method == 'POST':
+      faculty_id = request.form.get('faculty')
+
+      # Validation based on role
+      if not faculty_id:
+         flash('Faculty selection is required for all users.', 'error')
+         return redirect('/faculty_select')
+      
+      # Update user record with faculty and study level information 
+      user.FACULTY_ID = faculty_id
+      db.session.commit()
+
+      flash('Profile information updated successfully!', 'success')
+      return redirect(url_for('securityQues'))
+   
+   faculties = FACULTY_INFO.query.all()
+
+   return render_template('faculty_select.html', 
+                          faculties=faculties)
 
 @app.route('/securityQues', methods=['GET', 'POST'])
 def securityQues():
@@ -1513,17 +1558,6 @@ def edit_term(term_id):
             flash(f'Error updating term: {str(e)}', 'error') 
             return redirect(url_for('edit_term', term_id=term_id))
     return render_template('edit_term.html', term=term)
-
-
-@app.route('/delete_term/<term_id>', methods=['POST'])
-def delete_term(term_id):
-    term = TERM_INFO.query.get_or_404(term_id)
-    try:
-        db.session.delete(term)
-        db.session.commit()
-        flash('Term deleted successfully!', 'success')
-    except Exception as e:
-        db.session.rollback()
 
 if __name__ == "__main__":
     app.run(debug=True)
