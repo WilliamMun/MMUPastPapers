@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response, send_from_directory, jsonify
 from flask import send_file, abort
 from flask_socketio import SocketIO, emit, join_room
@@ -16,9 +19,6 @@ import re
 import uuid
 import time
 import socketio
-import eventlet
-
-eventlet.monkey_patch()
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
@@ -26,6 +26,7 @@ app.secret_key = "MmUPastPap3rs2510@CSP1123"
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mmupastpapers.db"
 app.config['UPLOAD_FOLDER'] = "uploads"
 app.config['CHAT_IMG_FOLDER'] = "static/chat"
+app.config['STUDENT_UPLOADS'] = "static/student_uploads"
 app.config['ALLOWED_EXTENSION'] = {'pdf'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
 app.config.update({
@@ -37,6 +38,7 @@ db = SQLAlchemy(app)
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create upload folder if it doesn't exist
 os.makedirs(app.config['CHAT_IMG_FOLDER'], exist_ok=True)
+os.makedirs(app.config['STUDENT_UPLOADS'], exist_ok=True)
 
 #-----------------------------------------------------------------------------------------------------------
 #Create database tables  
@@ -1489,6 +1491,7 @@ def submit_answers(class_id, answer_board_id):
             db.session.add(new_answer)
 
         db.session.commit()
+        print("Answer submitted successfully!",new_answer)
         flash("Answers submitted successfully!", "success")
     except Exception as e:
         db.session.rollback()

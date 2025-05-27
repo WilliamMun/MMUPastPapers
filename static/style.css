@@ -2185,12 +2185,80 @@ tr:hover {
   background: white;
   padding: 40px;
   width: auto;
-  height: auto;
+  height: 500px;
   max-width: 90%;
   margin: 40px auto;
   border-radius: 20px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
+
+.chat-box {
+  height:300px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.chat-input-container {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  gap: 10px;
+}
+
+.chat-icon {
+  display: flex;
+  align-items: center; 
+  cursor: pointer; 
+}
+
+.chat-svg {
+  margin-top: 15px;
+  width: 20px;
+  height: 20px;
+  stroke: #6b7280;
+  transition: stroke 0.2s;
+}
+
+.chat-icon:hover .chat-svg {
+  stroke: #2563eb;
+}
+
+.chat-input {
+  flex: 1;
+  outline: none;
+  padding: 6px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.chat-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+}
+
+.chat-send-btn {
+  width: 20%;
+  padding: 12px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 0px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.chat-send-btn:hover {
+  background-color: #BCCCDC;
+  color: black;
+}
+
 /** The End of View Answer Board Page **/
 
 
