@@ -1133,27 +1133,33 @@ def open_answer_board(class_id, answer_board_id):
     user_info = USER_INFO.query.filter_by(USER_ID=user_id).first()
     name = user_info.NAME
 
-    if ans_board:
-      paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
-      paper_path = paper.FILEPATH if paper else None  # Get the filepath
-    else:
-      flash("Answer board not found.", "error")
-      return redirect(url_for('view_class'))
+    if not ans_board:
+        flash("Answer board not found.", "error")
+        return redirect(url_for('view_class'))
 
     paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
     paper_path = paper.FILEPATH if paper else None
     answer_board_name = ans_board.ANSWER_BOARD_NAME
-
     answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+
+    # Fetch previous answers for the user
+    existing_answers = ANSWER.query.filter_by(ANSWER_BY=user_id).join(ANSWER_FIELD).filter(
+        ANSWER_FIELD.ANSWER_BOARD_ID == answer_board_id
+    ).all()
+
+    # Map field_id -> answer content
+    answer_map = {ans.ANSWER_FIELD_ID: ans.ANSWER_CONTENT for ans in existing_answers}
 
     return render_template(
         "view_answer_board.html", 
         paperPath=paper_path, 
         answer_board_name=answer_board_name,
         answer_fields=answer_fields,
-        class_id=class_id,               # <-- add this
-        answer_board_id=answer_board_id,  # <-- add this
-        username=name
+        class_id=class_id,
+        answer_board_id=answer_board_id,
+        username=name,
+        has_submitted=len(existing_answers) > 0,
+        existing_answers=answer_map
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
@@ -1451,52 +1457,69 @@ def edit_answer_board(class_id, answer_board_id):
 
 @app.route('/submit_answers/<class_id>/<answer_board_id>', methods=['POST'])
 def submit_answers(class_id, answer_board_id):
-    
     student_id = session.get('user_id')  
     submitted_data = request.form
     uploaded_files = request.files
 
-    # Retrieve related answer fields
     answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
 
     try:
         for index, field in enumerate(answer_fields, start=1):
-            answer_id = uuid.uuid4().hex[:10]
             answer_field_id = field.ANSWER_FIELD_ID
-            answer_by = student_id
-            answer_on = datetime.now()
-
-            form_key = f'answer{index}'
             answer_type = field.ANSWER_FIELD_TYPE
+            form_key = f'answer{index}'
+
+            existing_answer = ANSWER.query.filter_by(
+                ANSWER_FIELD_ID=answer_field_id,
+                ANSWER_BY=student_id
+            ).first()
+
+            answer_on = datetime.now()
 
             if answer_type == 3:  # File upload
                 file = uploaded_files.get(form_key)
-                if file:
+                if file and file.filename:
+                    # Delete previous file if exists
+                    if existing_answer and existing_answer.ANSWER_CONTENT:
+                        old_filepath = os.path.join('static', existing_answer.ANSWER_CONTENT)
+                        if os.path.exists(old_filepath):
+                            os.remove(old_filepath)
+
+                    # Save new file
                     filename = f"{uuid.uuid4().hex}_{file.filename}"
-                    file_path = os.path.join('static', 'student_uploads', filename)
+                    save_dir = os.path.join('static', 'student_uploads')
+                    os.makedirs(save_dir, exist_ok=True)
+                    file_path = os.path.join(save_dir, filename)
                     file.save(file_path)
-                    answer_content = file_path
+
+                    answer_content = os.path.join('student_uploads', filename).replace('\\', '/')
                 else:
-                    answer_content = None
+                    answer_content = existing_answer.ANSWER_CONTENT if existing_answer else None
             else:
                 answer_content = submitted_data.get(form_key)
 
-            new_answer = ANSWER(
-                ANSWER_ID=answer_id,
-                ANSWER_FIELD_ID=answer_field_id,
-                ANSWER_BY=answer_by,
-                ANSWER_ON=answer_on,
-                ANSWER_CONTENT=answer_content
-            )
-            db.session.add(new_answer)
+            if existing_answer:
+                existing_answer.ANSWER_CONTENT = answer_content
+                existing_answer.ANSWER_ON = answer_on
+                db.session.add(existing_answer)
+            else:
+                answer_id = uuid.uuid4().hex[:10]
+                new_answer = ANSWER(
+                    ANSWER_ID=answer_id,
+                    ANSWER_FIELD_ID=answer_field_id,
+                    ANSWER_BY=student_id,
+                    ANSWER_ON=answer_on,
+                    ANSWER_CONTENT=answer_content
+                )
+                db.session.add(new_answer)
 
         db.session.commit()
-        print("Answer submitted successfully!",new_answer)
-        flash("Answers submitted successfully!", "success")
+        flash("Answers saved successfully!", "success")
+
     except Exception as e:
         db.session.rollback()
         print("Error saving answers:", e)
-        flash("Failed to submit answers. Please try again.", "error")
+        flash("Failed to save answers. Please try again.", "error")
 
     return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
 
