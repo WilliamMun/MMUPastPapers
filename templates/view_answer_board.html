@@ -254,30 +254,4 @@
 
     {% include 'footer.html' %}
 </body>
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <script>
-        {% for category, message in messages %}
-          {% if category == 'error' %}
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops! An error occurred.',
-              text: "{{ message }}"
-            });
-          {% elif category == 'success' %}
-            Swal.fire({
-              icon: 'success',
-              title: 'Yay! Success.',
-              text: "{{ message }}"
-            }).then(() => {
-              setTimeout(function() {
-                  window.location.href = "{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
-      0        }, 2000);
-            });
-          {% endif %}
-        {% endfor %}
-      </script>
-    {% endif %}
-{% endwith %}
 </html>
