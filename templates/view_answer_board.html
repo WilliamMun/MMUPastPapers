@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"crossorigin="anonymous"></script>
     <title>Answer Board | MMUPastPapers</title>
 </head>
 
@@ -76,12 +77,194 @@
                 </div>
             {% endif %}
 
+            <!-- if have answer, then only display -->
+            <div class="discussion-forum-view-ansboard">
+                <h1>{{ answer_board_name }} - Discussion Forum</h1>
 
-         </div>
+                <div id="chat-box" class="chat-box">
+                    <script>
+                        const chatBox = document.getElementById('chat-box');
+
+                        fetch(`/chat_history/{{ answer_board_id }}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                data.messages.forEach(msg => {
+                                    const div = document.createElement('div');
+
+                                    let html = `<strong>${msg.sender}</strong>:`;
+
+                                    if (msg.image_url) {
+                                        html += `<img src="${msg.image_url}" class="w-48 rounded mb-1" /><br>`;
+                                    }
+
+                                    if (msg.message) {
+                                        html += `${msg.message}`;
+                                    }
+                                    
+                                    div.innerHTML = html; 
+                                    chatBox.appendChild(div);
+                                });
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            });
+                    </script>
+                </div>
+
+                <div id="send-msg-box" class="send-msg-box">
+                    <form id="chat-form" enctype="multipart/form-data" onsubmit="sendCombinedMessage(event)" class="block items-center rounded px-2 py-1 space-x-2">
+                        
+                        <div id="image-preview" class="flex-shrink-0 items-center"></div>
+
+                        <div class="chat-input-container">
+                            <label for="chat-image" class="chat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="chat-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9.828V7h-2.828z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </label>
+                            <input type="file" name="chat-image" id="chat-image" accept="image/*" style="display: none;" />
+                        
+                            <input type="text" name="chat-text" id="chat-text" placeholder="Type a message..." class="chat-input" />
+                        
+                            <button type="submit" class="chat-send-btn">Send</button>
+                        </div>
+
+                        <script>
+                                document.getElementById("chat-image").addEventListener("change", function () {
+                                    const previewDiv = document.getElementById("image-preview");
+                                    previewDiv.innerHTML = ""; // Clear previous preview
+
+                                    const file = this.files[0];
+                                    if (file && file.type.startsWith("image/")) {
+                                        const reader = new FileReader();
+                                        reader.onload = function (e) {
+
+                                            const wrapper = document.createElement("div");
+                                            wrapper.Id = "wrapper";
+                                            wrapper.className = "relative inline-block";
+
+                                            const img = document.createElement("img");
+                                            img.src = e.target.result;
+                                            img.className = "max-w-xs max-h-40 rounded shadow border";
+
+                                            const closeBtn = document.createElement("button");
+                                            closeBtn.innerHTML = "&times;";
+                                            closeBtn.className = "absolute top-0 right-0 w-6 h-6 bg-white text-black rounded-full flex items-center justify-center text-sm font-bold shadow hover:bg-red-500 hover:text-white";
+                                            closeBtn.style.transform = "translate(50%, -50%)";
+                                            closeBtn.onclick = function () {
+                                                previewDiv.innerHTML = ""; 
+                                                document.getElementById("chat-image").value = ""; 
+                                            }; 
+
+                                            wrapper.appendChild(img);
+                                            wrapper.appendChild(closeBtn);
+                                            previewDiv.appendChild(wrapper);
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                });
+                        </script>
+                    </form>
+
+                    <script>
+                        const socket = io();
+                        console.log("Socket initialized:", socket);
+                        const form = document.getElementById('chat-form');
+                        const answerBoardId = "{{ answer_board_id }}"; 
+                        const username = "{{ name }}";
+
+                        socket.on("connect", () => {
+                            console.log("Connected to WebSocket server");
+                        });
+
+                        socket.emit("join", {room: `answerboard_${answerBoardId}` });
+
+                        function sendCombinedMessage(event) {
+                            console.log("sendCombinedMessage js function is working")
+                            event.preventDefault();
+
+                            const textInput = document.getElementById("chat-text");
+                            const imageInput = document.getElementById("chat-image");
+
+                            const formData = new FormData();
+                            formData.append("chat-text", textInput.value);
+                            if (imageInput.files[0]) {
+                                formData.append("chat-image", imageInput.files[0]);
+                            }
+
+                            fetch("/send-message", {
+                                method: "POST",
+                                body: formData
+                            }).then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    textInput.value = "";
+                                    imageInput.value = "";
+                                    document.getElementById("image-preview").innerHTML = "";
+                                } else {
+                                    console.error("Server error:", data.error);
+                                    alert("Error: " + data.error);
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Fetch failed:", err);
+                                alert("Network or server error occurred.");
+                            });
+                        }
+
+                        // Socket.IO real-time display
+                        socket.on("message", data => {
+                            console.log("Received new message via WebSocket:", data);
+                            const chatBox = document.getElementById('chat-box');
+                            const div = document.createElement('div');
+
+                            let send_html = `<strong>${data.sender}</strong>:`;
+
+                            if (data.image_url) {
+                                send_html +=  `<img src="${data.image_url}" class="w-48 rounded mb-1"><br>`;
+                            } 
+
+                            if (data.msg) {
+                                send_html += `${data.msg}`;
+                            }
+
+                            console.log(send_html);
+                            div.innerHTML = send_html;
+                            chatBox.appendChild(div);
+                            chatBox.scrollTop = chatBox.scrollHeight;
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
         
     </main>
 
     {% include 'footer.html' %}
 </body>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script>
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops! An error occurred.',
+              text: "{{ message }}"
+            });
+          {% elif category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Yay! Success.',
+              text: "{{ message }}"
+            }).then(() => {
+              setTimeout(function() {
+                  window.location.href = "{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
+      0        }, 2000);
+            });
+          {% endif %}
+        {% endfor %}
+      </script>
+    {% endif %}
+{% endwith %}
 </html>
