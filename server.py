@@ -271,7 +271,7 @@ def register():
         #Retrive user input 
         email = request.form['email'].strip()
         name = request.form['name']
-        faculty_id = request.form.get['faculty']
+        faculty_id = request.form.get('faculty')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         roles = request.form.get('user_type')
