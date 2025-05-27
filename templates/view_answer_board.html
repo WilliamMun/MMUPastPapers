@@ -49,7 +49,7 @@
                         {% if field.ANSWER_FIELD_TYPE == 1 %}
                             <!-- Text Input -->
                             <textarea name="answer{{ loop.index }}" rows="4" cols="50" class="textarea-answer"
-                                    placeholder="Enter your answer...">{{ saved or '' }}</textarea>
+                                    placeholder="Enter your answer..." required>{{ saved or '' }}</textarea>
 
                         {% elif field.ANSWER_FIELD_TYPE == 2 %}
                             <!-- MCQ -->
@@ -57,15 +57,16 @@
                             {% for opt in options %}
                                 <label>
                                     <input type="radio" name="answer{{ loop.index }}" value="{{ opt }}"
-                                        {% if saved == opt %}checked{% endif %} class="radio-group"> {{ opt }}
+                                        {% if saved == opt %}checked{% endif %} class="radio-group" required> {{ opt }}
                                 </label>
                             {% endfor %}
 
                         {% elif field.ANSWER_FIELD_TYPE == 3 %}
                             <!-- File Upload -->
-                            <input type="file" class="answerboard-file" name="answer{{ loop.index }}">
+                            <input type="file" class="answerboard-file" name="answer{{ loop.index }}" accept="application/pdf">
                             {% if saved %}
-                                <p class="text-sm text-gray-600">Previously uploaded: 
+                            <br>
+                                <p class="text-sm text-blue-800 ml-4">Previously uploaded: 
                                     <a href="{{ url_for('static', filename=saved) }}" target="_blank">View File</a>
                                 </p>
                             {% endif %}
@@ -254,4 +255,31 @@
 
     {% include 'footer.html' %}
 </body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script>
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops! An error occurred.',
+              text: "{{ message }}"
+            });
+          {% elif category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Yay! Success.',
+              text: "{{ message }}"
+            }).then(() => {
+              setTimeout(function() {
+                  window.location.href = "{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
+      0        }, 2000);
+            });
+          {% endif %}
+        {% endfor %}
+      </script>
+    {% endif %}
+{% endwith %}
+
 </html>
