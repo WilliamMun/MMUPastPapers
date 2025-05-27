@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response, send_from_directory
+from flask import Flask, render_template, request, redirect, flash, url_for, session, make_response, send_from_directory, jsonify
 from flask import send_file, abort
-from flask import request
+from flask_socketio import SocketIO, emit, join_room
 from math import ceil
 from sqlalchemy import or_
 from sqlalchemy import and_
@@ -8,19 +8,24 @@ from sqlalchemy import func
 import os
 from sqlite3 import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import timedelta
 from collections import defaultdict
 import re
 import uuid
 import time
+import socketio
+import eventlet
+
+eventlet.monkey_patch()
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 app.secret_key = "MmUPastPap3rs2510@CSP1123"
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mmupastpapers.db"
 app.config['UPLOAD_FOLDER'] = "uploads"
+app.config['CHAT_IMG_FOLDER'] = "static/chat"
 app.config['ALLOWED_EXTENSION'] = {'pdf'}
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
 app.config.update({
@@ -31,9 +36,15 @@ app.config.update({
 db = SQLAlchemy(app)
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) #Create upload folder if it doesn't exist
+os.makedirs(app.config['CHAT_IMG_FOLDER'], exist_ok=True)
 
 #-----------------------------------------------------------------------------------------------------------
 #Create database tables  
+#ENTITY: FACULTY_INFO  
+class FACULTY_INFO(db.Model): 
+  FACULTY_ID = db.Column(db.String(3), primary_key=True) 
+  FACULTY_DESC = db.Column(db.Text, nullable=False) 
+
 #ENTITY: USER_INFO 
 class USER_INFO(db.Model):  
   USER_ID = db.Column(db.String(50), primary_key=True, unique=True) 
@@ -41,10 +52,10 @@ class USER_INFO(db.Model):
   NAME = db.Column(db.String(200), nullable=False) 
   PASSWORD = db.Column(db.String(255), nullable=False) 
   ROLES = db.Column(db.Integer, nullable=False) #1 indicates student; 2 indicates lecturer  
-  FACULTY_ID = db.column(db.String(3), db.ForeignKey('FACULTY_INFO.FACULTY_ID'))
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
+  FACULTY_ID = db.Column(db.String(3), db.ForeignKey(FACULTY_INFO.FACULTY_ID))
  
 #ENTITY: SECURITY_QUES 
 class SECURITY_QUES(db.Model): 
@@ -66,11 +77,6 @@ class SECURITY_QUES_ANS(db.Model):
 class STUDY_LVL_INFO(db.Model): 
   STUDY_LVL_ID = db.Column(db.String(4), primary_key=True) 
   STUDY_LVL_DESC = db.Column(db.Text, nullable=False) 
-
-#ENTITY: FACULTY_INFO  
-class FACULTY_INFO(db.Model): 
-  FACULTY_ID = db.Column(db.String(3), primary_key=True) 
-  FACULTY_DESC = db.Column(db.Text, nullable=False) 
 
 #ENTITY: SUBJECT_INFO  
 class SUBJECT_INFO(db.Model): 
@@ -154,8 +160,24 @@ class MCQ_OPTION(db.Model):
    MCQ_OPTION_DESC = db.Column(db.Text)
    MCQ_OPTION_FLAG = db.Column(db.Integer, nullable=True)
    ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
+
+#ENTITY: CHAT_MESSAGE
+class CHAT_MESSAGE(db.Model):
+  CHAT_ID = db.Column(db.String(100), primary_key=True)
+  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+  SENT_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID))
+  MESSAGE_CONTENT = db.Column(db.Text, nullable=True)
+  IMAGE_URL = db.Column(db.String(200), nullable=True)
+  TIMESTAMP = db.Column(db.DateTime, default=datetime.now)
+
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
+
+@socketio.on('join')
+def on_join(data):
+    room = data['room']
+    print(f"Joining room: {room}")
+    join_room(room)
 
 def isStrongPassword(password):
   pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{10,}$'
@@ -330,6 +352,7 @@ def register():
 @app.route('/')
 @app.route('/main')
 def main():
+    session.clear()
     return render_template("main.html")
 
 @app.route('/resetPassword', methods=['GET', 'POST'])
@@ -1104,6 +1127,10 @@ def open_answer_board(class_id, answer_board_id):
     session['current_answer_board_id'] = answer_board_id
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
 
+    user_id = session.get('user_id')
+    user_info = USER_INFO.query.filter_by(USER_ID=user_id).first()
+    name = user_info.NAME
+
     if ans_board:
       paper = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
       paper_path = paper.FILEPATH if paper else None  # Get the filepath
@@ -1123,7 +1150,8 @@ def open_answer_board(class_id, answer_board_id):
         answer_board_name=answer_board_name,
         answer_fields=answer_fields,
         class_id=class_id,               # <-- add this
-        answer_board_id=answer_board_id  # <-- add this
+        answer_board_id=answer_board_id,  # <-- add this
+        username=name
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
@@ -1533,5 +1561,70 @@ def delete_term(term_id):
     except Exception as e:
         db.session.rollback()
 
+@app.route("/chat_history/<answer_board_id>")
+def chat_history(answer_board_id):
+   try:
+        messages = CHAT_MESSAGE.query.filter_by(ANSWER_BOARD_ID=answer_board_id).order_by(CHAT_MESSAGE.TIMESTAMP).all()
+        
+        messages_info = []
+        for message in messages:
+            user_info = USER_INFO.query.filter_by(USER_ID=message.SENT_BY).first()
+            username = user_info.NAME if user_info else "Unknown"
+            
+            msg_dict = {
+                "sender": username,
+                "message": message.MESSAGE_CONTENT,
+                "image_url": message.IMAGE_URL,
+                "timestamp": message.TIMESTAMP.strftime("%Y-%m-%d %H:%M") if message.TIMESTAMP else ""
+            }
+            messages_info.append(msg_dict)
+
+        print(messages_info)
+        return jsonify(messages=messages_info)
+
+   except Exception as e:
+        # Log the full error for debugging
+        import traceback
+        print("ERROR in chat_history():", traceback.format_exc())
+        return jsonify({"error": "Something went wrong."}), 500
+
+@app.route('/send-message', methods=['POST'])
+def send_message():
+   sender_info = session.get('user_id','Anonymous')
+   if sender_info != "Anonymous":
+      senders = USER_INFO.query.filter_by(USER_ID=sender_info).first()
+      sender_name = senders.NAME
+   else:
+      sender_name = "Anonymous"
+    
+   text = request.form.get('chat-text').strip()
+   answer_board_id = session.get('current_answer_board_id')
+   file = request.files.get('chat-image')
+   
+   print(f"Sender: {sender_info}, Message content: {text}, Current Ans Board: {answer_board_id}, File received: {file}")
+
+   image_url = None
+   if file and file.filename:
+      ext = file.filename.rsplit('.', 1)[1].lower()
+      if ext in {'jpg','png','jpeg','gif'}:
+         filename = secure_filename(file.filename)
+         filepath = os.path.join('static/chat',filename)
+         file.save(filepath)
+         image_url = f"/{filepath}"
+   
+   new_msg = CHAT_MESSAGE(CHAT_ID=uuid.uuid4().hex[:20], ANSWER_BOARD_ID=answer_board_id, SENT_BY=sender_info, MESSAGE_CONTENT=text if text else None, IMAGE_URL=image_url)
+   db.session.add(new_msg)
+   db.session.commit()
+   
+   print(f"Emitting message to room: answerboard_{answer_board_id}")
+   socketio.emit("message", {
+      "sender": sender_name,
+      "msg": text,
+      "image_url": image_url
+   }, room=f"answerboard_{answer_board_id}")
+
+   return jsonify(success=True)
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    #app.run(debug=True)
+    socketio.run(app, debug=True)

@@ -2137,7 +2137,6 @@ tr:hover {
   font-weight: bold;
   color: #333;
   margin-top: 0;
-  padding-top:
 }
 
 .editAnswerBoard-btn {
@@ -2180,6 +2179,17 @@ tr:hover {
   gap: 10px;
   margin-left: 10px;
   justify-content: flex-start;
+}
+
+.discussion-forum-view-ansboard {
+  background: white;
+  padding: 40px;
+  width: auto;
+  height: auto;
+  max-width: 90%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 /** The End of View Answer Board Page **/
 
@@ -2226,7 +2236,6 @@ tr:hover {
   font-weight: bold;
   color: #333;
   margin-top: 0;
-  padding-top:
 }
 
 .field-buttons {
