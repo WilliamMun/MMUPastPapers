@@ -482,6 +482,7 @@ def editProfile():
     email = session.get('email')
     name = session.get('name')
     newName = request.form['name']
+    newFaculty = request.form.get('faculty')
     print("New name: ",newName) #For debugging purposes 
 
     #Input verification / validation 
@@ -507,6 +508,7 @@ def editProfile():
     try:
       if record: 
         record.NAME = newName 
+        record.FACULTY_ID = newFaculty
         record.LAST_MODIFIED_BY = email 
         record.LAST_MODIFIED_ON = datetime.now()
         db.session.commit()
@@ -523,7 +525,13 @@ def editProfile():
       print("Internal server error.") #For debugging purposes 
       return redirect('/editProfile')
        
-  return render_template("editProfile.html")
+  faculties = FACULTY_INFO.query.all()
+  faculty = None
+  if session.get('user_id'):
+      user = USER_INFO.query.filter_by(USER_ID=session.get('user_id')).first()
+      if user and user.FACULTY_ID:
+          faculty = FACULTY_INFO.query.filter_by(FACULTY_ID=user.FACULTY_ID).first()
+  return render_template("editProfile.html", faculties=faculties, faculty_desc=faculty.FACULTY_DESC if faculty else None)
 
 from sqlalchemy import and_
 
@@ -618,7 +626,7 @@ def faculty_select():
       db.session.commit()
 
       flash('Profile information updated successfully!', 'success')
-      return redirect(url_for('securityQues'))
+      return redirect(url_for('login'))
    
    faculties = FACULTY_INFO.query.all()
 
