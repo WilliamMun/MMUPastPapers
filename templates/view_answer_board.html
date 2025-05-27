@@ -36,39 +36,53 @@
             {% endif %}
             
             {% if answer_fields and answer_fields|length > 0 %}
-                <form action="{{ url_for('submit_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}" method="POST" enctype="multipart/form-data" class="answer-form">
-                    {% for field in answer_fields %}
+            <form action="{{ url_for('submit_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id) }}"
+                method="POST" enctype="multipart/form-data" class="answer-form">
+                {% for field in answer_fields %}
                     <br>
                     <div class="answer-field">
                         <label>{{ loop.index }}. {{ field.ANSWER_FIELD_DESC }}</label>
 
+                        {% set field_id = field.ANSWER_FIELD_ID %}
+                        {% set saved = existing_answers.get(field_id) %}
+
                         {% if field.ANSWER_FIELD_TYPE == 1 %}
                             <!-- Text Input -->
-                            <textarea name="answer{{ loop.index }}" rows="4" cols="50" class="textarea-answer" placeholder="Enter your answer"></textarea>
+                            <textarea name="answer{{ loop.index }}" rows="4" cols="50" class="textarea-answer"
+                                    placeholder="Enter your answer..." required>{{ saved or '' }}</textarea>
 
                         {% elif field.ANSWER_FIELD_TYPE == 2 %}
-                            <!-- MCQ Input -->
+                            <!-- MCQ -->
                             {% set options = ['A', 'B', 'C', 'D'] if field.MCQ_TYPE == 4 else ['A', 'B', 'C', 'D', 'E'] %}
                             {% for opt in options %}
                                 <label>
-                                    <input type="radio" name="answer{{ loop.index }}" value="{{ opt }}" class="radio-group"> {{ opt }}
+                                    <input type="radio" name="answer{{ loop.index }}" value="{{ opt }}"
+                                        {% if saved == opt %}checked{% endif %} class="radio-group" required> {{ opt }}
                                 </label>
                             {% endfor %}
 
                         {% elif field.ANSWER_FIELD_TYPE == 3 %}
                             <!-- File Upload -->
-                            <input type="file" class="answerboard-file" name="answer{{ loop.index }}">
+                            <input type="file" class="answerboard-file" name="answer{{ loop.index }}" accept="application/pdf">
+                            {% if saved %}
+                            <br>
+                                <p class="text-sm text-blue-800 ml-4">Previously uploaded: 
+                                    <a href="{{ url_for('static', filename=saved) }}" target="_blank">View File</a>
+                                </p>
+                            {% endif %}
                         {% endif %}
                         <hr>
                     </div>
-                    {% endfor %}
-                    {% if session.get('roles') == 1 %}
-                    <button type="submit" class="btn">Submit Answers</button>
+                {% endfor %}
+
+                {% if session.get('roles') == 1 %}
+                    {% if has_submitted %}
+                        <button type="submit" class="btn">Edit Answers</button>
+                    {% else %}
+                        <button type="submit" class="btn">Submit Answers</button>
                     {% endif %}
-                    {% if session.get('roles') == 2 %}
-                    <button type="button" class="btn">Review Student Answers</button>
-                    {% endif %}
-                </form>
+                {% endif %}
+
                 {% else %}
                 <div class="no-questions-container">
                     <div class="no-questions">
@@ -267,4 +281,5 @@
       </script>
     {% endif %}
 {% endwith %}
+
 </html>
