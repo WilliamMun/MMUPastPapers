@@ -242,51 +242,30 @@
     {% include 'footer.html' %}
 </body>
 
-<!-- Socket IO Live Chat System -->
-<!-- <script>
-    const socket = io();
-    const answerBoardId = {{ answer_board_id }}; 
-    const username = {{ name }};
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <script>
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops! An error occurred.',
+              text: "{{ message }}"
+            });
+          {% elif category == 'success' %}
+            Swal.fire({
+              icon: 'success',
+              title: 'Yay! Success.',
+              text: "{{ message }}"
+            }).then(() => {
+              setTimeout(function() {
+                  window.location.href = "{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
+      0        }, 2000);
+            });
+          {% endif %}
+        {% endfor %}
+      </script>
+    {% endif %}
+{% endwith %}
 
-    socket.emit("join", {room: `answerboard_${answerBoardId}` });
-
-    document.getElementById("chat-form").addEventListener("submit", sendCombinedMessage);
-
-    function sendCombinedMessage(e){
-        e.preventDefault();
-
-        const text = document.getElementById("chat-text").value.trim();
-        const image = document.getElementById("chat-image").files[0];
-        const formData = new FormData();
-        formData.append("text", text);
-        formData.append("image", image);
-        formData.append("answer_board_id", answerBoardId);
-
-        fetch("/send-message", {
-            method: "POST",
-            body: formData
-        });
-
-        document.getElementById("chat-text").value = "";
-        document.getElementById("chat-image").value = "";
-    }
-
-    socket.on("message", data => {
-        const chatBox = document.getElementById("chat-box");
-        const div = document.createElement("div");
-        div.classList.add("mb-2");
-
-        if (data.image_url) {
-            div.innerHTML = `<strong>${data.sender}</strong>:<br><img src="${data.image_url}" class="w-48 rounded mb-1" />`;
-            if (data.msg) {
-                div.innerHTML += `<br>${data.msg}`;
-            } 
-        } else {
-            div.textContent = `${data.sender}: ${data.msg}`;
-        }
-
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight; 
-    });
-</script> -->
 </html>

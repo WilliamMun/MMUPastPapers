@@ -1489,6 +1489,7 @@ def submit_answers(class_id, answer_board_id):
             db.session.add(new_answer)
 
         db.session.commit()
+        print("Answers submitted successfully!",new_answer)
         flash("Answers submitted successfully!", "success")
     except Exception as e:
         db.session.rollback()
