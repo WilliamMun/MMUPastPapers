@@ -25,6 +25,7 @@
                     <div class="text-profile">
                         <h2>{{ name }}</h2>
                         <i><h3>{{ email }}</h3></i>
+                        <i><h3>{{  faculty_desc  }}</h3></i>
                     </div>
                 </div>
                 <hr>
@@ -32,7 +33,7 @@
                     <img src="{{ url_for('static', filename='images/editProfile.jpg' )}}" alt="Profile" class="clickable-img" onclick="showInput()">
                     <div class="text-user" onclick="showInput()">
                         <h3>Edit Profile</h3>
-                        <p>You may edit your name here.</p>
+                        <p>You may edit your name and faculty here.</p>
                     </div>
                     <div class="hidden-input-box" id="hidden-input-box" style="display: none;">
                         <form method="POST" action="/editProfile">
@@ -43,6 +44,16 @@
                             <div class="email">
                                     <label for="email">Email</label>
                                     <input type="text" name="email" id="email" class="readonly" value="{{ email or '' }}" readonly>
+                            </div>
+                            <div class="faculty">
+                                <label for="faculty">Faculty</label>
+                                <select name="faculty" id="faculty">
+                                    {% for faculty in faculties %}
+                                        <option value="{{ faculty.FACULTY_ID }}" {% if faculty.FACULTY_ID == faculty_desc %}selected{% endif %}>
+                                            {{ faculty.FACULTY_DESC }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <input type="submit" class="submit" id="submit" name="submit" value="Edit">
                         </form>

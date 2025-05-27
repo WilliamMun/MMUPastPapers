@@ -251,6 +251,10 @@ def login():
           session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
+          if not user.FACULTY_ID:
+            print("User has not selected faculty. Redirecting to faculty selection page.")
+            return redirect(url_for('faculty_select'))
+          
           pending_class = session.pop('pending_class', None)
           if pending_class:
             print("Join class logic.")
@@ -263,9 +267,6 @@ def login():
 
 @app.route('/register' ,methods=['GET','POST'])
 def register():
-    faculties = FACULTY_INFO.query.all()
-    if request.method == 'GET':
-       return render_template("register.html", faculties=faculties)
     print("Executing register action")
     if request.method == 'POST':
         #Retrive user input 
@@ -287,10 +288,6 @@ def register():
         print(f"New registration info: {email},{name},{password},{roles},{rolesNum}.") #For debugging purposes 
 
         #Input verification 
-        if not FACULTY_INFO.query.get(faculty_id):
-           flash('Invalid faculty selected', 'error')
-           return redirect('/register')
-
         if password != confirm_password:
            flash('Passwords do not match.', 'error')
            print(f"Passwords do not match. New password:{password} vs Confirm password:{confirm_password}.") #For debugging purposes 
@@ -311,6 +308,11 @@ def register():
           print("Email does not met requirement.")
           return redirect('/register')
         
+        if rolesNum == None:
+           flash('Invalid user type selected.', 'error')
+           print(f"Invalid roles: {rolesNum}")
+           return redirect('/register')
+        
         #Retrive data from database 
         user_db = USER_INFO.query.filter_by(USER_EMAIL=email).first()
         print(f"Email: {user_db}") #For debugging purposes
@@ -330,15 +332,19 @@ def register():
         print(userId) #For debugging purposes
 
         try:
-           new_user = USER_INFO(USER_ID=userId, USER_EMAIL=email, NAME=name, PASSWORD=generate_password_hash(password), ROLES=rolesNum, FACULTY_ID=faculty_id)
+           new_user = USER_INFO(USER_ID=userId, USER_EMAIL=email, NAME=name, PASSWORD=generate_password_hash(password), ROLES=rolesNum)
            db.session.add(new_user)
            db.session.commit()
            flash('User registered successfully!', 'success')
            print(f"User {email} succesfully registered")
+           session['email'] = email
+           session['name'] = name
+           session['roles'] = rolesNum
+           session['user_id'] = userId
            session['newRegistered'] = True
            print(f"New registered: {session.get('newRegistered')}")
            print(f"Variable type: {type(session.get('newRegistered'))}")
-           return render_template("register.html")
+           return redirect(url_for('faculty_select'))
         except IntegrityError:
            db.session.rollback()
            flash('Email already exists.', 'error')
@@ -347,6 +353,7 @@ def register():
         except Exception as e:
            db.session.rollback()
            flash('Error occurred while registering user. Please try again later', 'error')
+           app.logger.error(f"Registration error: {str(e)}", exc_info=True)
            print(f"Internal server error: {e}")
            return redirect('/register')
     return render_template("register.html")
@@ -475,6 +482,7 @@ def editProfile():
     email = session.get('email')
     name = session.get('name')
     newName = request.form['name']
+    newFaculty = request.form.get('faculty')
     print("New name: ",newName) #For debugging purposes 
 
     #Input verification / validation 
@@ -500,6 +508,7 @@ def editProfile():
     try:
       if record: 
         record.NAME = newName 
+        record.FACULTY_ID = newFaculty
         record.LAST_MODIFIED_BY = email 
         record.LAST_MODIFIED_ON = datetime.now()
         db.session.commit()
@@ -516,7 +525,13 @@ def editProfile():
       print("Internal server error.") #For debugging purposes 
       return redirect('/editProfile')
        
-  return render_template("editProfile.html")
+  faculties = FACULTY_INFO.query.all()
+  faculty = None
+  if session.get('user_id'):
+      user = USER_INFO.query.filter_by(USER_ID=session.get('user_id')).first()
+      if user and user.FACULTY_ID:
+          faculty = FACULTY_INFO.query.filter_by(FACULTY_ID=user.FACULTY_ID).first()
+  return render_template("editProfile.html", faculties=faculties, faculty_desc=faculty.FACULTY_DESC if faculty else None)
 
 from sqlalchemy import and_
 
@@ -588,6 +603,35 @@ def download_paper(paper_id):
         )
     else:
         abort(404, description="Paper not found or file missing.")
+
+@app.route('/faculty_select', methods=['GET', 'POST'])
+def faculty_select():
+   if 'user_id' not in session:
+      flash('Please log in to access this page.', 'error')
+      return redirect('/login')
+   
+   user_id = session['user_id']
+   user = USER_INFO.query.get(user_id)
+
+   if request.method == 'POST':
+      faculty_id = request.form.get('faculty')
+
+      # Validation based on role
+      if not faculty_id:
+         flash('Faculty selection is required for all users.', 'error')
+         return redirect('/faculty_select')
+      
+      # Update user record with faculty and study level information 
+      user.FACULTY_ID = faculty_id
+      db.session.commit()
+
+      flash('Profile information updated successfully!', 'success')
+      return redirect(url_for('login'))
+   
+   faculties = FACULTY_INFO.query.all()
+
+   return render_template('faculty_select.html', 
+                          faculties=faculties)
 
 @app.route('/securityQues', methods=['GET', 'POST'])
 def securityQues():
