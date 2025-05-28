@@ -32,6 +32,9 @@
                     {% if 'email' in session %}
                     <li><a href="/view_papers">View Papers</a></li>
                     <li><a href="/view_class">View Class</a></li>
+                    {% if session.get('roles') == 2 %}
+                        <li><a href="/view_subjects">Maintenance</a></li>
+                    {% endif %}
                     {% else %}
                     <li><a href="/main">Main</a></li>
                     <li><a href="/login">Login</a></li>
