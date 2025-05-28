@@ -38,6 +38,10 @@
                     <div class="text">
                         <h3>{{ name }}</h3>
                         <i><h4 class="email">{{ email }}</h4></i>
+                        <i><h4 class="faculty">{{ faculty_desc }}</h4></i>
+                        {% if roles == 1 %}
+                            <i><h4 class="study-level">{{ study_level_desc }}</h4></i>
+                        {% endif %}
                     </div>
                 </div>
                 <hr>

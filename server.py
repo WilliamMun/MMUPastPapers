@@ -344,7 +344,7 @@ def register():
            session['newRegistered'] = True
            print(f"New registered: {session.get('newRegistered')}")
            print(f"Variable type: {type(session.get('newRegistered'))}")
-           return redirect(url_for('faculty_select'))
+           return redirect(url_for('login'))
         except IntegrityError:
            db.session.rollback()
            flash('Email already exists.', 'error')
@@ -483,6 +483,7 @@ def editProfile():
     name = session.get('name')
     newName = request.form['name']
     newFaculty = request.form.get('faculty')
+    newStudyLevel = request.form.get('study_level')
     print("New name: ",newName) #For debugging purposes 
 
     #Input verification / validation 
@@ -509,6 +510,7 @@ def editProfile():
       if record: 
         record.NAME = newName 
         record.FACULTY_ID = newFaculty
+        record.STUDY_LVL_ID = newStudyLevel if record.ROLES == 1 else None #Only students have study levels
         record.LAST_MODIFIED_BY = email 
         record.LAST_MODIFIED_ON = datetime.now()
         db.session.commit()
@@ -526,12 +528,13 @@ def editProfile():
       return redirect('/editProfile')
        
   faculties = FACULTY_INFO.query.all()
+  study_levels = STUDY_LVL_INFO.query.all()
   faculty = None
   if session.get('user_id'):
       user = USER_INFO.query.filter_by(USER_ID=session.get('user_id')).first()
       if user and user.FACULTY_ID:
           faculty = FACULTY_INFO.query.filter_by(FACULTY_ID=user.FACULTY_ID).first()
-  return render_template("editProfile.html", faculties=faculties, faculty_desc=faculty.FACULTY_DESC if faculty else None)
+  return render_template("editProfile.html", faculties=faculties, faculty_desc=faculty.FACULTY_DESC if faculty else None, study_levels=study_levels)
 
 from sqlalchemy import and_
 
@@ -612,26 +615,35 @@ def faculty_select():
    
    user_id = session['user_id']
    user = USER_INFO.query.get(user_id)
+   study_levels = STUDY_LVL_INFO.query.all()
 
    if request.method == 'POST':
       faculty_id = request.form.get('faculty')
+      study_level_id = request.form.get('study_level')
 
       # Validation based on role
       if not faculty_id:
          flash('Faculty selection is required for all users.', 'error')
          return redirect('/faculty_select')
       
+      if user.ROLES == 1 and not study_level_id:
+         flash('Study level selection is required for students.', 'error')
+         return redirect('/faculty_select')
+      
       # Update user record with faculty and study level information 
       user.FACULTY_ID = faculty_id
+      if user.ROLES == 1:  # Only students have study levels
+         user.STUDY_LVL_ID = study_level_id
       db.session.commit()
 
       flash('Profile information updated successfully!', 'success')
-      return redirect(url_for('login'))
+      return redirect(url_for('view_papers'))
    
    faculties = FACULTY_INFO.query.all()
 
    return render_template('faculty_select.html', 
-                          faculties=faculties)
+                          faculties=faculties,
+                          study_levels=study_levels)
 
 @app.route('/securityQues', methods=['GET', 'POST'])
 def securityQues():
@@ -697,6 +709,7 @@ def securityQues():
         flash("Security questions edited successfully! Please log in again.", 'success')
       elif registerStatus == 1:
         flash("Security questions sucessfully setup!",'success')
+        return redirect(url_for('faculty_select'))
       print("Sucessfully saved new sec ques.") #For debugging purposes 
       return render_template("securityQues.html",registerStatus=registerStatus)
   return render_template("securityQues.html", user_qa=user_qa)
