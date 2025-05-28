@@ -25,9 +25,9 @@
                     <div class="text-profile">
                         <h2>{{ name }}</h2>
                         <i><h3>{{ email }}</h3></i>
-                        <i><h3>{{  faculty_desc  }}</h3></i>
+                        <i><h4>{{  faculty_desc  }}</h4></i>
                         {% if session.get('roles') == 1 %}
-                            <i><h3>{{ study_level_desc }}</h3></i>
+                            <i><h5>{{ study_level_desc }}</h5></i>
                         {% endif %}
                     </div>
                 </div>
@@ -52,29 +52,34 @@
                                     <label for="email">Email</label>
                                     <input type="text" name="email" id="email" class="readonly" value="{{ email or '' }}" readonly>
                             </div>
-                            <div class="faculty">
+                            <div class="select-field">
                                 <label for="faculty">Faculty</label>
-                                <select name="faculty" id="faculty">
+                                <select id="faculty" name="faculty">
                                     {% for faculty in faculties %}
-                                        <option value="{{ faculty.FACULTY_ID }}" {% if faculty.FACULTY_ID == faculty_selected.FACULTY_ID %}selected{% endif %}>
+                                        <option value="{{ faculty.FACULTY_ID }}"
+                                            {% if faculty.FACULTY_ID == faculty_selected.FACULTY_ID %}selected{% endif %}>
                                             {{ faculty.FACULTY_DESC }}
                                         </option>
                                     {% endfor %}
                                 </select>
                             </div>
+
                             {% if session.get('roles') == 1 %}
-                                <div class="study-level">
+                                <div class="select-field">
                                     <label for="study_level">Study Level</label>
                                     <select name="study_level" id="study_level">
                                         {% for level in study_levels %}
-                                            <option value="{{ level.STUDY_LVL_ID }}" {% if  level.STUDY_LVL_ID == study_lvl_selected.STUDY_LVL_ID %}selected{% endif %}>
+                                            <option value="{{ level.STUDY_LVL_ID }}" 
+                                                {% if level.STUDY_LVL_ID == study_lvl_selected.STUDY_LVL_ID %}selected{% endif %}>
                                                 {{ level.STUDY_LVL_DESC }}
                                             </option>
                                         {% endfor %}
                                     </select>
                                 </div>
                             {% endif %}
-                            <input type="submit" class="submit" id="submit" name="submit" value="Edit">
+                            <div class="btn-container">
+                                    <button type="submit" class="btn" id="submit" name="submit">Edit</button>
+                            </div>
                         </form>
                     </div>
                 </div>
