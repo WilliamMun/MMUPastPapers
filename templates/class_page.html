@@ -47,4 +47,30 @@
     </main>
   {% include 'footer.html' %}
 </body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <script>
+                    {% for category, message in messages %}
+                        {% if category == 'error' %}
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops! An error occurred.',
+                                text: "{{ message }}"
+                            });
+                        {% elif category == 'success' %}
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Yay! Success.',
+                                text: "{{ message }}"
+                            }).then(() => {
+                                setTimeout(function() {
+                                    window.location.href = "{{ url_for('open_class', class_id=session.get('current_class_id')) }}";
+                                }, 1000);
+                            });
+                        {% endif %}
+                    {% endfor %}
+                </script>
+            {% endif %}
+        {% endwith %}
 </html>

@@ -1728,6 +1728,46 @@ def send_message():
 
    return jsonify(success=True)
 
+@app.route("/view_others_answers/<class_id>/<answer_board_id>")
+def view_others_answers(class_id, answer_board_id):
+  #Get answers field for that particular answer board 
+  answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+  print(f"Answer field exists:{answer_fields}")
+
+  answers_by_fields = []
+  #Get answers from each users for that particular answer board 
+  for answer_field in answer_fields:
+    std_answers = ANSWER.query.filter(ANSWER.ANSWER_FIELD_ID==answer_field.ANSWER_FIELD_ID, 
+                                      ANSWER.ANSWER_BY!=session.get('user_id')).all()
+    print(f"Answers for answer field {answer_field.ANSWER_FIELD_ID}: {std_answers}")
+
+    related_answers = { ans.ANSWER_ID: ans.ANSWER_CONTENT for ans in std_answers}
+    print(f"Related answers with {answer_field.ANSWER_FIELD_ID} ans field: {related_answers}")
+
+    answers_by_field = {
+       'field_id': answer_field.ANSWER_FIELD_ID,
+       'field_type': answer_field.ANSWER_FIELD_TYPE,
+       'field_desc': answer_field.ANSWER_FIELD_DESC,
+       'answers': related_answers
+    }
+    print(f"Dictionary of answer field {answer_field.ANSWER_FIELD_ID}: {answers_by_field}")
+    answers_by_fields.append(answers_by_field)
+  
+  print(f"Final list of dictionary of answer field and answers record: {answers_by_fields}")
+    
+  #Get paper path 
+  ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+  print(f"Answer board: {ans_board}")
+  paper_id = ans_board.PAPER_ID
+  print(f"Paper ID: {paper_id}")
+  if paper_id:
+    paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=paper_id).first()
+    print(f"Paper Info: {paper_info}")
+    paper_path = paper_info.FILEPATH
+    print(f"Paper path: {paper_path}")
+
+  return render_template("view_others_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path)
+
 if __name__ == "__main__":
     #app.run(debug=True)
     socketio.run(app, debug=True)

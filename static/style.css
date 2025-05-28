@@ -2366,3 +2366,30 @@ tr:hover {
   margin-bottom: 6px;
 }
 /** End of Faculty Page **/
+
+/** View Others Answers Page **/
+.view-ans-box {
+  background: white;
+  padding: 40px;
+  width: auto;
+  height: auto;
+  max-width: 90%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.view-ans-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+  text-align: left;
+}
+
+.view-ans-box p{
+  text-align: left;
+}
+/** End of View Others Answers Page **/
