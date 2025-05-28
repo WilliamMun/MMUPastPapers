@@ -92,12 +92,25 @@
 
 .user-info .text {
   font-size: 16px;
-  font-weight: 1000;
+  font-weight: bold;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
 .user-info .email {
   font-size: 14px;
+  font-weight: 500;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.user-info .faculty {
+  font-size: 14px;
+  font-weight: bold;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-top: 0.75rem;
+}
+
+.user-info .study-level {
+  font-size: 13.5px;
   font-weight: 500;
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
@@ -789,7 +802,7 @@ tr:hover {
   border: 0;
   height: 1px;
   width: 100%;
-  background: #050505;
+  background: darkgray;
   margin: 15px 0 10px;
 }
 
@@ -831,6 +844,22 @@ tr:hover {
   margin-left: 10px;
 }
 
+.user-pic-name-box .text-profile h4 {
+  text-align: left;
+  font-weight: bold;
+  font-size: 16px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.user-pic-name-box .text-profile h5{
+  text-align: left;
+  font-size: 15px;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  margin-left: 10px;
+}
+
 .edit-user-box {
   display: flex;
   align-items: center;
@@ -850,43 +879,52 @@ tr:hover {
 }
 
 .edit-user-box .hidden-input-box {
-  width: 500px;
+  width: 750px;
   display: flex;
   margin-left: 15px;
   font-weight: bold;
 }
+
 .edit-user-box .hidden-input-box label{
-  text-align: center;
+  text-align: left;
   flex-direction: row;
   align-items: center;
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-display: bold;
 }
 
+.edit-user-box .hidden-input-box label{ 
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-top: 0.5rem;
+}
+
+.edit-user-box .hidden-input-box .input-field,
+.edit-user-box .hidden-input-box .select-field {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.edit-user-box .hidden-input-box .select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
 .edit-user-box .hidden-input-box input[type="text"]{
   font-family: Georgia, 'Times New Roman', Times, serif;
-  width: 80%;                
+  width: 100%;                
   height: 40px;               
   padding: 10px;              
   box-sizing: border-box;
   font-size: 15px;
-  margin-top: 10px;
-}
-
-.edit-user-box .hidden-input-box input[type="submit"]{
-  width: 30%;
-  padding: 12px;
-  background-color: #E5E1DA;
-  color: black;
-  font-family: serif;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  margin-top: 10px;
-  margin-left: 50px;
-  cursor: pointer;
-  transition: 0.3s ease;
+  margin-top: 0.5rem;
+  margin-bottom: 10px;
 }
 
 .edit-security-ques-box {
