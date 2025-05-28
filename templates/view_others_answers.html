@@ -56,6 +56,8 @@
                     </div>
                     <br>
                 {% endfor %}
+
+                <button type="button" class="btn" onclick="window.location.href='{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}'">Back</button>
             </div>
         </main>
 
