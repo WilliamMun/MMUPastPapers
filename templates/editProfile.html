@@ -26,7 +26,7 @@
                         <h2>{{ name }}</h2>
                         <i><h3>{{ email }}</h3></i>
                         <i><h3>{{  faculty_desc  }}</h3></i>
-                        {% if roles == 1 %}
+                        {% if session.get('roles') == 1 %}
                             <i><h3>{{ study_level_desc }}</h3></i>
                         {% endif %}
                     </div>
@@ -56,18 +56,18 @@
                                 <label for="faculty">Faculty</label>
                                 <select name="faculty" id="faculty">
                                     {% for faculty in faculties %}
-                                        <option value="{{ faculty.FACULTY_ID }}" {% if faculty.FACULTY_ID == faculty_desc %}selected{% endif %}>
+                                        <option value="{{ faculty.FACULTY_ID }}" {% if faculty.FACULTY_ID == faculty_selected.FACULTY_ID %}selected{% endif %}>
                                             {{ faculty.FACULTY_DESC }}
                                         </option>
                                     {% endfor %}
                                 </select>
                             </div>
-                            {% if roles == 1 %}
+                            {% if session.get('roles') == 1 %}
                                 <div class="study-level">
                                     <label for="study_level">Study Level</label>
                                     <select name="study_level" id="study_level">
                                         {% for level in study_levels %}
-                                            <option value="{{ level.STUDY_LVL_ID }}" {% if level.STUDY_LVL_ID == study_level %}selected{% endif %}>
+                                            <option value="{{ level.STUDY_LVL_ID }}" {% if  level.STUDY_LVL_ID == study_lvl_selected.STUDY_LVL_ID %}selected{% endif %}>
                                                 {{ level.STUDY_LVL_DESC }}
                                             </option>
                                         {% endfor %}
