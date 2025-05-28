@@ -1552,7 +1552,7 @@ def submit_answers(class_id, answer_board_id):
         for index, field in enumerate(answer_fields, start=1):
             answer_field_id = field.ANSWER_FIELD_ID
             answer_type = field.ANSWER_FIELD_TYPE
-            form_key = f'answer{index}'
+            form_key = f'answer{answer_field_id}'
 
             existing_answer = ANSWER.query.filter_by(
                 ANSWER_FIELD_ID=answer_field_id,

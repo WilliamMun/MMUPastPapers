@@ -48,7 +48,7 @@
 
                         {% if field.ANSWER_FIELD_TYPE == 1 %}
                             <!-- Text Input -->
-                            <textarea name="answer{{ loop.index }}" rows="4" cols="50" class="textarea-answer"
+                            <textarea name="answer{{ field.ANSWER_FIELD_ID }}" rows="4" cols="50" class="textarea-answer"
                                     placeholder="Enter your answer..." required>{{ saved or '' }}</textarea>
 
                         {% elif field.ANSWER_FIELD_TYPE == 2 %}
@@ -56,14 +56,14 @@
                             {% set options = ['A', 'B', 'C', 'D'] if field.MCQ_TYPE == 4 else ['A', 'B', 'C', 'D', 'E'] %}
                             {% for opt in options %}
                                 <label>
-                                    <input type="radio" name="answer{{ loop.index }}" value="{{ opt }}"
-                                        {% if saved == opt %}checked{% endif %} class="radio-group" required> {{ opt }}
+                                    <input type="radio" name="answer{{ field.ANSWER_FIELD_ID }}" value="{{ opt }}" required
+                                        {% if saved == opt %}checked{% endif %} class="radio-group"> {{ opt }}
                                 </label>
                             {% endfor %}
 
                         {% elif field.ANSWER_FIELD_TYPE == 3 %}
                             <!-- File Upload -->
-                            <input type="file" class="answerboard-file" name="answer{{ loop.index }}" accept="application/pdf">
+                            <input type="file" class="answerboard-file" name="answer{{ field.ANSWER_FIELD_ID }}" accept="application/pdf">
                             {% if saved %}
                             <br>
                                 <p class="text-sm text-blue-800 ml-4">Previously uploaded: 
