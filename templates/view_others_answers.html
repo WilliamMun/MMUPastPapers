@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <title>Others' Answers | MMUPastPapers</title>
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+
+        <main class="main-content">
+            {% include 'class_bar.html' %}
+
+            <div class="view-ans-box">
+                <h1>Others' Answers</h1>
+                <hr>
+                {% if paperPath %}
+                    <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" type="application/pdf" width="1000px" height="1000px">
+                    </iframe>
+                {% else %}
+                    <p>No paper available for this answer board.</p>
+                {% endif %}
+                <br>
+                {% for answers_by_field in answers_by_fields %}
+                    <div class="ans-field-view">
+                        <h1>{{ answers_by_field.field_desc }}</h1>
+                        <p>Answer from other students:</p>
+                        
+                            <div class="other-std-ans">
+                                {% if answers_by_field.field_type == 1 %} 
+                                    <!-- Text input -->
+                                    {% for answer_id, answer_content in answers_by_field.answers.items() %}
+                                    <textarea disabled>{{ answer_content }}</textarea><br>
+                                    {% endfor %}
+
+                                {% elif answers_by_field.field_type == 2 %}
+                                    <!-- MCQ input -->
+                                    {% for answer_id, answer_content in answers_by_field.answers.items() %}
+                                    <textarea disabled>{{ answer_content }}</textarea><br><br>
+                                    {% endfor %}
+
+                                {% elif answers_by_field.field_type == 3 %}
+                                    <!-- File Upload -->
+                                    {% for answer_id, answer_content in answers_by_field.answers.items() %}
+                                    <p class="text-sm text-blue-800 ml-4">Others' upload: 
+                                    <a href="{{ url_for('static', filename=answer_content) }}" target="_blank">View File</a>
+                                    </p>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        
+                    </div>
+                    <br>
+                {% endfor %}
+            </div>
+        </main>
+
+        {% include 'footer.html' %}
+    </body>
+</html>

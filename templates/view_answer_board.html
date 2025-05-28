@@ -78,11 +78,17 @@
                 {% if session.get('roles') == 1 %}
                     {% if has_submitted %}
                         <button type="submit" class="btn">Edit Answers</button>
+                        <button type="button" class="btn" onclick="seeOthersAns()">View Other Answers</button>
+                        <script>
+                            function seeOthersAns() {
+                                window.location.href = "{{ url_for('view_others_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
+                            }
+                        </script>
                     {% else %}
                         <button type="submit" class="btn">Submit Answers</button>
                     {% endif %}
                 {% endif %}
-
+            </form>
                 {% else %}
                 <div class="no-questions-container">
                     <div class="no-questions">
@@ -91,7 +97,7 @@
                 </div>
             {% endif %}
 
-            <!-- if have answer, then only display -->
+            {% if has_submitted or session.get('roles') == 2 %}
             <div class="discussion-forum-view-ansboard">
                 <h1>{{ answer_board_name }} - Discussion Forum</h1>
 
@@ -250,6 +256,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
         
     </main>
 
