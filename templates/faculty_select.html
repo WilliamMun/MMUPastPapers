@@ -27,6 +27,15 @@
                                 <option value="{{ faculty.FACULTY_ID }}">{{ faculty.FACULTY_DESC }}</option>
                             {% endfor %}
                         </select>
+                        {% if roles == 1 %}
+                        <label for="study_level">Study Level</label>
+                        <select class="form-control" name="study_level" id="study_level" required>
+                            <option value="">Select Study Level</option>
+                            {% for level in study_levels %}
+                                <option value="{{ level.STUDY_LVL_ID }}">{{ level.STUDY_LVL_DESC }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
