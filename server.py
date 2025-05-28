@@ -47,6 +47,11 @@ class FACULTY_INFO(db.Model):
   FACULTY_ID = db.Column(db.String(3), primary_key=True) 
   FACULTY_DESC = db.Column(db.Text, nullable=False) 
 
+#ENTITY: STUDY_LVL_INFO  
+class STUDY_LVL_INFO(db.Model): 
+  STUDY_LVL_ID = db.Column(db.String(4), primary_key=True) 
+  STUDY_LVL_DESC = db.Column(db.Text, nullable=False) 
+
 #ENTITY: USER_INFO 
 class USER_INFO(db.Model):  
   USER_ID = db.Column(db.String(50), primary_key=True, unique=True) 
@@ -58,6 +63,7 @@ class USER_INFO(db.Model):
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
   FACULTY_ID = db.Column(db.String(3), db.ForeignKey(FACULTY_INFO.FACULTY_ID))
+  STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey(STUDY_LVL_INFO.STUDY_LVL_ID), nullable=True) #Only students have study level id  
  
 #ENTITY: SECURITY_QUES 
 class SECURITY_QUES(db.Model): 
@@ -74,11 +80,6 @@ class SECURITY_QUES_ANS(db.Model):
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
 
   __table_args__ = (db.PrimaryKeyConstraint('USER_ID','SECURITY_QUES_ID'),)
-
-#ENTITY: STUDY_LVL_INFO  
-class STUDY_LVL_INFO(db.Model): 
-  STUDY_LVL_ID = db.Column(db.String(4), primary_key=True) 
-  STUDY_LVL_DESC = db.Column(db.Text, nullable=False) 
 
 #ENTITY: SUBJECT_INFO  
 class SUBJECT_INFO(db.Model): 
@@ -529,12 +530,16 @@ def editProfile():
        
   faculties = FACULTY_INFO.query.all()
   study_levels = STUDY_LVL_INFO.query.all()
-  faculty = None
+  faculty_selected = None
+  study_lvl_selected = None
   if session.get('user_id'):
       user = USER_INFO.query.filter_by(USER_ID=session.get('user_id')).first()
       if user and user.FACULTY_ID:
-          faculty = FACULTY_INFO.query.filter_by(FACULTY_ID=user.FACULTY_ID).first()
-  return render_template("editProfile.html", faculties=faculties, faculty_desc=faculty.FACULTY_DESC if faculty else None, study_levels=study_levels)
+          faculty_selected = FACULTY_INFO.query.filter_by(FACULTY_ID=user.FACULTY_ID).first()
+          if user.ROLES == 1:
+            study_lvl_selected = STUDY_LVL_INFO.query.filter_by(STUDY_LVL_ID=user.STUDY_LVL_ID).first()
+  print(faculty_selected, study_lvl_selected)
+  return render_template("editProfile.html", faculties=faculties, faculty_selected=faculty_selected, faculty_desc=faculty_selected.FACULTY_DESC if faculty_selected else None, study_levels=study_levels, study_lvl_selected=study_lvl_selected, study_level_desc=study_lvl_selected.STUDY_LVL_DESC if study_lvl_selected else None)
 
 from sqlalchemy import and_
 
