@@ -637,7 +637,22 @@ def faculty_select():
       db.session.commit()
 
       flash('Profile information updated successfully!', 'success')
-      return redirect(url_for('view_papers'))
+      if session.get('newRegistered') is True:
+         registerStatus = 1
+      elif session.get('newRegistered') is False:
+           registerStatus = 2
+      else:
+          registerStatus = 3
+          session.clear()
+          flash('Unknown user status. Please login properly.','error')
+          print("Unknown user register status?")
+          return redirect('/login')
+      
+      if registerStatus == 1:
+         newRegistered = True
+         return redirect(url_for('securityQues'))
+      elif registerStatus == 2:
+          return redirect(url_for('view_papers'))
    
    faculties = FACULTY_INFO.query.all()
 
@@ -709,8 +724,8 @@ def securityQues():
         flash("Security questions edited successfully! Please log in again.", 'success')
       elif registerStatus == 1:
         flash("Security questions sucessfully setup!",'success')
-        return redirect(url_for('faculty_select'))
-      print("Sucessfully saved new sec ques.") #For debugging purposes 
+        return redirect(url_for('view_papers'))
+      session['newRegistered'] = False  # Reset the new registration status
       return render_template("securityQues.html",registerStatus=registerStatus)
   return render_template("securityQues.html", user_qa=user_qa)
 
