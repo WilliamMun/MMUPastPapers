@@ -465,13 +465,21 @@ def inject_data():
       print(initials) #For debugging purposes 
       print(email)
 
+      # Retrieve user data from the database
+      user = USER_INFO.query.filter_by(USER_EMAIL=email).first()
+      if user:
+         faculty = FACULTY_INFO.query.filter_by(FACULTY_ID=user.FACULTY_ID).first()
+         study_level = STUDY_LVL_INFO.query.filter_by(STUDY_LVL_ID=user.STUDY_LVL_ID).first() if user.ROLES == 1 else None
+
       return {
         'email': session.get('email'),
         'name': session.get('name'),
         'roles': session.get('roles'),
         'newRegistered': session.get('newRegistered'),
         'initials': initials,
-        'class_id': session.get('current_class_id')
+        'class_id': session.get('current_class_id'),
+        'faculty_desc': faculty.FACULTY_DESC if faculty else None,
+        'study_level_desc': study_level.STUDY_LVL_DESC if study_level else None
       }
     
     else:
