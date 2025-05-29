@@ -2220,14 +2220,22 @@ tr:hover {
 }
 
 .discussion-forum-view-ansboard {
-  background: white;
-  padding: 40px;
-  width: auto;
+  background: #fff;
+  padding: 2.5rem 3rem;
+  width: 100%;
+  max-width: 900px;
   height: 500px;
-  max-width: 90%;
-  margin: 40px auto;
-  border-radius: 20px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  margin: 2.5rem auto;
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  overflow-y: auto; 
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: box-shadow 0.3s ease;
+}
+
+.discussion-forum-view-ansboard:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
 }
 
 .chat-box {
@@ -2429,5 +2437,60 @@ tr:hover {
 
 .view-ans-box p{
   text-align: left;
+}
+
+.ans-field-view {
+  background: whitesmoke;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid lightblue;
+  border-right: 4px solid lightblue;
+}
+
+.ans-field-view h1 {
+  font-size: 18px;
+  color: #222;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ans-field-view p {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.other-std-ans textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #eee;
+  resize: vertical;
+  color: #333;
+}
+
+.other-std-ans .others{
+  padding: 5px;
+  border-radius: 12px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.other-std-ans a {
+  color: #1d4ed8;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.other-std-ans a:hover {
+  color: #2563eb;
+  text-decoration: none;
 }
 /** End of View Others Answers Page **/
