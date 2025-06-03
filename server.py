@@ -156,6 +156,7 @@ class DISCUSSION_FORUM(db.Model):
   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID)) 
   POSTED_BY = db.Column(db.String(50), nullable=False) 
   POSTED_ON = db.Column(db.DateTime, default=datetime.now)
+  
 
 #ENTITY: MCQ_OPTION
 class MCQ_OPTION(db.Model):
@@ -172,6 +173,15 @@ class CHAT_MESSAGE(db.Model):
   MESSAGE_CONTENT = db.Column(db.Text, nullable=True)
   IMAGE_URL = db.Column(db.String(200), nullable=True)
   TIMESTAMP = db.Column(db.DateTime, default=datetime.now)
+
+#ENTITY: LECTURER_COMMENT
+class LECTURER_COMMENT(db.Model):
+    __tablename__ = 'LECTURER_COMMENT'
+    LEC_COMMENT_ID = db.Column(db.Integer, primary_key=True)
+    LEC_COMMENT_CONTENT = db.Column(db.Text, nullable=False)
+    ANSWER_ID = db.Column(db.Integer, db.ForeignKey('ANSWER.ANSWER_ID'))
+    ANSWER_BOARD_ID = db.Column(db.Integer, db.ForeignKey('ANSWER_BOARD.ANSWER_BOARD_ID'))
+    LEC_COMMENT_BY = db.Column(db.Integer, db.ForeignKey('USER_INFO.USER_ID'))
 
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
@@ -1775,6 +1785,120 @@ def view_others_answers(class_id, answer_board_id):
     print(f"Paper path: {paper_path}")
 
   return render_template("view_others_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path)
+
+@app.route("/lecturer_view_students_answers/<class_id>/<answer_board_id>")
+def lecturer_view_students_answers(class_id, answer_board_id):
+    answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+    answers_by_fields = []
+    all_user_ids = set()
+
+    # Collect all user ids from answers
+    for answer_field in answer_fields:
+        std_answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=answer_field.ANSWER_FIELD_ID).all()
+        for ans in std_answers:
+            all_user_ids.add(ans.ANSWER_BY)
+
+    # Query user info in bulk
+    users = USER_INFO.query.filter(USER_INFO.USER_ID.in_(all_user_ids)).all()
+    user_dict = {user.USER_ID: user.NAME for user in users}
+
+    # Build answers_by_fields with names and comments
+    for answer_field in answer_fields:
+        std_answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=answer_field.ANSWER_FIELD_ID).all()
+        related_answers = {}
+
+        for ans in std_answers:
+            user_name = user_dict.get(ans.ANSWER_BY, "Unknown User")
+
+            # Get existing comment for this answer by this lecturer
+            existing_comment = LECTURER_COMMENT.query.filter_by(
+                ANSWER_ID=ans.ANSWER_ID,
+                ANSWER_BOARD_ID=answer_board_id,
+                LEC_COMMENT_BY=session.get('user_id')
+            ).first()
+
+            related_answers[ans.ANSWER_ID] = {
+                'name': user_name,
+                'content': ans.ANSWER_CONTENT,
+                'comment': existing_comment.LEC_COMMENT_CONTENT if existing_comment else ''
+            }
+
+        answers_by_field = {
+            'field_id': answer_field.ANSWER_FIELD_ID,
+            'field_type': answer_field.ANSWER_FIELD_TYPE,
+            'field_desc': answer_field.ANSWER_FIELD_DESC,
+            'answers': related_answers
+        }
+
+        answers_by_fields.append(answers_by_field)
+
+    # Get paper file path
+    ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+    paper_path = ""
+    if ans_board and ans_board.PAPER_ID:
+        paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
+        if paper_info:
+            paper_path = paper_info.FILEPATH
+
+    return render_template("lecturer_view_students_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path)
+
+
+@app.route('/save_comments', methods=['POST'])
+def save_comments():
+    board_id = request.form.get('answer_board_id')
+    posted_by = session.get('user_id')
+
+    # Save per-answer comments
+    for key in request.form:
+        if key.startswith("comments["):
+            answer_id = key[9:-1]
+            comment = request.form.get(key).strip()
+            if comment:
+                # Check if comment already exists
+                existing_comment = LECTURER_COMMENT.query.filter_by(
+                    ANSWER_ID=answer_id,
+                    ANSWER_BOARD_ID=board_id,
+                    LEC_COMMENT_BY=posted_by
+                ).first()
+
+                if existing_comment:
+                    existing_comment.LEC_COMMENT_CONTENT = comment
+                else:
+                    new_comment = LECTURER_COMMENT(
+                        LEC_COMMENT_CONTENT=comment,
+                        ANSWER_ID=answer_id,
+                        ANSWER_BOARD_ID=board_id,
+                        LEC_COMMENT_BY=posted_by
+                    )
+                    db.session.add(new_comment)
+
+    # Save bulk comments per question
+    for key in request.form:
+        if key.startswith("comments_all_question["):
+            field_id = key[23:-1]
+            comment = request.form.get(key).strip()
+            if comment:
+                answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=field_id).all()
+                for ans in answers:
+                    existing_comment = LECTURER_COMMENT.query.filter_by(
+                        ANSWER_ID=ans.ANSWER_ID,
+                        ANSWER_BOARD_ID=board_id,
+                        LEC_COMMENT_BY=posted_by
+                    ).first()
+
+                    if existing_comment:
+                        existing_comment.LEC_COMMENT_CONTENT = comment
+                    else:
+                        new_comment = LECTURER_COMMENT(
+                            LEC_COMMENT_CONTENT=comment,
+                            ANSWER_ID=ans.ANSWER_ID,
+                            ANSWER_BOARD_ID=board_id,
+                            LEC_COMMENT_BY=posted_by
+                        )
+                        db.session.add(new_comment)
+
+    db.session.commit()
+    return redirect(url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=board_id))
 
 if __name__ == "__main__":
     #app.run(debug=True)
