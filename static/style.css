@@ -2515,8 +2515,8 @@ tr:hover {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 20px;
   font-weight: bold;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 0rem;
+  margin-bottom: 1rem;
   color: black;
   text-align: left;
 }
