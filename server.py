@@ -1251,6 +1251,26 @@ def open_answer_board(class_id, answer_board_id):
     # Map field_id -> answer content
     answer_map = {ans.ANSWER_FIELD_ID: ans.ANSWER_CONTENT for ans in existing_answers}
 
+    std_comments_record = [] 
+    
+    for ans_field in answer_fields:
+       related_answer_id = ANSWER.query.filter_by(ANSWER_FIELD_ID=ans_field.ANSWER_FIELD_ID, ANSWER_BY=session.get('user_id')).first()
+       std_comments = STUDENT_COMMENT.query.filter(STUDENT_COMMENT.ANSWER_ID==related_answer_id.ANSWER_ID, STUDENT_COMMENT.STD_COMMENT_BY!=session.get('user_id')).all()
+       std_comments_dict = {
+          'answer_field_id': ans_field.ANSWER_FIELD_ID,
+          'answer_id': related_answer_id.ANSWER_ID,
+          'comments': [{
+             'user': cmt.STD_COMMENT_BY,
+             'comment': cmt.STD_COMMENT_CONTENT 
+          } 
+          for cmt in std_comments]
+       }
+       
+       print(f"Record for one answer field: {std_comments_dict}")
+       std_comments_record.append(std_comments_dict)
+    
+    print(f"Final record of record in answer field: {std_comments_record}")
+
     return render_template(
         "view_answer_board.html", 
         paperPath=paper_path, 
@@ -1260,7 +1280,8 @@ def open_answer_board(class_id, answer_board_id):
         answer_board_id=answer_board_id,
         username=name,
         has_submitted=len(existing_answers) > 0,
-        existing_answers=answer_map
+        existing_answers=answer_map,
+        std_comments_record=std_comments_record
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
