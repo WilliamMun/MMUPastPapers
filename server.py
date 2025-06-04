@@ -143,12 +143,15 @@ class ANSWER_FIELD(db.Model):
   MCQ_TYPE = db.Column(db.Integer) #4: 4 answer options, 5: 5 answer options 
 
 #ENTITY: ANSWER  
-class ANSWER(db.Model): 
-  ANSWER_ID = db.Column(db.String(50), primary_key=True)
-  ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID)) 
-  ANSWER_BY = db.Column(db.String(50), nullable=False) 
-  ANSWER_ON = db.Column(db.DateTime, default=datetime.now) 
-  ANSWER_CONTENT = db.Column(db.Text) 
+class ANSWER(db.Model):
+    __tablename__ = 'ANSWER'
+
+    ANSWER_ID = db.Column(db.String(50), primary_key=True)
+    ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
+    ANSWER_BY = db.Column(db.String(50), nullable=False)
+    ANSWER_ON = db.Column(db.DateTime, default=datetime.now)
+    ANSWER_CONTENT = db.Column(db.Text)
+
 
 #ENTITY: DISCUSSION_FORUM 
 class DISCUSSION_FORUM(db.Model): 
