@@ -1255,8 +1255,9 @@ def open_answer_board(class_id, answer_board_id):
     
     for ans_field in answer_fields:
        related_answer_id = ANSWER.query.filter_by(ANSWER_FIELD_ID=ans_field.ANSWER_FIELD_ID, ANSWER_BY=session.get('user_id')).first()
-       std_comments = STUDENT_COMMENT.query.filter(STUDENT_COMMENT.ANSWER_ID==related_answer_id.ANSWER_ID, STUDENT_COMMENT.STD_COMMENT_BY!=session.get('user_id')).all()
-       std_comments_dict = {
+       if related_answer_id:
+        std_comments = STUDENT_COMMENT.query.filter(STUDENT_COMMENT.ANSWER_ID==related_answer_id.ANSWER_ID, STUDENT_COMMENT.STD_COMMENT_BY!=session.get('user_id')).all()
+        std_comments_dict = {
           'answer_field_id': ans_field.ANSWER_FIELD_ID,
           'answer_id': related_answer_id.ANSWER_ID,
           'comments': [{
@@ -1264,8 +1265,9 @@ def open_answer_board(class_id, answer_board_id):
              'comment': cmt.STD_COMMENT_CONTENT 
           } 
           for cmt in std_comments]
-       }
-       
+        }
+       else:
+          continue
        print(f"Record for one answer field: {std_comments_dict}")
        std_comments_record.append(std_comments_dict)
     
