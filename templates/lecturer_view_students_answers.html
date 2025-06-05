@@ -89,7 +89,7 @@
                         text: "{{ message }}"
                     }).then(() => {
                         setTimeout(function() {
-                            window.location.href = "{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
+                            window.location.href = "{{ url_for('lecturer_view_students_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
                         }, 1000);
                     });
                 {% endif %}
