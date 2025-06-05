@@ -253,3 +253,18 @@ function closeCommentBox(answerId) {
         commentBox.style.display = 'none'; 
     }
 }
+
+function toggleComments(answerId, linkElement) {
+    const comments = document.querySelectorAll(`.std-comment[data-answer='${answerId}']`);
+    comments.forEach((comment, index) => {
+        if (index >= 3) {
+            if (comment.style.display === "none") {
+                comment.style.display = "block";
+                linkElement.textContent = "Show Less";
+            } else {
+                comment.style.display = "none";
+                linkElement.textContent = "View More";
+            }
+        }
+    });
+}
