@@ -71,20 +71,28 @@
                                 </p>
                             {% endif %}
                         {% endif %}
+
+                        {% if has_submitted %}
                         <div class="comment-from-std">
                             <p>Comment from Other Students:</p>
                             {% for std_cmt in std_comments_record %}
                                 {% if std_cmt.answer_field_id == field.ANSWER_FIELD_ID %}
                                     {% if std_cmt.comments %}
                                         {% for cmt in std_cmt.comments %}
-                                            <textarea>{{ cmt.comment }}</textarea>
+                                            <div class="std-comment" style="{% if loop.index > 3 %}display: none;{% endif %}" data-answer="{{ field.ANSWER_FIELD_ID }}">
+                                                <textarea disabled>{{ cmt.comment }}</textarea>
+                                            </div>
                                         {% endfor %}
+                                        {% if std_cmt.comments | length > 3 %}
+                                            <a href="javascript:void(0);" class="view-more" onclick="toggleComments('{{ field.ANSWER_FIELD_ID }}', this)">View More</a>
+                                        {% endif %}
                                     {% else %}
                                         <p>No comments from other students.</p>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </div>
+                        {% endif %}
                         <hr>
                     </div>
                 {% endfor %}
