@@ -71,6 +71,16 @@
                                 </p>
                             {% endif %}
                         {% endif %}
+                        <div class="comment-from-std">
+                            <p>Comment from Other Students:</p>
+                            {% for std_cmt in std_comments_record %}
+                                {% if std_cmt.answer_field_id == field.ANSWER_FIELD_ID %}
+                                    {% for cmt in std_cmt.comments %}
+                                        <textarea>{{ cmt.comment }}</textarea>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                         <hr>
                     </div>
                 {% endfor %}
