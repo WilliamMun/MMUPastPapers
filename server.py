@@ -1237,7 +1237,7 @@ def open_answer_board(class_id, answer_board_id):
 
     user_id = session.get('user_id')
     user_info = USER_INFO.query.filter_by(USER_ID=user_id).first()
-    name = user_info.NAME
+    name = user_info.NAME if user_info else "Unknown"
 
     if not ans_board:
         flash("Answer board not found.", "error")
@@ -1256,31 +1256,61 @@ def open_answer_board(class_id, answer_board_id):
     # Map field_id -> answer content
     answer_map = {ans.ANSWER_FIELD_ID: ans.ANSWER_CONTENT for ans in existing_answers}
 
-    std_comments_record = [] 
-    
+    # Prepare comments grouped by answer field
+    std_comments_record = []
+    lec_comments_record = []
+
     for ans_field in answer_fields:
-       related_answer_id = ANSWER.query.filter_by(ANSWER_FIELD_ID=ans_field.ANSWER_FIELD_ID, ANSWER_BY=session.get('user_id')).first()
-       if related_answer_id:
-        std_comments = STUDENT_COMMENT.query.filter(STUDENT_COMMENT.ANSWER_ID==related_answer_id.ANSWER_ID, STUDENT_COMMENT.STD_COMMENT_BY!=session.get('user_id')).all()
-        std_comments_dict = {
-          'answer_field_id': ans_field.ANSWER_FIELD_ID,
-          'answer_id': related_answer_id.ANSWER_ID,
-          'comments': [{
-             'user': cmt.STD_COMMENT_BY,
-             'comment': cmt.STD_COMMENT_CONTENT 
-          } 
-          for cmt in std_comments]
-        }
-       else:
-          continue
-       print(f"Record for one answer field: {std_comments_dict}")
-       std_comments_record.append(std_comments_dict)
-    
-    print(f"Final record of record in answer field: {std_comments_record}")
+        related_answer = ANSWER.query.filter_by(
+            ANSWER_FIELD_ID=ans_field.ANSWER_FIELD_ID,
+            ANSWER_BY=user_id
+        ).first()
+
+        if related_answer:
+            # Student comments from other users on this answer
+            std_comments = STUDENT_COMMENT.query.filter(
+                STUDENT_COMMENT.ANSWER_ID == related_answer.ANSWER_ID,
+                STUDENT_COMMENT.STD_COMMENT_BY != user_id
+            ).all()
+            std_comments_list = [{
+                'user': cmt.STD_COMMENT_BY,
+                'comment': cmt.STD_COMMENT_CONTENT
+            } for cmt in std_comments]
+
+            std_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': std_comments_list
+            })
+
+            # Lecturer comments on this answer
+            lec_comments = LECTURER_COMMENT.query.filter_by(
+                ANSWER_ID=related_answer.ANSWER_ID,
+                ANSWER_BOARD_ID=answer_board_id
+            ).all()
+            lec_comments_list = [{
+                'user': c.LEC_COMMENT_BY,
+                'comment': c.LEC_COMMENT_CONTENT
+            } for c in lec_comments]
+
+            lec_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': lec_comments_list
+            })
+
+        else:
+            # If no answer yet, still add empty comment lists for this answer field
+            std_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': []
+            })
+            lec_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': []
+            })
 
     return render_template(
-        "view_answer_board.html", 
-        paperPath=paper_path, 
+        "view_answer_board.html",
+        paperPath=paper_path,
         answer_board_name=answer_board_name,
         answer_fields=answer_fields,
         class_id=class_id,
@@ -1288,7 +1318,8 @@ def open_answer_board(class_id, answer_board_id):
         username=name,
         has_submitted=len(existing_answers) > 0,
         existing_answers=answer_map,
-        std_comments_record=std_comments_record
+        std_comments_record=std_comments_record,
+        lec_comments_record=lec_comments_record
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])

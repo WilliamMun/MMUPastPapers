@@ -72,19 +72,37 @@
                             {% endif %}
                         {% endif %}
                         <div class="comment-from-std">
-                            <p>Comment from Other Students:</p>
+                            <h2>Comment from Other Students:</h2>
                             {% for std_cmt in std_comments_record %}
                                 {% if std_cmt.answer_field_id == field.ANSWER_FIELD_ID %}
                                     {% if std_cmt.comments %}
                                         {% for cmt in std_cmt.comments %}
-                                            <textarea>{{ cmt.comment }}</textarea>
+                                            <textarea readonly>{{ cmt.comment }}</textarea>
                                         {% endfor %}
                                     {% else %}
-                                        <p>No comments from other students.</p>
+                                        <h3>No comments from other students.</h3>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </div>
+                        <!-- Lecturer Comments Section -->
+                        <div class="comment-from-lec">
+                            <h2>Comments from Lecturers:</h2>
+                            {% set found_lec_comment = false %}
+                            {% for lec_cmt in lec_comments_record %}
+                                {% if lec_cmt.answer_field_id == field.ANSWER_FIELD_ID %}
+                                    {% if lec_cmt.comments %}
+                                        {% set found_lec_comment = true %}
+                                        {% for cmt in lec_cmt.comments %}
+                                            <textarea readonly title="Comment by {{ cmt.user }}">{{ cmt.comment }}</textarea>
+                                        {% endfor %}
+                                    {% else %}
+                                        <h3>No comments from lecturer.</h3>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
                         <hr>
                     </div>
                 {% endfor %}
