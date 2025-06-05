@@ -1668,6 +1668,11 @@ def add_term():
             if not term_desc or not term_id:
                 flash('All fields are required!', 'error')
                 return redirect(url_for('add_term'))
+            
+            # Check for existing term ID
+            if TERM_INFO.query.get(term_id):
+                flash('Term ID already exists!', 'error')
+                return redirect(url_for('add_term'))
 
             new_term = TERM_INFO(TERM_ID=term_id, TERM_DESC=term_desc)
             db.session.add(new_term)
@@ -1700,7 +1705,6 @@ def edit_term(term_id):
             return redirect(url_for('edit_term', term_id=term_id))
     return render_template('edit_term.html', term=term)
 
-
 @app.route('/delete_term/<term_id>', methods=['POST'])
 def delete_term(term_id):
     term = TERM_INFO.query.get_or_404(term_id)
@@ -1710,6 +1714,67 @@ def delete_term(term_id):
         flash('Term deleted successfully!', 'success')
     except Exception as e:
         db.session.rollback()
+
+@app.route('/edit_faculty/<faculty_id>', methods=['GET', 'POST'])
+def edit_faculty(faculty_id):
+    faculty = FACULTY_INFO.query.get_or_404(faculty_id)
+
+    if request.method == 'POST':
+        try:
+            faculty.FACULTY_ID = request.form['faculty_id']
+            faculty.FACULTY_DESC = request.form['faculty_desc']
+            db.session.commit()
+            flash('Faculty updated successfully!', 'success')
+            return redirect(url_for('view_faculties'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating faculty: {str(e)}', 'error')
+            return redirect(url_for('edit_faculty', faculty_id=faculty_id))
+
+    return render_template('edit_faculty.html', faculty=faculty)
+
+@app.route('/view_faculties')
+def view_faculties():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    pagination = FACULTY_INFO.query.order_by(FACULTY_INFO.FACULTY_ID).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+    return render_template('view_faculties.html', faculties=pagination.items, pagination=pagination)
+
+@app.route('/add_faculty', methods=['GET', 'POST'])
+def add_faculty():
+
+   if request.method == 'POST':
+      faculty_id = request.form['faculty_id']
+      faculty_desc = request.form['faculty_desc']
+      try:
+         if not faculty_desc or not faculty_id:
+            flash('All fields are required!', 'error')
+            return redirect(url_for('add_faculty'))
+
+          # Check for existing faculty ID
+         if FACULTY_INFO.query.get(faculty_id):
+            flash('Faculty ID already exists!', 'error')
+            return redirect(url_for('add_faculty'))
+
+         new_faculty = FACULTY_INFO(FACULTY_ID=faculty_id, FACULTY_DESC=faculty_desc)
+         db.session.add(new_faculty)
+         db.session.commit()
+         flash('Faculty added successfully!', 'success')
+         return redirect(url_for('view_faculties'))
+
+      except IntegrityError:
+         db.session.rollback()
+         flash('Faculty already exists!', 'error')
+      except Exception as e:
+         db.session.rollback()
+         flash(f'Error adding faculty: {str(e)}', 'error')
+   return render_template('add_faculty.html')
 
 @app.route("/chat_history/<answer_board_id>")
 def chat_history(answer_board_id):
