@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <title>Faculty | MMUPastPapers</title>
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <main class="main-content">
+        {% include 'maintenance_bar.html' %}
+
+        <div class="table-container">
+            <div class="faculty-info-box">
+                <h1>Edit Faculty Info</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Faculty ID</th>
+                            <th>Faculty Description</th>
+                            <th colspan="2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faculty in faculties %}
+                        <tr>
+                            <td class="bil">{{ faculty.FACULTY_ID }}</td>
+                            <td>{{ faculty.FACULTY_DESC }}</td>
+                            <td>
+                                <a href="{{ url_for('edit_faculty', faculty_id=faculty.FACULTY_ID) }}">
+                                    <img src="{{ url_for('static', filename='images/edit.png') }}" alt="Edit Faculty">
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pagination mt-4 flex justify-center items-center gap-2">
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for('view_faculties', page=pagination.prev_num) }}" 
+                       class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Previous
+                    </a>
+                {% endif %}
+    
+                {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                        <a href="{{ url_for('view_faculties', page=page_num) }}" 
+                            class="px-3 py-1 rounded {% if page_num == pagination.page %}bg-blue-500 text-white{% else %}bg-gray-200 hover:bg-gray-300{% endif %}">
+                        {{ page_num }}
+                        </a>
+                    {% else %}
+                        <span class="px-3">...</span>
+                    {% endif %}
+                {% endfor %}
+    
+                {% if pagination.has_next %}
+                    <a href="{{ url_for('view_faculties', page=pagination.next_num) }}" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Next
+                    </a>
+                {% endif %}
+                </div>
+                <br>
+                <div class="btn-container">
+                    <a href="{{ url_for('add_faculty') }}" class="btn">Add New Faculty</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                {% for category, message in messages %}
+                    {% if category == 'success' %}
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Yay! Success.',
+                            text: "{{ message }}"
+                        }).then(() => {
+                            setTimeout(function() {
+                                window.location.href = "{{ url_for('view_faculties') }}";
+                            }, 1000);
+                        });
+                    {% endif %}
+                {% endfor %}
+            </script>
+        {% endif %}
+    {% endwith %}
+
+    {% include 'footer.html' %}
+    </header>
+</body>
+</html>

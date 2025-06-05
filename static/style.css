@@ -1936,6 +1936,41 @@ hr{
 }
 /**The End of View Term Page
 
+/* Container for faculty information */
+.faculty-info-box {
+  background: white;
+  padding: 40px;
+  width: 1000px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Page heading */
+.faculty-info-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+
+.faculty-info-box th, .faculty-info-box td {
+  padding: 8px;
+  vertical-align: middle;
+}
+
+/* Ensure images like edit/delete icons stay aligned */
+.faculty-info-box td img {
+  height: 17px;
+  align-items: center;
+  display: inline-block;
+}
+/**The End of View faculties Page**/
+
 /* Centering the table container */
 .table-container {
   display: flex;
@@ -2089,6 +2124,29 @@ tr:hover {
 }
 /**The End of Edit Term Page**/
 
+/**Edit Faculty Page**/
+.editFaculty-box {
+  background: white;
+  padding: 40px;
+  width: 750px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Page heading */
+.editFaculty-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+/**The End of Edit Faculty Page**/
+
 /**New Subject Page**/
 .newSubject-box {
   background: white;
@@ -2132,6 +2190,28 @@ tr:hover {
   color: black;
 }
 /**The End of Add Term Page**/
+
+/**New Faculty Page**/
+.newFaculty-box {
+  background: white;
+  padding: 40px;
+  width: 750px;
+  height: auto;
+  max-width: 95%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.newFaculty-box h1 {
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: black;
+}
+/**The End of Add Faculty Page**/
 
 /** View Answer Board Page **/
 .view-answer-board-box{
