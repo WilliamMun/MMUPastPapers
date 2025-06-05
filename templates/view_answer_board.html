@@ -80,14 +80,20 @@
                                     {% if std_cmt.comments %}
                                         {% for cmt in std_cmt.comments %}
                                             <div class="std-comment" style="{% if loop.index > 3 %}display: none;{% endif %}" data-answer="{{ field.ANSWER_FIELD_ID }}">
-                                                <textarea readonly>{{ cmt.comment }}</textarea>
+                                                <textarea disabled>{{ cmt.comment }}</textarea>
+                                            </div>
                                         {% endfor %}
+                                        {% if std_cmt.comments | length > 3 %}
+                                            <a href="javascript:void(0);" class="view-more" onclick="toggleComments('{{ field.ANSWER_FIELD_ID }}', this)">View More</a>
+                                        {% endif %}
                                     {% else %}
                                         <h3>No comments from other students.</h3>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </div>
+                        {% endif %}
+
                         <!-- Lecturer Comments Section -->
                         <div class="comment-from-lec">
                             <h2>Comments from Lecturers:</h2>
@@ -97,12 +103,8 @@
                                     {% if lec_cmt.comments %}
                                         {% set found_lec_comment = true %}
                                         {% for cmt in lec_cmt.comments %}
-                                            <textarea readonly title="Comment by {{ cmt.user }}" disabled>{{ cmt.comment }}</textarea>
-                                            </div>
+                                            <textarea readonly title="Comment by {{ cmt.user }}">{{ cmt.comment }}</textarea>
                                         {% endfor %}
-                                        {% if std_cmt.comments | length > 3 %}
-                                            <a href="javascript:void(0);" class="view-more" onclick="toggleComments('{{ field.ANSWER_FIELD_ID }}', this)">View More</a>
-                                        {% endif %}
                                     {% else %}
                                         <h3>No comments from lecturer.</h3>
                                     {% endif %}
