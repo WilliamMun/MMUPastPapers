@@ -178,14 +178,21 @@ class CHAT_MESSAGE(db.Model):
   IMAGE_URL = db.Column(db.String(200), nullable=True)
   TIMESTAMP = db.Column(db.DateTime, default=datetime.now)
 
+#ENTITY: STUDENT_COMMENT 
+class STUDENT_COMMENT(db.Model):
+   STD_COMMENT_ID = db.Column(db.String(100), primary_key=True)
+   STD_COMMENT_CONTENT = db.Column(db.Text)
+   ANSWER_ID = db.Column(db.String(50), db.ForeignKey(ANSWER.ANSWER_ID))
+   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+   STD_COMMENT_BY = db.Column(db.String(50))
+
 #ENTITY: LECTURER_COMMENT
 class LECTURER_COMMENT(db.Model):
-    __tablename__ = 'LECTURER_COMMENT'
-    LEC_COMMENT_ID = db.Column(db.Integer, primary_key=True)
-    LEC_COMMENT_CONTENT = db.Column(db.Text, nullable=False)
-    ANSWER_ID = db.Column(db.Integer, db.ForeignKey('ANSWER.ANSWER_ID'))
-    ANSWER_BOARD_ID = db.Column(db.Integer, db.ForeignKey('ANSWER_BOARD.ANSWER_BOARD_ID'))
-    LEC_COMMENT_BY = db.Column(db.Integer, db.ForeignKey('USER_INFO.USER_ID'))
+   LEC_COMMENT_ID = db.Column(db.String(100), primary_key=True)
+   LEC_COMMENT_CONTENT = db.Column(db.Text)
+   ANSWER_ID = db.Column(db.String(50), db.ForeignKey(ANSWER.ANSWER_ID))
+   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+   LEC_COMMENT_BY = db.Column(db.String(50))
 
 #-------------------------------------------------------------------------------------------------------
 #Finish setting up database tables 
@@ -1249,6 +1256,28 @@ def open_answer_board(class_id, answer_board_id):
     # Map field_id -> answer content
     answer_map = {ans.ANSWER_FIELD_ID: ans.ANSWER_CONTENT for ans in existing_answers}
 
+    std_comments_record = [] 
+    
+    for ans_field in answer_fields:
+       related_answer_id = ANSWER.query.filter_by(ANSWER_FIELD_ID=ans_field.ANSWER_FIELD_ID, ANSWER_BY=session.get('user_id')).first()
+       if related_answer_id:
+        std_comments = STUDENT_COMMENT.query.filter(STUDENT_COMMENT.ANSWER_ID==related_answer_id.ANSWER_ID, STUDENT_COMMENT.STD_COMMENT_BY!=session.get('user_id')).all()
+        std_comments_dict = {
+          'answer_field_id': ans_field.ANSWER_FIELD_ID,
+          'answer_id': related_answer_id.ANSWER_ID,
+          'comments': [{
+             'user': cmt.STD_COMMENT_BY,
+             'comment': cmt.STD_COMMENT_CONTENT 
+          } 
+          for cmt in std_comments]
+        }
+       else:
+          continue
+       print(f"Record for one answer field: {std_comments_dict}")
+       std_comments_record.append(std_comments_dict)
+    
+    print(f"Final record of record in answer field: {std_comments_record}")
+
     return render_template(
         "view_answer_board.html", 
         paperPath=paper_path, 
@@ -1258,7 +1287,8 @@ def open_answer_board(class_id, answer_board_id):
         answer_board_id=answer_board_id,
         username=name,
         has_submitted=len(existing_answers) > 0,
-        existing_answers=answer_map
+        existing_answers=answer_map,
+        std_comments_record=std_comments_record
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
@@ -1643,6 +1673,11 @@ def add_term():
             if not term_desc or not term_id:
                 flash('All fields are required!', 'error')
                 return redirect(url_for('add_term'))
+            
+            # Check for existing term ID
+            if TERM_INFO.query.get(term_id):
+                flash('Term ID already exists!', 'error')
+                return redirect(url_for('add_term'))
 
             new_term = TERM_INFO(TERM_ID=term_id, TERM_DESC=term_desc)
             db.session.add(new_term)
@@ -1675,7 +1710,6 @@ def edit_term(term_id):
             return redirect(url_for('edit_term', term_id=term_id))
     return render_template('edit_term.html', term=term)
 
-
 @app.route('/delete_term/<term_id>', methods=['POST'])
 def delete_term(term_id):
     term = TERM_INFO.query.get_or_404(term_id)
@@ -1685,6 +1719,67 @@ def delete_term(term_id):
         flash('Term deleted successfully!', 'success')
     except Exception as e:
         db.session.rollback()
+
+@app.route('/edit_faculty/<faculty_id>', methods=['GET', 'POST'])
+def edit_faculty(faculty_id):
+    faculty = FACULTY_INFO.query.get_or_404(faculty_id)
+
+    if request.method == 'POST':
+        try:
+            faculty.FACULTY_ID = request.form['faculty_id']
+            faculty.FACULTY_DESC = request.form['faculty_desc']
+            db.session.commit()
+            flash('Faculty updated successfully!', 'success')
+            return redirect(url_for('view_faculties'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating faculty: {str(e)}', 'error')
+            return redirect(url_for('edit_faculty', faculty_id=faculty_id))
+
+    return render_template('edit_faculty.html', faculty=faculty)
+
+@app.route('/view_faculties')
+def view_faculties():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    pagination = FACULTY_INFO.query.order_by(FACULTY_INFO.FACULTY_ID).paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+    return render_template('view_faculties.html', faculties=pagination.items, pagination=pagination)
+
+@app.route('/add_faculty', methods=['GET', 'POST'])
+def add_faculty():
+
+   if request.method == 'POST':
+      faculty_id = request.form['faculty_id']
+      faculty_desc = request.form['faculty_desc']
+      try:
+         if not faculty_desc or not faculty_id:
+            flash('All fields are required!', 'error')
+            return redirect(url_for('add_faculty'))
+
+          # Check for existing faculty ID
+         if FACULTY_INFO.query.get(faculty_id):
+            flash('Faculty ID already exists!', 'error')
+            return redirect(url_for('add_faculty'))
+
+         new_faculty = FACULTY_INFO(FACULTY_ID=faculty_id, FACULTY_DESC=faculty_desc)
+         db.session.add(new_faculty)
+         db.session.commit()
+         flash('Faculty added successfully!', 'success')
+         return redirect(url_for('view_faculties'))
+
+      except IntegrityError:
+         db.session.rollback()
+         flash('Faculty already exists!', 'error')
+      except Exception as e:
+         db.session.rollback()
+         flash(f'Error adding faculty: {str(e)}', 'error')
+   return render_template('add_faculty.html')
 
 @app.route("/chat_history/<answer_board_id>")
 def chat_history(answer_board_id):
@@ -1750,7 +1845,7 @@ def send_message():
 
    return jsonify(success=True)
 
-@app.route("/view_others_answers/<class_id>/<answer_board_id>")
+@app.route("/view_others_answers/<class_id>/<answer_board_id>", methods=['GET','POST'])
 def view_others_answers(class_id, answer_board_id):
   #Get answers field for that particular answer board 
   answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
@@ -1787,115 +1882,148 @@ def view_others_answers(class_id, answer_board_id):
     print(f"Paper Info: {paper_info}")
     paper_path = paper_info.FILEPATH
     print(f"Paper path: {paper_path}")
+  
+  #Get existing comment from db 
+  existing_comments = STUDENT_COMMENT.query.filter_by(ANSWER_BOARD_ID=answer_board_id, STD_COMMENT_BY=session.get('user_id')).all()
+  
+  existed_comments = []
+  for cmt in existing_comments:
+    cmt_dict = {
+       'comment_id': cmt.STD_COMMENT_ID,
+       'comment': cmt.STD_COMMENT_CONTENT,
+       'answer_id': cmt.ANSWER_ID
+    }
+    print(f"Dicts for 1 comment: {cmt_dict}")
+    
+    existed_comments.append(cmt_dict)
 
-  return render_template("view_others_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path)
+  print(f"List of existed comments: {existed_comments}")
+
+  if request.method == 'POST': 
+    try: 
+      comment = request.form
+      print(f"Input received: {comment}")
+
+      for key, value in comment.items():
+        if key.startswith('comment-'):
+          answer_id = key.replace('comment-', '')
+          comment_content = value
+          comment_id = request.form.get(f"comment_id-{answer_id}")
+          print(f"Answer Id: {answer_id} and the comment is: {comment_content} Comment Id received: {comment_id}")
+      
+      if comment_id: 
+         new_comment = STUDENT_COMMENT.query.filter_by(STD_COMMENT_ID=comment_id).first()
+         new_comment.STD_COMMENT_CONTENT = comment_content 
+         print("Comment edited!")
+      else:
+        new_comment = STUDENT_COMMENT(STD_COMMENT_ID=uuid.uuid4().hex[:20], STD_COMMENT_CONTENT=comment_content, ANSWER_ID=answer_id, ANSWER_BOARD_ID=answer_board_id, STD_COMMENT_BY=session.get('user_id'))
+        db.session.add(new_comment)
+        print("New comment added!")
+      
+      db.session.commit() 
+
+      flash("Comment saved successfully!","success")
+      print(f"Comment: {new_comment} saved successfully!")
+      return render_template("view_others_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path, existed_comments=existed_comments)
+    
+    except Exception as e: 
+      flash("Failed to comment. Please try again.","error")
+      print(f"Error occurs when commenting: {e}")
+      return redirect(url_for('view_others_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')))
+    
+  return render_template("view_others_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path, existed_comments=existed_comments)
 
 @app.route("/lecturer_view_students_answers/<class_id>/<answer_board_id>", methods=['GET'])
 def lecturer_view_students_answers(class_id, answer_board_id):
     answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
     all_user_ids = set()
-    
-    # Collect user ids from answers
+
+    # Collect user IDs from answers
     for answer_field in answer_fields:
         std_answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=answer_field.ANSWER_FIELD_ID).all()
         for ans in std_answers:
             all_user_ids.add(ans.ANSWER_BY)
-    
+
     users = USER_INFO.query.filter(USER_INFO.USER_ID.in_(all_user_ids)).all()
     user_dict = {user.USER_ID: user.NAME for user in users}
-    
+
     answers_by_fields = []
     for answer_field in answer_fields:
         std_answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=answer_field.ANSWER_FIELD_ID).all()
         related_answers = {}
-        
+
         for ans in std_answers:
             user_name = user_dict.get(ans.ANSWER_BY, "Unknown User")
-            existing_comment = LECTURER_COMMENT.query.filter_by(
-                ANSWER_ID=ans.ANSWER_ID,
-                ANSWER_BOARD_ID=answer_board_id,
-                LEC_COMMENT_BY=session.get('user_id')
-            ).first()
             related_answers[ans.ANSWER_ID] = {
                 'name': user_name,
-                'content': ans.ANSWER_CONTENT,
-                'comment': existing_comment.LEC_COMMENT_CONTENT if existing_comment else ''
+                'content': ans.ANSWER_CONTENT
+                # No 'comment' included
             }
-        
+
         answers_by_fields.append({
             'field_id': answer_field.ANSWER_FIELD_ID,
             'field_type': answer_field.ANSWER_FIELD_TYPE,
             'field_desc': answer_field.ANSWER_FIELD_DESC,
             'answers': related_answers
         })
-    
+
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
     paper_path = ""
     if ans_board and ans_board.PAPER_ID:
         paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
         if paper_info:
             paper_path = paper_info.FILEPATH
-    
-    return render_template("lecturer_view_students_answers.html", 
-                           answers_by_fields=answers_by_fields, 
-                           paperPath=paper_path)
 
+    return render_template("lecturer_view_students_answers.html",
+                           answers_by_fields=answers_by_fields,
+                           paperPath=paper_path)
 
 @app.route('/save_comments', methods=['POST'])
 def save_comments():
-    board_id = request.form.get('answer_board_id')
-    posted_by = session.get('user_id')
+    answer_board_id = request.form.get('answer_board_id')
+    try:
+        form_data = request.form
 
-    # Save individual comments
-    for key in request.form:
-        if key.startswith("comments["):
-            answer_id = key[9:-1]
-            comment = request.form.get(key).strip()
-            if comment:
-                existing_comment = LECTURER_COMMENT.query.filter_by(
-                    ANSWER_ID=answer_id,
-                    ANSWER_BOARD_ID=board_id,
-                    LEC_COMMENT_BY=posted_by
-                ).first()
-                if existing_comment:
-                    existing_comment.LEC_COMMENT_CONTENT = comment
-                else:
+        # Handle individual lecturer comments
+        for key, value in form_data.items():
+            if key.startswith('comments['):
+                answer_id = key[len('comments['):-1]
+                comment_content = value.strip()
+                if comment_content:
                     new_comment = LECTURER_COMMENT(
                         LEC_COMMENT_ID=str(uuid.uuid4()),
-                        LEC_COMMENT_CONTENT=comment,
+                        LEC_COMMENT_CONTENT=comment_content,
                         ANSWER_ID=answer_id,
-                        ANSWER_BOARD_ID=board_id,
-                        LEC_COMMENT_BY=posted_by
+                        ANSWER_BOARD_ID=answer_board_id,
+                        LEC_COMMENT_BY=session.get('user_id')
                     )
                     db.session.add(new_comment)
 
-    # Save bulk comments per question
-    for key in request.form:
-        if key.startswith("comments_all_question["):
-            field_id = key[23:-1]
-            comment = request.form.get(key).strip()
-            if comment:
-                answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=field_id).all()
-                for ans in answers:
-                    existing_comment = LECTURER_COMMENT.query.filter_by(
-                        ANSWER_ID=ans.ANSWER_ID,
-                        ANSWER_BOARD_ID=board_id,
-                        LEC_COMMENT_BY=posted_by
-                    ).first()
-                    if existing_comment:
-                        existing_comment.LEC_COMMENT_CONTENT = comment
-                    else:
+        # Handle "comment all answers for this question"
+        for key, value in form_data.items():
+            if key.startswith('comments_all_question['):
+                field_id = key[len('comments_all_question['):-1]
+                comment_content = value.strip()
+                if comment_content:
+                    answers_for_field = ANSWER.query.filter_by(ANSWER_FIELD_ID=field_id).all()
+                    for ans in answers_for_field:
                         new_comment = LECTURER_COMMENT(
                             LEC_COMMENT_ID=str(uuid.uuid4()),
-                            LEC_COMMENT_CONTENT=comment,
+                            LEC_COMMENT_CONTENT=comment_content,
                             ANSWER_ID=ans.ANSWER_ID,
-                            ANSWER_BOARD_ID=board_id,
-                            LEC_COMMENT_BY=posted_by
+                            ANSWER_BOARD_ID=answer_board_id,
+                            LEC_COMMENT_BY=session.get('user_id')
                         )
                         db.session.add(new_comment)
 
-    db.session.commit()
-    return redirect(url_for('lecturer_view_students_answers', class_id=session.get('current_class_id'), answer_board_id=board_id))
+        db.session.commit()
+        flash("Lecturer comments saved successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Failed to save comments. Please try again.", "error")
+        print(f"Error saving lecturer comments: {e}")
+
+    return redirect(url_for('lecturer_view_students_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id))
 
 if __name__ == "__main__":
     #app.run(debug=True)

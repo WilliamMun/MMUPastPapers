@@ -235,3 +235,21 @@ function renumberQuestions() {
   document.getElementById('answer-fields').setAttribute('data-answer-count', fields.length + 1);
 
 }
+
+function openCommentBox(answerId) {
+    var commentBox = document.getElementById('commenting-box-' + answerId);
+
+    if (commentBox.style.display === 'none' || commentBox.style.display === '') {
+        commentBox.style.display = "block";
+    } else {
+        commentBox.style.display = 'none';
+    }
+}
+
+function closeCommentBox(answerId) {
+    var commentBox = document.getElementById('commenting-box-' + answerId);
+
+    if (commentBox.style.display === 'block') {
+        commentBox.style.display = 'none'; 
+    }
+}

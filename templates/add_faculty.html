@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='sweetalert.js' )}}"></script>
+  <title>Add Faculty | MMUPastPapers</title>
+</head>
+<body>
+{% include 'header.html' %}
+<main class="main-content">
+    <div class="newFaculty-box">
+        <h1>Add New Faculty</h1>
+        <form method="POST" action="{{ url_for('add_faculty') }}">
+            <div class="ques-box-input">
+                <label for="faculty_id">Faculty ID:</label>
+                <input type="text" id="faculty_id" name="faculty_id" placeholder="Enter Faculty ID" required>
+            </div>
+            <div class="ques-box-input">
+                <label for="faculty_desc">Faculty Description:</label>
+                <input type="text" id="faculty_desc" name="faculty_desc" placeholder="Enter Faculty Description" required>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn" onclick="window.location.href='{{ url_for('view_faculties') }}'">Cancel</button>
+                <button type="submit" class="btn">Add Faculty</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "{{ url_for('view_faculties') }}";
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
+{% include 'footer.html' %}
+</body>
+</html>
