@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <title>Review Student Answers | MMUPastPapers</title>
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <main class="main-content">
+        {% include 'class_bar.html' %}
+
+        <div class="lec-view-ans-box">
+            <h1>Students Answers</h1>
+            <hr>
+            
+            {% if paperPath %}
+                <iframe src="{{ url_for('get_pdf', filepath=paperPath) }}" width="100%" height="500px"></iframe>
+            {% endif %}
+
+            <br>
+            <form method="POST" action="{{ url_for('save_comments') }}">
+                <input type="hidden" name="answer_board_id" value="{{ request.view_args.answer_board_id }}">
+
+                {% for answers_by_field in answers_by_fields %}
+                <div class="lec-ans-field-view">
+                    <h1>{{ answers_by_field.field_desc }}</h1>
+                    <hr class="my-4">
+
+                    {% for answer_id, answer_data in answers_by_field.answers.items() %}
+                    <div class="mb-8">
+                        <button type="button" class="viewStudentAns-btn" onclick="toggleComment('{{ answer_id }}')">
+                            Comment This Answer
+                        </button>
+                        <label>{{ answer_data.name }}:</label>
+
+                        {% if answer_data.content and answer_data.content.endswith(".pdf") %}
+                            <a href="{{ url_for('static', filename=answer_data.content) }}" target="_blank" class="text-blue-600 underline">View File</a>
+                        {% else %}
+                            <p>{{ answer_data.content or "No answer submitted." }}</p>
+                        {% endif %}
+
+                        <div id="comment-{{ answer_id }}" style="display: none;">
+                            <textarea name="comments[{{ answer_id }}]" class="textarea-answer mt-2" rows="3" placeholder="Enter feedback..."></textarea>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="comment-from-lec">
+                        <label>Comment All Answers for this Question:</label>
+                        <textarea name="comments_all_question[{{ answers_by_field.field_id }}]" class="textarea-answer mt-2" rows="3" placeholder="Comment all answers under this question..."></textarea>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="btn-container">
+                    <button type="submit" class="viewStudentAns-btn" style="margin-left: 15px;">Save Comment</button>
+                    <a href="{{ url_for('open_answer_board', class_id=session.get('current_class_id'), answer_board_id=request.view_args.answer_board_id) }}" class="viewStudentAns-btn">Back</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function toggleComment(answerId) {
+            const box = document.getElementById('comment-' + answerId);
+            box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+        }
+    </script>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "{{ url_for('lecturer_view_students_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}";
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>

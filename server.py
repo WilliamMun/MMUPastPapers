@@ -54,6 +54,7 @@ class STUDY_LVL_INFO(db.Model):
 
 #ENTITY: USER_INFO 
 class USER_INFO(db.Model):  
+  __tablename__ = 'USER_INFO'
   USER_ID = db.Column(db.String(50), primary_key=True, unique=True) 
   USER_EMAIL = db.Column(db.String(255), unique=True) 
   NAME = db.Column(db.String(200), nullable=False) 
@@ -124,11 +125,11 @@ class USER_CLASS(db.Model):
 
   __table_args__ = (db.PrimaryKeyConstraint('USER_ID','CLASS_ID'),)
 
-#ENTITY: ANSWER_BOARD 
 class ANSWER_BOARD(db.Model): 
+  __tablename__ = 'ANSWER_BOARD'
   ANSWER_BOARD_ID = db.Column(db.String(50), primary_key=True) 
-  PAPER_ID = db.Column(db.String(50), db.ForeignKey(PASTPAPERS_INFO.PAPER_ID)) 
-  CLASS_ID = db.Column(db.String(50), db.ForeignKey(CLASS.CLASS_ID)) 
+  PAPER_ID = db.Column(db.String(50), db.ForeignKey('PASTPAPERS_INFO.PAPER_ID')) 
+  CLASS_ID = db.Column(db.String(50), db.ForeignKey('CLASS.CLASS_ID')) 
   CREATED_BY = db.Column(db.String(50), nullable=False) 
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   ANSWER_BOARD_NAME = db.Column(db.Text)
@@ -142,12 +143,15 @@ class ANSWER_FIELD(db.Model):
   MCQ_TYPE = db.Column(db.Integer) #4: 4 answer options, 5: 5 answer options 
 
 #ENTITY: ANSWER  
-class ANSWER(db.Model): 
-  ANSWER_ID = db.Column(db.String(50), primary_key=True)
-  ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID)) 
-  ANSWER_BY = db.Column(db.String(50), nullable=False) 
-  ANSWER_ON = db.Column(db.DateTime, default=datetime.now) 
-  ANSWER_CONTENT = db.Column(db.Text) 
+class ANSWER(db.Model):
+    __tablename__ = 'ANSWER'
+
+    ANSWER_ID = db.Column(db.String(50), primary_key=True)
+    ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
+    ANSWER_BY = db.Column(db.String(50), nullable=False)
+    ANSWER_ON = db.Column(db.DateTime, default=datetime.now)
+    ANSWER_CONTENT = db.Column(db.Text)
+
 
 #ENTITY: DISCUSSION_FORUM 
 class DISCUSSION_FORUM(db.Model): 
@@ -156,6 +160,7 @@ class DISCUSSION_FORUM(db.Model):
   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID)) 
   POSTED_BY = db.Column(db.String(50), nullable=False) 
   POSTED_ON = db.Column(db.DateTime, default=datetime.now)
+  
 
 #ENTITY: MCQ_OPTION
 class MCQ_OPTION(db.Model):
@@ -163,7 +168,7 @@ class MCQ_OPTION(db.Model):
    MCQ_OPTION_DESC = db.Column(db.Text)
    MCQ_OPTION_FLAG = db.Column(db.Integer, nullable=True)
    ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
-
+  
 #ENTITY: CHAT_MESSAGE
 class CHAT_MESSAGE(db.Model):
   CHAT_ID = db.Column(db.String(100), primary_key=True)
@@ -1232,7 +1237,7 @@ def open_answer_board(class_id, answer_board_id):
 
     user_id = session.get('user_id')
     user_info = USER_INFO.query.filter_by(USER_ID=user_id).first()
-    name = user_info.NAME
+    name = user_info.NAME if user_info else "Unknown"
 
     if not ans_board:
         flash("Answer board not found.", "error")
@@ -1251,31 +1256,61 @@ def open_answer_board(class_id, answer_board_id):
     # Map field_id -> answer content
     answer_map = {ans.ANSWER_FIELD_ID: ans.ANSWER_CONTENT for ans in existing_answers}
 
-    std_comments_record = [] 
-    
+    # Prepare comments grouped by answer field
+    std_comments_record = []
+    lec_comments_record = []
+
     for ans_field in answer_fields:
-       related_answer_id = ANSWER.query.filter_by(ANSWER_FIELD_ID=ans_field.ANSWER_FIELD_ID, ANSWER_BY=session.get('user_id')).first()
-       if related_answer_id:
-        std_comments = STUDENT_COMMENT.query.filter(STUDENT_COMMENT.ANSWER_ID==related_answer_id.ANSWER_ID, STUDENT_COMMENT.STD_COMMENT_BY!=session.get('user_id')).all()
-        std_comments_dict = {
-          'answer_field_id': ans_field.ANSWER_FIELD_ID,
-          'answer_id': related_answer_id.ANSWER_ID,
-          'comments': [{
-             'user': cmt.STD_COMMENT_BY,
-             'comment': cmt.STD_COMMENT_CONTENT 
-          } 
-          for cmt in std_comments]
-        }
-       else:
-          continue
-       print(f"Record for one answer field: {std_comments_dict}")
-       std_comments_record.append(std_comments_dict)
-    
-    print(f"Final record of record in answer field: {std_comments_record}")
+        related_answer = ANSWER.query.filter_by(
+            ANSWER_FIELD_ID=ans_field.ANSWER_FIELD_ID,
+            ANSWER_BY=user_id
+        ).first()
+
+        if related_answer:
+            # Student comments from other users on this answer
+            std_comments = STUDENT_COMMENT.query.filter(
+                STUDENT_COMMENT.ANSWER_ID == related_answer.ANSWER_ID,
+                STUDENT_COMMENT.STD_COMMENT_BY != user_id
+            ).all()
+            std_comments_list = [{
+                'user': cmt.STD_COMMENT_BY,
+                'comment': cmt.STD_COMMENT_CONTENT
+            } for cmt in std_comments]
+
+            std_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': std_comments_list
+            })
+
+            # Lecturer comments on this answer
+            lec_comments = LECTURER_COMMENT.query.filter_by(
+                ANSWER_ID=related_answer.ANSWER_ID,
+                ANSWER_BOARD_ID=answer_board_id
+            ).all()
+            lec_comments_list = [{
+                'user': c.LEC_COMMENT_BY,
+                'comment': c.LEC_COMMENT_CONTENT
+            } for c in lec_comments]
+
+            lec_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': lec_comments_list
+            })
+
+        else:
+            # If no answer yet, still add empty comment lists for this answer field
+            std_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': []
+            })
+            lec_comments_record.append({
+                'answer_field_id': ans_field.ANSWER_FIELD_ID,
+                'comments': []
+            })
 
     return render_template(
-        "view_answer_board.html", 
-        paperPath=paper_path, 
+        "view_answer_board.html",
+        paperPath=paper_path,
         answer_board_name=answer_board_name,
         answer_fields=answer_fields,
         class_id=class_id,
@@ -1283,7 +1318,8 @@ def open_answer_board(class_id, answer_board_id):
         username=name,
         has_submitted=len(existing_answers) > 0,
         existing_answers=answer_map,
-        std_comments_record=std_comments_record
+        std_comments_record=std_comments_record,
+        lec_comments_record=lec_comments_record
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
@@ -1927,6 +1963,98 @@ def view_others_answers(class_id, answer_board_id):
       return redirect(url_for('view_others_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')))
     
   return render_template("view_others_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path, existed_comments=existed_comments)
+
+@app.route("/lecturer_view_students_answers/<class_id>/<answer_board_id>", methods=['GET'])
+def lecturer_view_students_answers(class_id, answer_board_id):
+    answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
+    all_user_ids = set()
+
+    # Collect user IDs from answers
+    for answer_field in answer_fields:
+        std_answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=answer_field.ANSWER_FIELD_ID).all()
+        for ans in std_answers:
+            all_user_ids.add(ans.ANSWER_BY)
+
+    users = USER_INFO.query.filter(USER_INFO.USER_ID.in_(all_user_ids)).all()
+    user_dict = {user.USER_ID: user.NAME for user in users}
+
+    answers_by_fields = []
+    for answer_field in answer_fields:
+        std_answers = ANSWER.query.filter_by(ANSWER_FIELD_ID=answer_field.ANSWER_FIELD_ID).all()
+        related_answers = {}
+
+        for ans in std_answers:
+            user_name = user_dict.get(ans.ANSWER_BY, "Unknown User")
+            related_answers[ans.ANSWER_ID] = {
+                'name': user_name,
+                'content': ans.ANSWER_CONTENT
+                # No 'comment' included
+            }
+
+        answers_by_fields.append({
+            'field_id': answer_field.ANSWER_FIELD_ID,
+            'field_type': answer_field.ANSWER_FIELD_TYPE,
+            'field_desc': answer_field.ANSWER_FIELD_DESC,
+            'answers': related_answers
+        })
+
+    ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
+    paper_path = ""
+    if ans_board and ans_board.PAPER_ID:
+        paper_info = PASTPAPERS_INFO.query.filter_by(PAPER_ID=ans_board.PAPER_ID).first()
+        if paper_info:
+            paper_path = paper_info.FILEPATH
+
+    return render_template("lecturer_view_students_answers.html",
+                           answers_by_fields=answers_by_fields,
+                           paperPath=paper_path)
+
+@app.route('/save_comments', methods=['POST'])
+def save_comments():
+    answer_board_id = request.form.get('answer_board_id')
+    try:
+        form_data = request.form
+
+        # Handle individual lecturer comments
+        for key, value in form_data.items():
+            if key.startswith('comments['):
+                answer_id = key[len('comments['):-1]
+                comment_content = value.strip()
+                if comment_content:
+                    new_comment = LECTURER_COMMENT(
+                        LEC_COMMENT_ID=str(uuid.uuid4()),
+                        LEC_COMMENT_CONTENT=comment_content,
+                        ANSWER_ID=answer_id,
+                        ANSWER_BOARD_ID=answer_board_id,
+                        LEC_COMMENT_BY=session.get('user_id')
+                    )
+                    db.session.add(new_comment)
+
+        # Handle "comment all answers for this question"
+        for key, value in form_data.items():
+            if key.startswith('comments_all_question['):
+                field_id = key[len('comments_all_question['):-1]
+                comment_content = value.strip()
+                if comment_content:
+                    answers_for_field = ANSWER.query.filter_by(ANSWER_FIELD_ID=field_id).all()
+                    for ans in answers_for_field:
+                        new_comment = LECTURER_COMMENT(
+                            LEC_COMMENT_ID=str(uuid.uuid4()),
+                            LEC_COMMENT_CONTENT=comment_content,
+                            ANSWER_ID=ans.ANSWER_ID,
+                            ANSWER_BOARD_ID=answer_board_id,
+                            LEC_COMMENT_BY=session.get('user_id')
+                        )
+                        db.session.add(new_comment)
+
+        db.session.commit()
+        flash("Lecturer comments saved successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Failed to save comments. Please try again.", "error")
+        print(f"Error saving lecturer comments: {e}")
+
+    return redirect(url_for('lecturer_view_students_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id))
 
 if __name__ == "__main__":
     #app.run(debug=True)
