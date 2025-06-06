@@ -26,7 +26,7 @@
                 {% endif %}
                 <br>
                 {% for answers_by_field in answers_by_fields %}
-                    <div class="ans-field-view">
+                    <div id="answer-group-{{ answers_by_field.field_id }}" class="ans-field-view">
                         <h1>{{ answers_by_field.field_desc }}</h1>
                         <p>Answer from other students:</p>
                         
@@ -35,24 +35,30 @@
                                 <!-- Text input -->
                                 {% if answers_by_field.answers %}
                                     {% for answer_id, answer_content in answers_by_field.answers.items() %}
-                                        <textarea disabled>{{ answer_content }}</textarea><br>
-                                        <button type="button" class="btn" onclick="openCommentBox('{{ answer_id }}')">Comment This Answer</button>
-                                        <br><br>
-                                        <div class="commenting-box" id="commenting-box-{{ answer_id }}" style="display: none;">
-                                            <form action="{{ url_for('view_others_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}" method="POST">
-                                                <textarea placeholder="Type comment ..." name="comment-{{ answer_id }}">{% for comment in existed_comments %}{% if comment.answer_id == answer_id %}{{ comment.comment or '' }}{% endif %}{% endfor %}</textarea>
-                                                {% for comment in existed_comments %}
-                                                    {% if comment.answer_id == answer_id %}
-                                                        {% if comment.comment_id %}
-                                                            <input type="hidden" name="comment_id-{{ answer_id }}" value="{{ comment.comment_id }}">
+                                        <div class="answer-block answer-field-{{ answers_by_field.field_id }}" style="{% if loop.index > 3 %}display: none;{% endif %}">
+                                            <textarea disabled>{{ answer_content }}</textarea><br>
+                                            <button type="button" class="btn" onclick="openCommentBox('{{ answer_id }}')">Comment This Answer</button>
+                                            <br><br>
+                                            <div class="commenting-box" id="commenting-box-{{ answer_id }}" style="display: none;">
+                                                <form action="{{ url_for('view_others_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}" method="POST">
+                                                    <textarea placeholder="Type comment ..." name="comment-{{ answer_id }}">{% for comment in existed_comments %}{% if comment.answer_id == answer_id %}{{ comment.comment or '' }}{% endif %}{% endfor %}</textarea>
+                                                    {% for comment in existed_comments %}
+                                                        {% if comment.answer_id == answer_id %}
+                                                            {% if comment.comment_id %}
+                                                                <input type="hidden" name="comment_id-{{ answer_id }}" value="{{ comment.comment_id }}">
+                                                            {% endif %}
                                                         {% endif %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                                <input type="submit" class="btn" value="Comment!">
-                                                <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
-                                            </form>
+                                                    {% endfor %}
+                                                    <input type="submit" class="btn" value="Comment!">
+                                                    <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     {% endfor %}
+
+                                    {% if answers_by_field.answers|length > 3 %}
+                                        <a href="javascript:void(0);" class="view-more" onclick="toggleAnswers('{{ answers_by_field.field_id }}', this)">View More</a>
+                                    {% endif %}
                                 {% else %}
                                     <p>No answers from other students yet. You are the first!</p>
                                 {% endif %}
@@ -61,37 +67,8 @@
                                 <!-- MCQ input -->
                                 {% if answers_by_field.answers %}
                                     {% for answer_id, answer_content in answers_by_field.answers.items() %}
-                                        <textarea disabled>{{ answer_content }}</textarea><br><br>
-                                        <button type="button" class="btn" onclick="openCommentBox('{{ answer_id }}')">Comment This Answer</button>
-                                        <br><br>
-                                        <div class="commenting-box" id="commenting-box-{{ answer_id }}"  style="display: none;">
-                                            <form  action="{{ url_for('view_others_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}" method="POST">
-                                                <textarea placeholder="Type comment ..." name="comment-{{ answer_id }}">{% for comment in existed_comments %}{% if comment.answer_id == answer_id %}{{ comment.comment or '' }}{% endif %}{% endfor %}</textarea>
-                                                {% for comment in existed_comments %}
-                                                    {% if comment.answer_id == answer_id %}
-                                                        {% if comment.comment_id %}
-                                                            <input type="hidden" name="comment_id-{{ answer_id }}" value="{{ comment.comment_id }}">
-                                                        {% endif %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                                <input type="submit" class="btn" value="Comment!">
-                                                <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
-                                            </form>
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <p>No answers from other students yet. You are the first!</p>
-                                {% endif %}
-
-                            {% elif answers_by_field.field_type == 3 %}
-                                <!-- File Upload -->
-                                {% if answers_by_field.answers %}
-                                    {% for answer_id, answer_content in answers_by_field.answers.items() %}
-                                        {% if answer_content %}
-                                            <p class="others">
-                                                <strong>Others' upload:</strong><br>
-                                                <a href="{{ url_for('static', filename=answer_content) }}" target="_blank">View File</a>
-                                            </p>
+                                        <div class="answer-block answer-field-{{ answers_by_field.field_id }}" style="{% if loop.index > 3 %}display: none;{% endif %}">
+                                            <textarea disabled>{{ answer_content }}</textarea><br><br>
                                             <button type="button" class="btn" onclick="openCommentBox('{{ answer_id }}')">Comment This Answer</button>
                                             <br><br>
                                             <div class="commenting-box" id="commenting-box-{{ answer_id }}"  style="display: none;">
@@ -108,8 +85,49 @@
                                                     <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
                                                 </form>
                                             </div>
-                                        {% endif %}
+                                        </div>
                                     {% endfor %}
+
+                                    {% if answers_by_field.answers|length > 3 %}
+                                        <a href="javascript:void(0);" class="view-more" onclick="toggleAnswers('{{ answers_by_field.field_id }}', this)">View More</a>
+                                    {% endif %}
+                                {% else %}
+                                    <p>No answers from other students yet. You are the first!</p>
+                                {% endif %}
+
+                            {% elif answers_by_field.field_type == 3 %}
+                                <!-- File Upload -->
+                                {% if answers_by_field.answers %}
+                                    {% for answer_id, answer_content in answers_by_field.answers.items() %}
+                                        <div class="answer-block answer-field-{{ answers_by_field.field_id }}" style="{% if loop.index > 3 %}display: none;{% endif %}">
+                                            {% if answer_content %}
+                                                <p class="others">
+                                                    <strong>Others' upload:</strong><br>
+                                                    <a href="{{ url_for('static', filename=answer_content) }}" target="_blank">View File</a>
+                                                </p>
+                                                <button type="button" class="btn" onclick="openCommentBox('{{ answer_id }}')">Comment This Answer</button>
+                                                <br><br>
+                                                <div class="commenting-box" id="commenting-box-{{ answer_id }}"  style="display: none;">
+                                                    <form  action="{{ url_for('view_others_answers', class_id=session.get('current_class_id'), answer_board_id=session.get('current_answer_board_id')) }}" method="POST">
+                                                        <textarea placeholder="Type comment ..." name="comment-{{ answer_id }}">{% for comment in existed_comments %}{% if comment.answer_id == answer_id %}{{ comment.comment or '' }}{% endif %}{% endfor %}</textarea>
+                                                        {% for comment in existed_comments %}
+                                                            {% if comment.answer_id == answer_id %}
+                                                                {% if comment.comment_id %}
+                                                                    <input type="hidden" name="comment_id-{{ answer_id }}" value="{{ comment.comment_id }}">
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        <input type="submit" class="btn" value="Comment!">
+                                                        <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
+                                                    </form>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+
+                                    {% if answers_by_field.answers|length > 3 %}
+                                        <a href="javascript:void(0);" class="view-more" onclick="toggleAnswers('{{ answers_by_field.field_id }}', this)">View More</a>
+                                    {% endif %}
                                 {% else %}
                                     <p>No answers from other students yet. You are the first!</p>
                                 {% endif %}
