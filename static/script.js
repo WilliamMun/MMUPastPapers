@@ -268,3 +268,20 @@ function toggleComments(answerId, linkElement) {
         }
     });
 }
+
+function toggleAnswers(fieldId, link) {
+    const group = document.getElementById(`answer-group-${fieldId}`);
+    const answers = group.querySelectorAll(`.answer-field-${fieldId}`);
+
+    answers.forEach((el, index) => {
+        if (index >= 3) {
+            if (el.style.display === "none") {
+                el.style.display = "block";
+                link.textContent = "Show Less";
+            } else if (el.style.display === "block") {
+                el.style.display = "none";
+                link.textContent = "View More";
+            }
+        }
+    });
+}
