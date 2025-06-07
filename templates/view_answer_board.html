@@ -94,6 +94,7 @@
                         </div>
                         {% endif %}
 
+                        {% if session.get('roles') == 1 %}
                         <!-- Lecturer Comments Section -->
                         <div class="comment-from-lec">
                             <h2>Comments from Lecturers:</h2>
@@ -111,6 +112,7 @@
                                 {% endif %}
                             {% endfor %}
                         </div>
+                        {% endif %}
 
                         <hr>
                     </div>
