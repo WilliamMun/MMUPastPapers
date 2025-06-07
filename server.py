@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from collections import defaultdict
+from functools import wraps 
 import re
 import uuid
 import time
@@ -211,10 +212,20 @@ def allowed_file(filename):
    ALLOWED_EXTENSION = {'pdf'}
    return '.' in filename and filename.rsplit('.', 1)[1]. lower() in ALLOWED_EXTENSION
 
-@app.before_request
-def refresh_session():
-    session.permanent = True #Set session to permanent
-    app.permanent_session_lifetime = timedelta(days=7) #Set session to expire after 7 days
+def login_required(f):
+   @wraps(f)
+   def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('main'))  
+        return f(*args, **kwargs)
+   return decorated_function
+
+@app.route('/')
+@app.route('/main')
+def main():
+    if session.get('user_id'):
+       return redirect(url_for('view_papers'))
+    return render_template("main.html")
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -224,6 +235,15 @@ def login():
         #Retrive user input 
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '').strip()
+        remember = 'remember' in request.form 
+        print(f"User remember: {remember}")
+
+        if remember:
+           session.permanent = True
+           app.permanent_session_lifetime = timedelta(days=30)
+        else:
+           session.permanent = False
+
         if not session.get('newRegistered'):
           session['newRegistered'] = False 
         print(email, password) #For debugging purposes 
@@ -268,8 +288,6 @@ def login():
           session['email'] = user.USER_EMAIL
           session['name'] = user.NAME
           session['roles'] = user.ROLES
-          session['user_id'] = user.USER_ID
-          session.permanent = True #Set session to permanent
           session['user_id'] = user.USER_ID
           flash('Login successful!', 'success')
           print(f"Login successful for user {email}.") #For debugging purposes
@@ -379,12 +397,6 @@ def register():
            print(f"Internal server error: {e}")
            return redirect('/register')
     return render_template("register.html")
-
-@app.route('/')
-@app.route('/main')
-def main():
-    session.clear()
-    return render_template("main.html")
 
 @app.route('/resetPassword', methods=['GET', 'POST'])
 def resetPassword():
@@ -507,6 +519,7 @@ def inject_data():
        return { }
 
 @app.route('/editProfile', methods=['GET', 'POST'])
+@login_required
 def editProfile():
   if request.method == 'POST':
     email = session.get('email')
@@ -573,6 +586,7 @@ def editProfile():
 from sqlalchemy import and_
 
 @app.route('/view_papers')
+@login_required
 def view_papers():
     # Get search filter inputs
     term = request.args.get('term', '').strip()
@@ -618,6 +632,7 @@ def view_papers():
     )
 
 @app.route('/view_paper/<paper_id>')
+@login_required
 def view_paper(paper_id):
     paper = db.session.get(PASTPAPERS_INFO,paper_id)
     return send_file(paper.FILEPATH, mimetype='application/pdf')
@@ -642,6 +657,7 @@ def download_paper(paper_id):
         abort(404, description="Paper not found or file missing.")
 
 @app.route('/faculty_select', methods=['GET', 'POST'])
+@login_required
 def faculty_select():
    if 'user_id' not in session:
       flash('Please log in to access this page.', 'error')
@@ -695,6 +711,7 @@ def faculty_select():
                           study_levels=study_levels)
 
 @app.route('/securityQues', methods=['GET', 'POST'])
+@login_required
 def securityQues():
   print("Executing security question page...")
   #Retrieve data from database:
@@ -764,6 +781,7 @@ def securityQues():
   return render_template("securityQues.html", user_qa=user_qa)
 
 @app.route('/logout')
+@login_required
 def logout():
    print("Executing logout action...")
    session.clear()
@@ -773,6 +791,7 @@ def logout():
    return response
 
 @app.route('/upload_paper', methods=['GET', 'POST']) 
+@login_required
 def upload_paper():
     file = None
     filepath = None
@@ -854,6 +873,7 @@ def upload_paper():
 
 
 @app.route('/delete_paper/<paper_id>', methods=['POST'])
+@login_required
 def delete_paper(paper_id):
     paper = PASTPAPERS_INFO.query.get_or_404(paper_id)
 
@@ -875,6 +895,7 @@ def delete_paper(paper_id):
     return redirect('/view_papers')
 
 @app.route('/view_class', methods=['GET', 'POST'])
+@login_required
 def view_class():
     #Show Term Info in Filter Section 
     term_info = TERM_INFO.query.all()
@@ -920,6 +941,7 @@ def view_class():
     return render_template("view_class.html", terms=terms, records=class_records, pagination=pagination, selected_term=term_filter, selected_entry=int(per_page))
 
 @app.route('/open_class/<class_id>', methods=['GET','POST'])
+@login_required
 def open_class(class_id):
    session['current_class_id'] = class_id
    class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
@@ -946,6 +968,7 @@ def open_class(class_id):
    return render_template("class_page.html",class_data=class_data, class_id=class_id, answer_board_info=answer_board_info)
 
 @app.route('/createClass', methods=['GET','POST'])
+@login_required
 def createClass():
   #Show data in template
   subjectRec = db.session.query(SUBJECT_INFO.SUBJECT_ID, SUBJECT_INFO.SUBJECT_DESC).all()
@@ -1008,6 +1031,7 @@ def createClass():
   return render_template("create_class.html", subjectList=subject_list, termList=term_list)
 
 @app.route('/joinClass', methods=['GET','POST'])
+@login_required
 def joinClass():
 
   if request.method == 'POST':
@@ -1056,6 +1080,7 @@ def joinClass():
   return redirect(url_for('view_class')) #In case 'GET' method is passed 
 
 @app.route('/view_people/<class_id>')
+@login_required
 def view_people(class_id):
     page = request.args.get('page', 1, type=int)
     per_page = 10
@@ -1096,6 +1121,7 @@ def view_people(class_id):
     )
 
 @app.route('/create_answer_board/<class_id>', methods=['GET','POST'])
+@login_required
 def create_answer_board(class_id):
    print(f"Class ID: {class_id}")
    class_info = CLASS.query.filter_by(CLASS_ID=class_id).first()
@@ -1117,6 +1143,7 @@ def create_answer_board(class_id):
    return render_template("upload_answer_board.html", papers=papers_record)
 
 @app.route('/upload_answer_board/<class_id>', methods=['GET','POST'])
+@login_required
 def upload_answer_board(class_id):
    if request.method == 'POST':
       answer_board_name = request.form.get('answer_board_des')
@@ -1154,6 +1181,7 @@ def upload_answer_board(class_id):
    return render_template("upload_answer_board.html", classCode=session.get('current_class_id'), answerBoardId=session.get('current_answer_board_id'))
 
 @app.route('/get_pdf/<path:filepath>')
+@login_required
 def get_pdf(filepath):
     print('Final file path:',filepath)
     directory = os.path.dirname(filepath)  
@@ -1162,6 +1190,7 @@ def get_pdf(filepath):
     return send_from_directory(directory, file, mimetype='application/pdf')
 
 @app.route('/setup_answer_field/<class_id>/<answer_board_id>', methods=['GET','POST'])
+@login_required
 def setup_answer_field(class_id, answer_board_id):
   ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
   print(f"Answer board: {ans_board}")
@@ -1231,6 +1260,7 @@ def setup_answer_field(class_id, answer_board_id):
   return render_template("setup_answer_field.html",paperPath=paper_path, classCode=session.get('current_class_id'))
 
 @app.route('/open_answer_board/<class_id>/<answer_board_id>', methods=['GET', 'POST'])
+@login_required
 def open_answer_board(class_id, answer_board_id):
     session['current_answer_board_id'] = answer_board_id
     ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
@@ -1323,6 +1353,7 @@ def open_answer_board(class_id, answer_board_id):
     )
 
 @app.route('/class_info/<class_id>', methods=['POST','GET'])
+@login_required
 def class_info(class_id):
   class_info = CLASS.query.filter_by(CLASS_ID=session.get('current_class_id')).first()
   print(f"Class info: {class_info}")
@@ -1408,6 +1439,7 @@ def join_class_link(class_id):
       return redirect(url_for('open_class', class_id=class_id, showAlert=False))
       
 @app.route('/view_subjects')
+@login_required
 def view_subjects():
     # Query with explicit joins
     subjects = db.session.query(
@@ -1425,6 +1457,7 @@ def view_subjects():
     return render_template('view_subjects.html', subjects=subjects, class_id='none')
 
 @app.route('/edit_subject/<subject_id>', methods=['GET', 'POST'])
+@login_required
 def edit_subject(subject_id):
     subject = SUBJECT_INFO.query.get_or_404(subject_id)
     study_levels = STUDY_LVL_INFO.query.all()
@@ -1461,6 +1494,7 @@ def edit_subject(subject_id):
                          faculties=faculties)
 
 @app.route('/delete_subject/<subject_id>', methods=['POST'])
+@login_required
 def delete_subject(subject_id):
     subject = SUBJECT_INFO.query.get_or_404(subject_id)
     try:
@@ -1473,6 +1507,7 @@ def delete_subject(subject_id):
     return redirect(url_for('view_subjects'))
 
 @app.route('/add_subject', methods=['GET', 'POST'])
+@login_required
 def add_subject():
     study_levels = STUDY_LVL_INFO.query.all()
     faculties = FACULTY_INFO.query.all()
@@ -1516,6 +1551,7 @@ def add_subject():
                          faculties=faculties)
 
 @app.route('/edit_answer_board/<class_id>/<answer_board_id>', methods=['GET','POST'])
+@login_required
 def edit_answer_board(class_id, answer_board_id):
   ans_board = ANSWER_BOARD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).first()
   print(f"Answer board: {ans_board}")
@@ -1616,6 +1652,7 @@ def edit_answer_board(class_id, answer_board_id):
   return render_template("edit_answer_board.html", paperPath=paper_path, ans_field_datas=ans_field_datas)
 
 @app.route('/submit_answers/<class_id>/<answer_board_id>', methods=['POST'])
+@login_required
 def submit_answers(class_id, answer_board_id):
     student_id = session.get('user_id')  
     submitted_data = request.form
@@ -1684,6 +1721,7 @@ def submit_answers(class_id, answer_board_id):
     return redirect(url_for('open_answer_board', class_id=class_id, answer_board_id=answer_board_id))
 
 @app.route('/terms')
+@login_required
 def view_terms():
     page = request.args.get('page', 1, type=int)
     per_page = 10
@@ -1726,6 +1764,7 @@ def add_term():
     return render_template('add_term.html')
 
 @app.route('/edit_term/<term_id>', methods=['GET', 'POST'])
+@login_required
 def edit_term(term_id):
     term = TERM_INFO.query.get_or_404(term_id)
     if request.method == 'POST':
@@ -1742,6 +1781,7 @@ def edit_term(term_id):
     return render_template('edit_term.html', term=term)
 
 @app.route('/delete_term/<term_id>', methods=['POST'])
+@login_required
 def delete_term(term_id):
     term = TERM_INFO.query.get_or_404(term_id)
     try:
@@ -1752,6 +1792,7 @@ def delete_term(term_id):
         db.session.rollback()
 
 @app.route('/edit_faculty/<faculty_id>', methods=['GET', 'POST'])
+@login_required
 def edit_faculty(faculty_id):
     faculty = FACULTY_INFO.query.get_or_404(faculty_id)
 
@@ -1771,6 +1812,7 @@ def edit_faculty(faculty_id):
     return render_template('edit_faculty.html', faculty=faculty)
 
 @app.route('/view_faculties')
+@login_required
 def view_faculties():
     page = request.args.get('page', 1, type=int)
     per_page = 10
@@ -1783,6 +1825,7 @@ def view_faculties():
     return render_template('view_faculties.html', faculties=pagination.items, pagination=pagination)
 
 @app.route('/add_faculty', methods=['GET', 'POST'])
+@login_required
 def add_faculty():
 
    if request.method == 'POST':
@@ -1813,6 +1856,7 @@ def add_faculty():
    return render_template('add_faculty.html')
 
 @app.route("/chat_history/<answer_board_id>")
+@login_required
 def chat_history(answer_board_id):
    try:
         messages = CHAT_MESSAGE.query.filter_by(ANSWER_BOARD_ID=answer_board_id).order_by(CHAT_MESSAGE.TIMESTAMP).all()
@@ -1840,6 +1884,7 @@ def chat_history(answer_board_id):
         return jsonify({"error": "Something went wrong."}), 500
 
 @app.route('/send-message', methods=['POST'])
+@login_required
 def send_message():
    sender_info = session.get('user_id','Anonymous')
    if sender_info != "Anonymous":
@@ -1877,6 +1922,7 @@ def send_message():
    return jsonify(success=True)
 
 @app.route("/view_others_answers/<class_id>/<answer_board_id>", methods=['GET','POST'])
+@login_required
 def view_others_answers(class_id, answer_board_id):
   #Get answers field for that particular answer board 
   answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
@@ -1965,6 +2011,7 @@ def view_others_answers(class_id, answer_board_id):
   return render_template("view_others_answers.html", answers_by_fields=answers_by_fields, paperPath=paper_path, existed_comments=existed_comments)
 
 @app.route("/lecturer_view_students_answers/<class_id>/<answer_board_id>", methods=['GET'])
+@login_required
 def lecturer_view_students_answers(class_id, answer_board_id):
     answer_fields = ANSWER_FIELD.query.filter_by(ANSWER_BOARD_ID=answer_board_id).all()
     all_user_ids = set()
@@ -2010,6 +2057,7 @@ def lecturer_view_students_answers(class_id, answer_board_id):
                            paperPath=paper_path)
 
 @app.route('/save_comments', methods=['POST'])
+@login_required
 def save_comments():
     answer_board_id = request.form.get('answer_board_id')
     try:
