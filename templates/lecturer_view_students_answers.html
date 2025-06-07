@@ -33,7 +33,7 @@
                     <hr class="my-4">
 
                     {% for answer_id, answer_data in answers_by_field.answers.items() %}
-                    <div class="mb-8">
+                    <div class="mb-8 answer-item field-{{ answers_by_field.field_id }}"{% if loop.index > 3 %} style="display: none;"{% endif %}>
                         <button type="button" class="viewStudentAns-btn" onclick="toggleComment('{{ answer_id }}')">
                             Comment This Answer
                         </button>
@@ -50,6 +50,9 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% if answers_by_field.answers|length > 3 %}
+                        <a href="javascript:void(0);" class="toggle-link" onclick="toggleAnswers('{{ answers_by_field.field_id }}', this)">View More</a>
+                    {% endif %}
                     <div class="comment-from-lec">
                         <label>Comment All Answers for this Question:</label>
                         <textarea name="comments_all_question[{{ answers_by_field.field_id }}]" class="textarea-answer mt-2" rows="3" placeholder="Comment all answers under this question..."></textarea>
@@ -69,6 +72,22 @@
         function toggleComment(answerId) {
             const box = document.getElementById('comment-' + answerId);
             box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+        }
+        function toggleAnswers(fieldId, link) {
+            const items = document.querySelectorAll(`.field-${fieldId}`);
+            let isHidden = false;
+
+            items.forEach((el, index) => {
+                if (index >= 3) {
+                    if (el.style.display === "none" || el.style.display === "") {
+                        el.style.display = "block";
+                        link.textContent = "Show Less";
+                    } else {
+                        el.style.display = "none";
+                        link.textContent = "View More";
+                    }
+                }
+            });
         }
     </script>
 
