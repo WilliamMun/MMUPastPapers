@@ -431,7 +431,7 @@ button:hover {
 }
 
 .search-button{
-  width: 20%;
+  width: 15%;
   padding: 8px;
   background-color: #E5E1DA;
   color: black;
@@ -443,6 +443,23 @@ button:hover {
   cursor: pointer;
   display: flex-end;
   justify-content: center;
+  margin-left: 1rem;
+}
+
+.reset-button{
+  width: 10%;
+  padding: 8px;
+  background-color: #E5E1DA;
+  color: black;
+  font-family: serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex-end;
+  justify-content: center;
+  margin-left: 9rem;
 }
 
 /* Links */
@@ -778,6 +795,7 @@ tr:hover {
   transition: 0.3s ease;
   display: right;
   justify-content: center;
+  margin-right: 19rem;
 }
 
 .filter-container {
