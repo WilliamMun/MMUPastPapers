@@ -315,6 +315,22 @@ footer {
   color: #6b7280;
 }
 
+/**Pagination Settings**/
+.pagination-no{
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.pagination-no:hover {
+  background-color: #d1d5db; /* hover:bg-gray-300 */
+}
+/**The End of Pagination Settings**/
+
 /** Login Page (login.html) **/
 .loginBox {
   background: white;
@@ -405,7 +421,6 @@ button:hover {
   border: none;
   border-radius: 8px;
   font-size: 16px;
-  margin-top: 15px;
   cursor: pointer;
   transition: 0.3s ease;
 }
@@ -1424,8 +1439,8 @@ hr{
 
 /** Class Page Settings **/
 .class-title-box { /**Size of Register Box**/
-  background: white;
-  padding: 40px;
+  background-color: #f5f5f5;
+  padding: 30px;
   width: 60%;
   height: auto;
   max-width: 60%;
@@ -1456,8 +1471,10 @@ hr{
 }
 
 .class-title-box img{
-  height: 200px;
-  width: 2500px;
+  height: 325px;
+  width: 3500px;
+  border-radius: 20px;
+  margin-bottom: 1rem;
 }
 
 .answer-board-box{
