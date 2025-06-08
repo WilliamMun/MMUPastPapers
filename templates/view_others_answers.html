@@ -49,8 +49,8 @@
                                                             {% endif %}
                                                         {% endif %}
                                                     {% endfor %}
-                                                    <input type="submit" class="btn" value="Comment!">
-                                                    <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
+                                                    <input type="submit" class="btn" value="Save">
+                                                    <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Cancel</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -81,8 +81,9 @@
                                                             {% endif %}
                                                         {% endif %}
                                                     {% endfor %}
-                                                    <input type="submit" class="btn" value="Comment!">
-                                                    <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
+                                                
+                                                    <input type="submit" class="btn" value="Save">
+                                                    <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Cancel</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -102,8 +103,7 @@
                                         <div class="answer-block answer-field-{{ answers_by_field.field_id }}" style="{% if loop.index > 3 %}display: none;{% endif %}">
                                             {% if answer_content %}
                                                 <p class="others">
-                                                    <strong>Others' upload:</strong><br>
-                                                    <a href="{{ url_for('static', filename=answer_content) }}" target="_blank">View File</a>
+                                                    <a href="{{ url_for('static', filename=answer_content) }}" target="_blank" class="text-blue-600">View File</a>
                                                 </p>
                                                 <button type="button" class="btn" onclick="openCommentBox('{{ answer_id }}')">Comment This Answer</button>
                                                 <br><br>
@@ -117,8 +117,8 @@
                                                                 {% endif %}
                                                             {% endif %}
                                                         {% endfor %}
-                                                        <input type="submit" class="btn" value="Comment!">
-                                                        <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Back</button>
+                                                        <input type="submit" class="btn" value="Save">
+                                                        <button type="button" class="btn" onclick="closeCommentBox('{{ answer_id }}')">Cancel</button>
                                                     </form>
                                                 </div>
                                             {% endif %}
