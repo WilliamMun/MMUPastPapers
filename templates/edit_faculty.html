@@ -15,11 +15,6 @@
         <h1>Edit Faculty Info</h1>
         <form method="POST" action="{{ url_for('edit_faculty', faculty_id=faculty.FACULTY_ID) }}">
             <div class="ques-box-input">
-                <label for="faculty_id">Faculty ID:</label>
-                <input type="text" id="faculty_id" name="faculty_id" value="{{ faculty.FACULTY_ID }}" required>
-            </div>
-
-            <div class="ques-box-input">
                 <label for="faculty_desc">Faculty Description:</label>
                 <input type="text" id="faculty_desc" name="faculty_desc" value="{{ faculty.FACULTY_DESC }}" required>
             </div>

@@ -1798,7 +1798,6 @@ def edit_faculty(faculty_id):
 
     if request.method == 'POST':
         try:
-            faculty.FACULTY_ID = request.form['faculty_id']
             faculty.FACULTY_DESC = request.form['faculty_desc']
             db.session.commit()
             flash('Faculty updated successfully!', 'success')
