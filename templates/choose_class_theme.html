@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <title>Choose Class Theme | MMUPastPapers</title>
+    </head>
+
+    <body>
+        {% include 'header.html' %}
+        
+        <main class="main-content">
+            <div class="select-class-theme-box">
+                <p>Choose your class theme: </p>
+                <form id="themeForm" action="/choose_class_theme/{{ session.get('current_class_id') }}" method="POST">
+                    <input type="hidden" name="filename" id="selectedFilename">
+                    <div class="photo-grid">
+                        {% for i in range(1, 37) %}
+                            <div class="photo-container" onclick="selectImage(this, '{{ url_for('static', filename='class_theme/default' ~ i ~ '.jpg') }}')" >
+                                <img src="{{ url_for('static', filename='class_theme/default' ~ i ~ '.jpg') }}" alt="default{{ i }}" style="cursor:pointer;">
+                                <div class="tick-overlay">✔</div>
+                                <span class="expand-icon" onclick="event.stopPropagation(); openLightbox('{{ url_for('static', filename='class_theme/default' ~ i ~ '.jpg') }}')">🔍</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn">Submit Theme</button>
+                </form>
+                
+                <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+                    <a href="#" class="lightbox-close" onclick="closeLightbox(event)">✖</a>
+                    <img id="lightbox-img" src="" alt="Full View">
+                </div>
+            </div>
+        </main>
+        {% include 'footer.html' %}
+    </body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops! An error occurred.',
+                        text: "{{ message }}"
+                    });
+                {% elif category == 'success' %}
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Yay! Success.',
+                        text: "{{ message }}"
+                    }).then(() => {
+                        setTimeout(function() {
+                            window.location.href = "/open_class/{{ session.get('current_class_id') }}";
+                        }, 1000);
+                    });
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+{% endwith %}
+</html>

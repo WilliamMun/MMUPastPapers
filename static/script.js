@@ -285,3 +285,28 @@ function toggleAnswers(fieldId, link) {
         }
     });
 }
+
+function openLightbox(src) {
+    document.getElementById("lightbox-img").src = src;
+    document.getElementById("lightbox").style.display = "flex";
+    }
+
+function closeLightbox(event) {
+    event.preventDefault();
+    document.getElementById("lightbox").style.display = "none";
+}
+
+let selected = null;
+
+function selectImage(container, filename) {
+    document.querySelectorAll('.photo-container').forEach(c => {
+        c.classList.remove('selected');
+    });
+
+    container.classList.add('selected');
+    console.log("Class List is added");
+    selected = container;
+
+    document.getElementById('selectedFilename').value = filename;
+    console.log(filename);
+}
