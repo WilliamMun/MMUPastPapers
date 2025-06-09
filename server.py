@@ -117,6 +117,7 @@ class CLASS(db.Model):
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
   SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))  
   TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID))  
+  CLASS_THEME = db.Column(db.Text)
 
 #ENTITY: USER_CLASS 
 class USER_CLASS(db.Model): 
@@ -1019,6 +1020,7 @@ def createClass():
         db.session.commit()
         flash('Class created successfully!','success')
         print(f"Class {className} created!") #For debugging purposes 
+        session['current_class_id'] = classID
         return render_template("create_class.html", classCode=classID)
       except IntegrityError:
         flash('The class you want to create existed!','error')
@@ -1029,6 +1031,34 @@ def createClass():
         return redirect(url_for('createClass'))
        
   return render_template("create_class.html", subjectList=subject_list, termList=term_list)
+
+@app.route('/choose_class_theme/<class_id>', methods=['GET','POST'])
+@login_required
+def choose_class_theme(class_id):
+  if request.method == 'POST':
+     filename = request.form.get('filename')
+     print(f"Filename received: {filename}")
+
+     if not filename:
+        flash("Please choose a theme or upload yours!","error")
+        print("No filename received.")
+     
+     try:
+      class_record = CLASS.query.filter_by(CLASS_ID=class_id).first()
+      if class_record:
+        class_record.CLASS_THEME = filename 
+      db.session.commit()
+      flash("Theme was chosen!","success")
+      print("Successfully choose a theme!")
+      return render_template("choose_class_theme.html")
+     
+     except Exception as e: 
+      db.session.rollback()
+      flash("Error occurs while choosing themes! Please try again!", "error")
+      print("Internal server error",e)
+      return redirect(url_for('choose_class_theme', class_id=class_id))
+     
+  return render_template("choose_class_theme.html")
 
 @app.route('/joinClass', methods=['GET','POST'])
 @login_required
