@@ -935,6 +935,7 @@ def view_class():
             'classID': cls.CLASS_ID,
             'className': cls.CLASS_NAME,
             'termID': cls.TERM_ID,
+            'classTheme': cls.CLASS_THEME if cls.CLASS_THEME else '/static/class_theme/default1.jpg',
             'lecturerName': lecturer.NAME if lecturer else 'Unknown'
         })
 
@@ -946,6 +947,9 @@ def view_class():
 def open_class(class_id):
    session['current_class_id'] = class_id
    class_data = CLASS.query.filter_by(CLASS_ID=class_id).first()
+   class_theme = class_data.CLASS_THEME
+   if not class_theme:
+      class_theme = "/static/class_theme/default1.jpg"
    if not class_data:
       message = "Class not found! Join a class?", 404
       return message
@@ -966,7 +970,7 @@ def open_class(class_id):
       })
 
    print(f"Final record Answer Board Info: {answer_board_info}")
-   return render_template("class_page.html",class_data=class_data, class_id=class_id, answer_board_info=answer_board_info)
+   return render_template("class_page.html",class_theme=class_theme, class_data=class_data, class_id=class_id, answer_board_info=answer_board_info)
 
 @app.route('/createClass', methods=['GET','POST'])
 @login_required
@@ -1386,6 +1390,9 @@ def open_answer_board(class_id, answer_board_id):
 @login_required
 def class_info(class_id):
   class_info = CLASS.query.filter_by(CLASS_ID=session.get('current_class_id')).first()
+  class_theme = class_info.CLASS_THEME
+  if not class_theme:
+     class_theme = "/static/class_theme/default1.jpg"
   print(f"Class info: {class_info}")
   subject_info = SUBJECT_INFO.query.filter_by(SUBJECT_ID = class_info.SUBJECT_ID).first()
   subjectName = f"{class_info.SUBJECT_ID} - {subject_info.SUBJECT_DESC}"
@@ -1424,7 +1431,7 @@ def class_info(class_id):
        print("Internal server error.", e)
        return redirect(f'/class_info/{session.get("current_class_id")}')
 
-  return render_template("class_info.html", class_record=class_record, classCode = session.get('current_class_id'))
+  return render_template("class_info.html", class_theme=class_theme, class_record=class_record, classCode = session.get('current_class_id'))
 
 @app.route('/join_class_link/<class_id>', methods=['GET','POST'])
 def join_class_link(class_id):
@@ -1455,6 +1462,7 @@ def join_class_link(class_id):
             'classID': cls.CLASS_ID,
             'className': cls.CLASS_NAME,
             'termID': cls.TERM_ID,
+            'classTheme': cls.CLASS_THEME,
             'lecturerName': lecturer.NAME if lecturer else 'Unknown'
         })
 
