@@ -14,7 +14,7 @@
         
         <main class="main-content">
             <div class="select-class-theme-box">
-                <p>Choose your class theme: </p>
+                <label>Choose your class theme: </label>
                 <form id="themeForm" action="/choose_class_theme/{{ session.get('current_class_id') }}" method="POST">
                     <input type="hidden" name="filename" id="selectedFilename">
                     <div class="photo-grid">
