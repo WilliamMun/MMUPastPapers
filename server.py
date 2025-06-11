@@ -66,8 +66,8 @@ class USER_INFO(db.Model):
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
-  FACULTY_ID = db.Column(db.String(3), db.ForeignKey(FACULTY_INFO.FACULTY_ID))
-  STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey(STUDY_LVL_INFO.STUDY_LVL_ID), nullable=True) #Only students have study level id  
+  FACULTY_ID = db.Column(db.String(3), db.ForeignKey("faculty_info.FACULTY_ID"))
+  STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey("study_lvl_info.STUDY_LVL_ID"), nullable=True) #Only students have study level id  
  
 #ENTITY: SECURITY_QUES 
 class SECURITY_QUES(db.Model): 
@@ -78,8 +78,8 @@ class SECURITY_QUES(db.Model):
 #ENTITY: SECURITY_QUES_ANS 
 class SECURITY_QUES_ANS(db.Model):
   __tablename__ = 'security_ques_ans'
-  USER_ID =  db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
-  SECURITY_QUES_ID = db.Column(db.String(100), db.ForeignKey(SECURITY_QUES.SECURITY_QUES_ID)) 
+  USER_ID =  db.Column(db.String(50), db.ForeignKey("user_info.USER_ID")) 
+  SECURITY_QUES_ID = db.Column(db.String(100), db.ForeignKey("security_ques.SECURITY_QUES_ID")) 
   ANSWER = db.Column(db.Text) 
   CREATED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now, nullable=True) 
@@ -92,8 +92,8 @@ class SUBJECT_INFO(db.Model):
   __tablename__ = 'subject_info'
   SUBJECT_ID = db.Column(db.String(7), primary_key=True) 
   SUBJECT_DESC = db.Column(db.Text, nullable=False) 
-  STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey(STUDY_LVL_INFO.STUDY_LVL_ID)) 
-  FACULTY_ID = db.Column(db.String(3), db.ForeignKey(FACULTY_INFO.FACULTY_ID)) 
+  STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey("study_lvl_info.STUDY_LVL_ID")) 
+  FACULTY_ID = db.Column(db.String(3), db.ForeignKey("faculty_info.FACULTY_ID")) 
  
 #ENTITY: TERM_INFO 
 class TERM_INFO(db.Model): 
@@ -104,15 +104,15 @@ class TERM_INFO(db.Model):
 class PASTPAPERS_INFO(db.Model): 
   __tablename__ = 'pastpapers_info'
   PAPER_ID = db.Column(db.String(10), primary_key=True) 
-  TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID)) 
+  TERM_ID = db.Column(db.Integer, db.ForeignKey("term_info.TERM_ID")) 
   FILENAME = db.Column(db.Text, nullable=True) 
   FILEPATH = db.Column(db.String(255), nullable=False) 
   PAPER_DESC = db.Column(db.Text, nullable=True) 
   UPLOAD_ON = db.Column(db.DateTime, default=datetime.now) 
-  UPLOAD_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
-  LAST_MODIFIED_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID), nullable=True) 
+  UPLOAD_BY = db.Column(db.String(50), db.ForeignKey("user_info.USER_ID")) 
+  LAST_MODIFIED_BY = db.Column(db.String(50), db.ForeignKey("user_info.USER_ID"), nullable=True) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
-  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))
+  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey("subject_info.SUBJECT_ID"))
  
 #ENTITY: CLASS 
 class CLASS(db.Model): 
@@ -123,15 +123,15 @@ class CLASS(db.Model):
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   LAST_MODIFIED_BY = db.Column(db.String(50), nullable=True) 
   LAST_MODIFIED_ON = db.Column(db.DateTime, default=datetime.now) 
-  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey(SUBJECT_INFO.SUBJECT_ID))  
-  TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID))  
+  SUBJECT_ID = db.Column(db.String(7), db.ForeignKey("subject_info.SUBJECT_ID"))  
+  TERM_ID = db.Column(db.Integer, db.ForeignKey("term_info.TERM_ID"))  
   CLASS_THEME = db.Column(db.Text)
 
 #ENTITY: USER_CLASS 
 class USER_CLASS(db.Model): 
   __tablename__ = 'user_class'
-  USER_ID = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
-  CLASS_ID = db.Column(db.String(50), db.ForeignKey(CLASS.CLASS_ID)) 
+  USER_ID = db.Column(db.String(50), db.ForeignKey("user_info.USER_ID")) 
+  CLASS_ID = db.Column(db.String(50), db.ForeignKey("class.CLASS_ID")) 
   JOINED_AT = db.Column(db.DateTime, default=datetime.now) 
 
   __table_args__ = (db.PrimaryKeyConstraint('USER_ID','CLASS_ID'),)
@@ -139,8 +139,8 @@ class USER_CLASS(db.Model):
 class ANSWER_BOARD(db.Model): 
   __tablename__ = 'answer_board'
   ANSWER_BOARD_ID = db.Column(db.String(50), primary_key=True) 
-  PAPER_ID = db.Column(db.String(50), db.ForeignKey('PASTPAPERS_INFO.PAPER_ID')) 
-  CLASS_ID = db.Column(db.String(50), db.ForeignKey('CLASS.CLASS_ID')) 
+  PAPER_ID = db.Column(db.String(50), db.ForeignKey('pastpapers_info.PAPER_ID')) 
+  CLASS_ID = db.Column(db.String(50), db.ForeignKey('class.CLASS_ID')) 
   CREATED_BY = db.Column(db.String(50), nullable=False) 
   CREATED_ON = db.Column(db.DateTime, default=datetime.now) 
   ANSWER_BOARD_NAME = db.Column(db.Text)
@@ -151,14 +151,14 @@ class ANSWER_FIELD(db.Model):
   ANSWER_FIELD_ID = db.Column(db.String(50), primary_key=True)
   ANSWER_FIELD_DESC = db.Column(db.Text, nullable=True) 
   ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload file 
-  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey("answer_board.ANSWER_BOARD_ID"))
   MCQ_TYPE = db.Column(db.Integer) #4: 4 answer options, 5: 5 answer options 
 
 #ENTITY: ANSWER  
 class ANSWER(db.Model):
     __tablename__ = 'answer'
     ANSWER_ID = db.Column(db.String(50), primary_key=True)
-    ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
+    ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey("answer_field.ANSWER_FIELD_ID"))
     ANSWER_BY = db.Column(db.String(50), nullable=False)
     ANSWER_ON = db.Column(db.DateTime, default=datetime.now)
     ANSWER_CONTENT = db.Column(db.Text)
@@ -167,8 +167,8 @@ class ANSWER(db.Model):
 class CHAT_MESSAGE(db.Model):
   __tablename__ = 'chat_message'
   CHAT_ID = db.Column(db.String(100), primary_key=True)
-  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
-  SENT_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID))
+  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey("answer_board.ANSWER_BOARD_ID"))
+  SENT_BY = db.Column(db.String(50), db.ForeignKey("user_info.USER_ID"))
   MESSAGE_CONTENT = db.Column(db.Text, nullable=True)
   IMAGE_URL = db.Column(db.String(200), nullable=True)
   TIMESTAMP = db.Column(db.DateTime, default=datetime.now)
@@ -178,8 +178,8 @@ class STUDENT_COMMENT(db.Model):
    __tablename__ = 'student_comment'
    STD_COMMENT_ID = db.Column(db.String(100), primary_key=True)
    STD_COMMENT_CONTENT = db.Column(db.Text)
-   ANSWER_ID = db.Column(db.String(50), db.ForeignKey(ANSWER.ANSWER_ID))
-   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+   ANSWER_ID = db.Column(db.String(50), db.ForeignKey("answer.ANSWER_ID"))
+   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey("answer_board.ANSWER_BOARD_ID"))
    STD_COMMENT_BY = db.Column(db.String(50))
 
 #ENTITY: LECTURER_COMMENT
@@ -187,8 +187,8 @@ class LECTURER_COMMENT(db.Model):
    __tablename__ = 'lecturer_comment'
    LEC_COMMENT_ID = db.Column(db.String(100), primary_key=True)
    LEC_COMMENT_CONTENT = db.Column(db.Text)
-   ANSWER_ID = db.Column(db.String(50), db.ForeignKey(ANSWER.ANSWER_ID))
-   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
+   ANSWER_ID = db.Column(db.String(50), db.ForeignKey("answer.ANSWER_ID"))
+   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey("answer_board.ANSWER_BOARD_ID"))
    LEC_COMMENT_BY = db.Column(db.String(50))
 
 #-------------------------------------------------------------------------------------------------------
