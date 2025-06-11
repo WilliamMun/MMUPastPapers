@@ -601,7 +601,7 @@ def view_papers():
     filters = []
     
     if term:
-        filters.append(func.lower(PASTPAPERS_INFO.TERM_ID) == term.lower())
+        filters.append(PASTPAPERS_INFO.TERM_ID == int(term))
     if subject:
         filters.append(func.lower(PASTPAPERS_INFO.SUBJECT_ID) == subject.lower())
     if filename:
@@ -638,7 +638,7 @@ def view_paper(paper_id):
 def download_paper(paper_id):
     paper = db.session.get(PASTPAPERS_INFO,paper_id)
     paper.FILEPATH = paper.FILEPATH.replace('\\','/')
-    
+
     if paper and os.path.exists(paper.FILEPATH):
         # Add the .pdf at the end of FIlename is the original name doesn't have .pdf
         filename = paper.FILENAME
