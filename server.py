@@ -637,7 +637,8 @@ def view_paper(paper_id):
 @app.route('/download_paper/<paper_id>')
 def download_paper(paper_id):
     paper = db.session.get(PASTPAPERS_INFO,paper_id)
-
+    paper.FILEPATH = paper.FILEPATH.replace('\\','/')
+    
     if paper and os.path.exists(paper.FILEPATH):
         # Add the .pdf at the end of FIlename is the original name doesn't have .pdf
         filename = paper.FILENAME
