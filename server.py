@@ -1213,7 +1213,8 @@ def upload_answer_board(class_id):
 @login_required
 def get_pdf(filepath):
     print('Final file path:',filepath)
-    directory = os.path.dirname(filepath)  
+    filepath = filepath.replace('\\', '/')
+    directory = os.path.join(app.root_path, os.path.dirname(filepath))
     file = os.path.basename(filepath)
     print(f"Directory: {directory}, file: {file}")
     return send_from_directory(directory, file, mimetype='application/pdf')
