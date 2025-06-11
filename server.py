@@ -2124,6 +2124,7 @@ def save_comments():
 
     return redirect(url_for('lecturer_view_students_answers', class_id=session.get('current_class_id'), answer_board_id=answer_board_id))
 
+port = int(os.environ.get("PORT", 5000))
 if __name__ == "__main__":
     #app.run(debug=True)
-    socketio.run(app, debug=True)
+    socketio.run(app, host="0.0.0.0", port=port, debug=True)
