@@ -631,7 +631,8 @@ def view_papers():
 @login_required
 def view_paper(paper_id):
     paper = db.session.get(PASTPAPERS_INFO,paper_id)
-    return send_file(paper.FILEPATH, mimetype='application/pdf')
+    filepath = paper.FILEPATH.replace('\\','/')
+    return send_file(filepath, mimetype='application/pdf')
 
 @app.route('/download_paper/<paper_id>')
 def download_paper(paper_id):
