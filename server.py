@@ -45,17 +45,19 @@ os.makedirs(app.config['STUDENT_UPLOADS'], exist_ok=True)
 #Create database tables  
 #ENTITY: FACULTY_INFO  
 class FACULTY_INFO(db.Model): 
+  __tablename__ = 'faculty_info'
   FACULTY_ID = db.Column(db.String(3), primary_key=True) 
   FACULTY_DESC = db.Column(db.Text, nullable=False) 
 
 #ENTITY: STUDY_LVL_INFO  
 class STUDY_LVL_INFO(db.Model): 
+  __tablename__ = 'study_lvl_info'
   STUDY_LVL_ID = db.Column(db.String(4), primary_key=True) 
   STUDY_LVL_DESC = db.Column(db.Text, nullable=False) 
 
 #ENTITY: USER_INFO 
 class USER_INFO(db.Model):  
-  __tablename__ = 'USER_INFO'
+  __tablename__ = 'user_info'
   USER_ID = db.Column(db.String(50), primary_key=True, unique=True) 
   USER_EMAIL = db.Column(db.String(255), unique=True) 
   NAME = db.Column(db.String(200), nullable=False) 
@@ -69,11 +71,13 @@ class USER_INFO(db.Model):
  
 #ENTITY: SECURITY_QUES 
 class SECURITY_QUES(db.Model): 
+  __tablename__ = 'security_ques'
   SECURITY_QUES_ID = db.Column(db.String(100), primary_key=True) 
   SECURITY_QUES_DESC = db.Column(db.Text, nullable=False) 
  
 #ENTITY: SECURITY_QUES_ANS 
 class SECURITY_QUES_ANS(db.Model):
+  __tablename__ = 'security_ques_ans'
   USER_ID =  db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
   SECURITY_QUES_ID = db.Column(db.String(100), db.ForeignKey(SECURITY_QUES.SECURITY_QUES_ID)) 
   ANSWER = db.Column(db.Text) 
@@ -85,6 +89,7 @@ class SECURITY_QUES_ANS(db.Model):
 
 #ENTITY: SUBJECT_INFO  
 class SUBJECT_INFO(db.Model): 
+  __tablename__ = 'subject_info'
   SUBJECT_ID = db.Column(db.String(7), primary_key=True) 
   SUBJECT_DESC = db.Column(db.Text, nullable=False) 
   STUDY_LVL_ID = db.Column(db.String(4), db.ForeignKey(STUDY_LVL_INFO.STUDY_LVL_ID)) 
@@ -92,10 +97,12 @@ class SUBJECT_INFO(db.Model):
  
 #ENTITY: TERM_INFO 
 class TERM_INFO(db.Model): 
+  __tablename__ = 'term_info'
   TERM_ID = db.Column(db.Integer, primary_key=True) 
   TERM_DESC = db.Column(db.Text, nullable=False) 
    
 class PASTPAPERS_INFO(db.Model): 
+  __tablename__ = 'pastpapers_info'
   PAPER_ID = db.Column(db.String(10), primary_key=True) 
   TERM_ID = db.Column(db.Integer, db.ForeignKey(TERM_INFO.TERM_ID)) 
   FILENAME = db.Column(db.Text, nullable=True) 
@@ -109,6 +116,7 @@ class PASTPAPERS_INFO(db.Model):
  
 #ENTITY: CLASS 
 class CLASS(db.Model): 
+  __tablename__ = 'class'
   CLASS_ID = db.Column(db.String(50), primary_key=True) 
   CLASS_NAME = db.Column(db.Text, nullable=False) 
   CREATED_BY = db.Column(db.String(50), nullable=False) 
@@ -121,6 +129,7 @@ class CLASS(db.Model):
 
 #ENTITY: USER_CLASS 
 class USER_CLASS(db.Model): 
+  __tablename__ = 'user_class'
   USER_ID = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID)) 
   CLASS_ID = db.Column(db.String(50), db.ForeignKey(CLASS.CLASS_ID)) 
   JOINED_AT = db.Column(db.DateTime, default=datetime.now) 
@@ -128,7 +137,7 @@ class USER_CLASS(db.Model):
   __table_args__ = (db.PrimaryKeyConstraint('USER_ID','CLASS_ID'),)
 
 class ANSWER_BOARD(db.Model): 
-  __tablename__ = 'ANSWER_BOARD'
+  __tablename__ = 'answer_board'
   ANSWER_BOARD_ID = db.Column(db.String(50), primary_key=True) 
   PAPER_ID = db.Column(db.String(50), db.ForeignKey('PASTPAPERS_INFO.PAPER_ID')) 
   CLASS_ID = db.Column(db.String(50), db.ForeignKey('CLASS.CLASS_ID')) 
@@ -138,6 +147,7 @@ class ANSWER_BOARD(db.Model):
  
 #ENTITY: ANSWER_FIELD 
 class ANSWER_FIELD(db.Model): 
+  __tablename__ = 'answer_field'
   ANSWER_FIELD_ID = db.Column(db.String(50), primary_key=True)
   ANSWER_FIELD_DESC = db.Column(db.Text, nullable=True) 
   ANSWER_FIELD_TYPE = db.Column(db.Integer, nullable=False) #1: Text field, 2: MCQ, 3: Upload file 
@@ -146,8 +156,7 @@ class ANSWER_FIELD(db.Model):
 
 #ENTITY: ANSWER  
 class ANSWER(db.Model):
-    __tablename__ = 'ANSWER'
-
+    __tablename__ = 'answer'
     ANSWER_ID = db.Column(db.String(50), primary_key=True)
     ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
     ANSWER_BY = db.Column(db.String(50), nullable=False)
@@ -156,6 +165,7 @@ class ANSWER(db.Model):
  
 #ENTITY: CHAT_MESSAGE
 class CHAT_MESSAGE(db.Model):
+  __tablename__ = 'chat_message'
   CHAT_ID = db.Column(db.String(100), primary_key=True)
   ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID))
   SENT_BY = db.Column(db.String(50), db.ForeignKey(USER_INFO.USER_ID))
@@ -165,6 +175,7 @@ class CHAT_MESSAGE(db.Model):
 
 #ENTITY: STUDENT_COMMENT 
 class STUDENT_COMMENT(db.Model):
+   __tablename__ = 'student_comment'
    STD_COMMENT_ID = db.Column(db.String(100), primary_key=True)
    STD_COMMENT_CONTENT = db.Column(db.Text)
    ANSWER_ID = db.Column(db.String(50), db.ForeignKey(ANSWER.ANSWER_ID))
@@ -173,6 +184,7 @@ class STUDENT_COMMENT(db.Model):
 
 #ENTITY: LECTURER_COMMENT
 class LECTURER_COMMENT(db.Model):
+   __tablename__ = 'lecturer_comment'
    LEC_COMMENT_ID = db.Column(db.String(100), primary_key=True)
    LEC_COMMENT_CONTENT = db.Column(db.Text)
    ANSWER_ID = db.Column(db.String(50), db.ForeignKey(ANSWER.ANSWER_ID))
