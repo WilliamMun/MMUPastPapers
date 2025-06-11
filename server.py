@@ -24,7 +24,7 @@ import socketio
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 app.secret_key = "MmUPastPap3rs2510@CSP1123"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mmupastpapers.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['UPLOAD_FOLDER'] = "uploads"
 app.config['CHAT_IMG_FOLDER'] = "static/chat"
 app.config['STUDENT_UPLOADS'] = "static/student_uploads"
@@ -153,24 +153,7 @@ class ANSWER(db.Model):
     ANSWER_BY = db.Column(db.String(50), nullable=False)
     ANSWER_ON = db.Column(db.DateTime, default=datetime.now)
     ANSWER_CONTENT = db.Column(db.Text)
-
-
-#ENTITY: DISCUSSION_FORUM 
-class DISCUSSION_FORUM(db.Model): 
-  COMMENT_ID = db.Column(db.String(100), primary_key=True) 
-  COMMENT = db.Column(db.Text) 
-  ANSWER_BOARD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_BOARD.ANSWER_BOARD_ID)) 
-  POSTED_BY = db.Column(db.String(50), nullable=False) 
-  POSTED_ON = db.Column(db.DateTime, default=datetime.now)
-  
-
-#ENTITY: MCQ_OPTION
-class MCQ_OPTION(db.Model):
-   MCQ_OPTION_ID = db.Column(db.String(50), primary_key=True)
-   MCQ_OPTION_DESC = db.Column(db.Text)
-   MCQ_OPTION_FLAG = db.Column(db.Integer, nullable=True)
-   ANSWER_FIELD_ID = db.Column(db.String(50), db.ForeignKey(ANSWER_FIELD.ANSWER_FIELD_ID))
-  
+ 
 #ENTITY: CHAT_MESSAGE
 class CHAT_MESSAGE(db.Model):
   CHAT_ID = db.Column(db.String(100), primary_key=True)
