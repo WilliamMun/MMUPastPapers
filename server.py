@@ -24,7 +24,7 @@ import socketio
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 app.secret_key = "MmUPastPap3rs2510@CSP1123"
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URI")
 app.config['UPLOAD_FOLDER'] = "uploads"
 app.config['CHAT_IMG_FOLDER'] = "static/chat"
 app.config['STUDENT_UPLOADS'] = "static/student_uploads"
