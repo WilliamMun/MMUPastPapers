@@ -2749,9 +2749,8 @@ tr:hover {
 .lec-view-ans-box {
   background: white;
   padding: 40px;
-  /* Adjust this to make the main box wider */
-  max-width: 1000px; /* Example: A common max-width for desktop view */
-  width: 95%; /* This ensures it's still responsive on smaller screens */
+  max-width: 1000px;
+  width: 95%;
   margin: 40px auto;
   border-radius: 20px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
@@ -2868,12 +2867,34 @@ tr:hover {
 }
 
 /** Choose Class Theme Page Settings **/
+.select-class-theme-box{
+  background: white;
+  padding: 40px;
+  width: auto;
+  height: auto;
+  max-width: 90%;
+  margin: 40px auto;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.select-class-theme-box label{
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: left;
+
+}
+
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
   max-width: 1000px;
   margin: auto;
+  margin-bottom: 1rem;
 }
 
 .photo-container {
