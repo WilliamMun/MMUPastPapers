@@ -592,7 +592,7 @@ def view_papers():
 
     print(f"Term: {term}, Subject: {subject}, Filename: {filename}, Desc: {description}")
     page = request.args.get('page', 1, type=int)
-    per_page = 5
+    per_page = 10
 
     # Base query
     query = PASTPAPERS_INFO.query
